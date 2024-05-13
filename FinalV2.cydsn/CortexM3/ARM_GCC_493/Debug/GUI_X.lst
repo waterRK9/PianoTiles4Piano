@@ -1,0 +1,1787 @@
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"GUI_X.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.text.GUI_X_Systick_Intr,"ax",%progbits
+  19              		.align	2
+  20              		.global	GUI_X_Systick_Intr
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	GUI_X_Systick_Intr, %function
+  24              	GUI_X_Systick_Intr:
+  25              	.LFB74:
+  26              		.file 1 ".\\GUI_X.c"
+   1:.\GUI_X.c     **** /*********************************************************************
+   2:.\GUI_X.c     **** *                SEGGER Microcontroller GmbH & Co. KG                *
+   3:.\GUI_X.c     **** *        Solutions for real time microcontroller applications        *
+   4:.\GUI_X.c     **** **********************************************************************
+   5:.\GUI_X.c     **** *                                                                    *
+   6:.\GUI_X.c     **** *        (c) 1996 - 2017  SEGGER Microcontroller GmbH & Co. KG       *
+   7:.\GUI_X.c     **** *                                                                    *
+   8:.\GUI_X.c     **** *        Internet: www.segger.com    Support:  support@segger.com    *
+   9:.\GUI_X.c     **** *                                                                    *
+  10:.\GUI_X.c     **** **********************************************************************
+  11:.\GUI_X.c     **** 
+  12:.\GUI_X.c     **** ** emWin V5.46 - Graphical user interface for embedded applications **
+  13:.\GUI_X.c     **** All  Intellectual Property rights  in the Software belongs to  SEGGER.
+  14:.\GUI_X.c     **** emWin is protected by  international copyright laws.  Knowledge of the
+  15:.\GUI_X.c     **** source code may not be used to write a similar product.  This file may
+  16:.\GUI_X.c     **** only be used in accordance with the following terms:
+  17:.\GUI_X.c     **** 
+  18:.\GUI_X.c     **** The software  has been licensed to  Cypress Semiconductor Corporation,
+  19:.\GUI_X.c     **** whose registered  office is situated  at 198 Champion Ct. San Jose, CA 
+  20:.\GUI_X.c     **** 95134 USA  solely for the  purposes of creating  libraries for Cypress
+  21:.\GUI_X.c     **** PSoC3 and  PSoC5 processor-based devices,  sublicensed and distributed
+  22:.\GUI_X.c     **** under  the  terms  and  conditions  of  the  Cypress  End User License
+  23:.\GUI_X.c     **** Agreement.
+  24:.\GUI_X.c     **** Full source code is available at: www.segger.com
+  25:.\GUI_X.c     **** 
+  26:.\GUI_X.c     **** We appreciate your understanding and fairness.
+  27:.\GUI_X.c     **** ----------------------------------------------------------------------
+  28:.\GUI_X.c     **** Licensing information
+  29:.\GUI_X.c     **** Licensor:                 SEGGER Microcontroller Systems LLC
+  30:.\GUI_X.c     **** Licensed to:              Cypress Semiconductor Corp, 198 Champion Ct., San Jose, CA 95134, USA
+  31:.\GUI_X.c     **** Licensed SEGGER software: emWin
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 2
+
+
+  32:.\GUI_X.c     **** License number:           GUI-00319
+  33:.\GUI_X.c     **** License model:            Services and License Agreement, signed June 10th, 2009
+  34:.\GUI_X.c     **** Licensed platform:        Any Cypress platform (Initial targets are: PSoC3, PSoC5)
+  35:.\GUI_X.c     **** ----------------------------------------------------------------------
+  36:.\GUI_X.c     **** Support and Update Agreement (SUA)
+  37:.\GUI_X.c     **** SUA period:               2009-06-12 - 2022-07-27
+  38:.\GUI_X.c     **** Contact to extend SUA:    sales@segger.com
+  39:.\GUI_X.c     **** ----------------------------------------------------------------------
+  40:.\GUI_X.c     **** File        : GUI_X.C
+  41:.\GUI_X.c     **** Purpose     : Config / System dependent externals for GUI
+  42:.\GUI_X.c     **** ---------------------------END-OF-HEADER------------------------------
+  43:.\GUI_X.c     **** */
+  44:.\GUI_X.c     **** 
+  45:.\GUI_X.c     **** #include "GUI.h"
+  46:.\GUI_X.c     **** 
+  47:.\GUI_X.c     **** #include "project.h"
+  48:.\GUI_X.c     **** 
+  49:.\GUI_X.c     **** /*********************************************************************
+  50:.\GUI_X.c     **** *
+  51:.\GUI_X.c     **** *       Function Prototypes
+  52:.\GUI_X.c     **** */
+  53:.\GUI_X.c     **** void GUI_X_Systick_Init(void);
+  54:.\GUI_X.c     **** 
+  55:.\GUI_X.c     **** /*********************************************************************
+  56:.\GUI_X.c     **** *
+  57:.\GUI_X.c     **** *       Global data
+  58:.\GUI_X.c     **** */
+  59:.\GUI_X.c     **** volatile GUI_TIMER_TIME OS_TimeMS;
+  60:.\GUI_X.c     **** 
+  61:.\GUI_X.c     **** /*********************************************************************
+  62:.\GUI_X.c     **** *
+  63:.\GUI_X.c     **** *      Timing:
+  64:.\GUI_X.c     **** *                 GUI_X_GetTime()
+  65:.\GUI_X.c     **** *                 GUI_X_Delay(int)
+  66:.\GUI_X.c     **** *
+  67:.\GUI_X.c     **** *   Some timing dependent routines require a GetTime
+  68:.\GUI_X.c     **** *   and delay function. Default time unit (tick), normally is
+  69:.\GUI_X.c     **** *   1 ms.
+  70:.\GUI_X.c     **** */
+  71:.\GUI_X.c     **** 
+  72:.\GUI_X.c     **** GUI_TIMER_TIME GUI_X_GetTime(void) { 
+  73:.\GUI_X.c     ****   return OS_TimeMS; 
+  74:.\GUI_X.c     **** }
+  75:.\GUI_X.c     **** 
+  76:.\GUI_X.c     **** void GUI_X_Delay(int ms) { 
+  77:.\GUI_X.c     ****   int tEnd = OS_TimeMS + ms;
+  78:.\GUI_X.c     ****   while ((tEnd - OS_TimeMS) > 0);
+  79:.\GUI_X.c     **** }
+  80:.\GUI_X.c     **** 
+  81:.\GUI_X.c     **** /*********************************************************************
+  82:.\GUI_X.c     **** *
+  83:.\GUI_X.c     **** *       GUI_X_Init()
+  84:.\GUI_X.c     **** *
+  85:.\GUI_X.c     **** * Note:
+  86:.\GUI_X.c     **** *     GUI_X_Init() is called from GUI_Init is a possibility to init
+  87:.\GUI_X.c     **** *     some hardware which needs to be up and running before the GUI.
+  88:.\GUI_X.c     **** */
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 3
+
+
+  89:.\GUI_X.c     **** void GUI_X_Init(void) {
+  90:.\GUI_X.c     ****   GUI_X_Systick_Init();
+  91:.\GUI_X.c     **** }
+  92:.\GUI_X.c     **** 
+  93:.\GUI_X.c     **** 
+  94:.\GUI_X.c     **** /*********************************************************************
+  95:.\GUI_X.c     **** *
+  96:.\GUI_X.c     **** *       GUI_X_ExecIdle
+  97:.\GUI_X.c     **** *
+  98:.\GUI_X.c     **** * Note:
+  99:.\GUI_X.c     **** *  Called if WM is in idle state
+ 100:.\GUI_X.c     **** */
+ 101:.\GUI_X.c     **** void GUI_X_ExecIdle(void) {}
+ 102:.\GUI_X.c     **** 
+ 103:.\GUI_X.c     **** /*********************************************************************
+ 104:.\GUI_X.c     **** *
+ 105:.\GUI_X.c     **** *      Logging: OS dependent
+ 106:.\GUI_X.c     **** 
+ 107:.\GUI_X.c     **** Note:
+ 108:.\GUI_X.c     ****   Logging is used in higher debug levels only. The typical target
+ 109:.\GUI_X.c     ****   build does not use logging and does therefor not require any of
+ 110:.\GUI_X.c     ****   the logging routines below. For a release build without logging
+ 111:.\GUI_X.c     ****   the routines below may be eliminated to save some space.
+ 112:.\GUI_X.c     ****   (If the linker is not function aware and eliminates unreferenced
+ 113:.\GUI_X.c     ****   functions automatically)
+ 114:.\GUI_X.c     **** 
+ 115:.\GUI_X.c     **** */
+ 116:.\GUI_X.c     **** 
+ 117:.\GUI_X.c     **** void GUI_X_Log     (const char *s) { GUI_USE_PARA(s); }
+ 118:.\GUI_X.c     **** void GUI_X_Warn    (const char *s) { GUI_USE_PARA(s); }
+ 119:.\GUI_X.c     **** void GUI_X_ErrorOut(const char *s) { GUI_USE_PARA(s); }
+ 120:.\GUI_X.c     **** 
+ 121:.\GUI_X.c     **** /*********************************************************************
+ 122:.\GUI_X.c     **** *
+ 123:.\GUI_X.c     **** *         Setup Systick for timing
+ 124:.\GUI_X.c     **** *
+ 125:.\GUI_X.c     **** */
+ 126:.\GUI_X.c     **** /*********************************************************************
+ 127:.\GUI_X.c     **** *
+ 128:.\GUI_X.c     **** *       GUI_X_Systick_Intr
+ 129:.\GUI_X.c     **** *
+ 130:.\GUI_X.c     **** * Purpose:
+ 131:.\GUI_X.c     **** *   Interrupt Service Routine for Systick.
+ 132:.\GUI_X.c     **** */
+ 133:.\GUI_X.c     **** void GUI_X_Systick_Intr(void){    
+  27              		.loc 1 133 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+ 134:.\GUI_X.c     ****   OS_TimeMS++;
+  32              		.loc 1 134 0
+  33 0000 024A     		ldr	r2, .L2
+  34 0002 1368     		ldr	r3, [r2]
+  35 0004 0133     		adds	r3, r3, #1
+  36 0006 1360     		str	r3, [r2]
+  37 0008 7047     		bx	lr
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 4
+
+
+  38              	.L3:
+  39 000a 00BF     		.align	2
+  40              	.L2:
+  41 000c 00000000 		.word	OS_TimeMS
+  42              		.cfi_endproc
+  43              	.LFE74:
+  44              		.size	GUI_X_Systick_Intr, .-GUI_X_Systick_Intr
+  45              		.section	.text.GUI_X_GetTime,"ax",%progbits
+  46              		.align	2
+  47              		.global	GUI_X_GetTime
+  48              		.thumb
+  49              		.thumb_func
+  50              		.type	GUI_X_GetTime, %function
+  51              	GUI_X_GetTime:
+  52              	.LFB67:
+  72:.\GUI_X.c     ****   return OS_TimeMS; 
+  53              		.loc 1 72 0
+  54              		.cfi_startproc
+  55              		@ args = 0, pretend = 0, frame = 0
+  56              		@ frame_needed = 0, uses_anonymous_args = 0
+  57              		@ link register save eliminated.
+  73:.\GUI_X.c     **** }
+  58              		.loc 1 73 0
+  59 0000 014B     		ldr	r3, .L5
+  60 0002 1868     		ldr	r0, [r3]
+  74:.\GUI_X.c     **** 
+  61              		.loc 1 74 0
+  62 0004 7047     		bx	lr
+  63              	.L6:
+  64 0006 00BF     		.align	2
+  65              	.L5:
+  66 0008 00000000 		.word	OS_TimeMS
+  67              		.cfi_endproc
+  68              	.LFE67:
+  69              		.size	GUI_X_GetTime, .-GUI_X_GetTime
+  70              		.section	.text.GUI_X_Delay,"ax",%progbits
+  71              		.align	2
+  72              		.global	GUI_X_Delay
+  73              		.thumb
+  74              		.thumb_func
+  75              		.type	GUI_X_Delay, %function
+  76              	GUI_X_Delay:
+  77              	.LFB68:
+  76:.\GUI_X.c     ****   int tEnd = OS_TimeMS + ms;
+  78              		.loc 1 76 0
+  79              		.cfi_startproc
+  80              		@ args = 0, pretend = 0, frame = 0
+  81              		@ frame_needed = 0, uses_anonymous_args = 0
+  82              		@ link register save eliminated.
+  83              	.LVL0:
+  77:.\GUI_X.c     ****   while ((tEnd - OS_TimeMS) > 0);
+  84              		.loc 1 77 0
+  85 0000 044B     		ldr	r3, .L9
+  86 0002 1B68     		ldr	r3, [r3]
+  87 0004 1844     		add	r0, r0, r3
+  88              	.LVL1:
+  89              	.L8:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 5
+
+
+  78:.\GUI_X.c     **** }
+  90              		.loc 1 78 0 discriminator 1
+  91 0006 034B     		ldr	r3, .L9
+  92 0008 1B68     		ldr	r3, [r3]
+  93 000a C31A     		subs	r3, r0, r3
+  94 000c 002B     		cmp	r3, #0
+  95 000e FADC     		bgt	.L8
+  79:.\GUI_X.c     **** 
+  96              		.loc 1 79 0
+  97 0010 7047     		bx	lr
+  98              	.L10:
+  99 0012 00BF     		.align	2
+ 100              	.L9:
+ 101 0014 00000000 		.word	OS_TimeMS
+ 102              		.cfi_endproc
+ 103              	.LFE68:
+ 104              		.size	GUI_X_Delay, .-GUI_X_Delay
+ 105              		.section	.text.GUI_X_ExecIdle,"ax",%progbits
+ 106              		.align	2
+ 107              		.global	GUI_X_ExecIdle
+ 108              		.thumb
+ 109              		.thumb_func
+ 110              		.type	GUI_X_ExecIdle, %function
+ 111              	GUI_X_ExecIdle:
+ 112              	.LFB70:
+ 101:.\GUI_X.c     **** 
+ 113              		.loc 1 101 0
+ 114              		.cfi_startproc
+ 115              		@ args = 0, pretend = 0, frame = 0
+ 116              		@ frame_needed = 0, uses_anonymous_args = 0
+ 117              		@ link register save eliminated.
+ 118 0000 7047     		bx	lr
+ 119              		.cfi_endproc
+ 120              	.LFE70:
+ 121              		.size	GUI_X_ExecIdle, .-GUI_X_ExecIdle
+ 122 0002 00BF     		.section	.text.GUI_X_Log,"ax",%progbits
+ 123              		.align	2
+ 124              		.global	GUI_X_Log
+ 125              		.thumb
+ 126              		.thumb_func
+ 127              		.type	GUI_X_Log, %function
+ 128              	GUI_X_Log:
+ 129              	.LFB71:
+ 117:.\GUI_X.c     **** void GUI_X_Warn    (const char *s) { GUI_USE_PARA(s); }
+ 130              		.loc 1 117 0
+ 131              		.cfi_startproc
+ 132              		@ args = 0, pretend = 0, frame = 0
+ 133              		@ frame_needed = 0, uses_anonymous_args = 0
+ 134              		@ link register save eliminated.
+ 135              	.LVL2:
+ 136 0000 7047     		bx	lr
+ 137              		.cfi_endproc
+ 138              	.LFE71:
+ 139              		.size	GUI_X_Log, .-GUI_X_Log
+ 140 0002 00BF     		.section	.text.GUI_X_Warn,"ax",%progbits
+ 141              		.align	2
+ 142              		.global	GUI_X_Warn
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 6
+
+
+ 143              		.thumb
+ 144              		.thumb_func
+ 145              		.type	GUI_X_Warn, %function
+ 146              	GUI_X_Warn:
+ 147              	.LFB72:
+ 118:.\GUI_X.c     **** void GUI_X_ErrorOut(const char *s) { GUI_USE_PARA(s); }
+ 148              		.loc 1 118 0
+ 149              		.cfi_startproc
+ 150              		@ args = 0, pretend = 0, frame = 0
+ 151              		@ frame_needed = 0, uses_anonymous_args = 0
+ 152              		@ link register save eliminated.
+ 153              	.LVL3:
+ 154 0000 7047     		bx	lr
+ 155              		.cfi_endproc
+ 156              	.LFE72:
+ 157              		.size	GUI_X_Warn, .-GUI_X_Warn
+ 158 0002 00BF     		.section	.text.GUI_X_ErrorOut,"ax",%progbits
+ 159              		.align	2
+ 160              		.global	GUI_X_ErrorOut
+ 161              		.thumb
+ 162              		.thumb_func
+ 163              		.type	GUI_X_ErrorOut, %function
+ 164              	GUI_X_ErrorOut:
+ 165              	.LFB73:
+ 119:.\GUI_X.c     **** 
+ 166              		.loc 1 119 0
+ 167              		.cfi_startproc
+ 168              		@ args = 0, pretend = 0, frame = 0
+ 169              		@ frame_needed = 0, uses_anonymous_args = 0
+ 170              		@ link register save eliminated.
+ 171              	.LVL4:
+ 172 0000 7047     		bx	lr
+ 173              		.cfi_endproc
+ 174              	.LFE73:
+ 175              		.size	GUI_X_ErrorOut, .-GUI_X_ErrorOut
+ 176 0002 00BF     		.section	.text.GUI_X_Systick_Init,"ax",%progbits
+ 177              		.align	2
+ 178              		.global	GUI_X_Systick_Init
+ 179              		.thumb
+ 180              		.thumb_func
+ 181              		.type	GUI_X_Systick_Init, %function
+ 182              	GUI_X_Systick_Init:
+ 183              	.LFB75:
+ 135:.\GUI_X.c     **** }
+ 136:.\GUI_X.c     **** 
+ 137:.\GUI_X.c     **** /*********************************************************************
+ 138:.\GUI_X.c     **** *
+ 139:.\GUI_X.c     **** *       GUI_X_Systick_Init()
+ 140:.\GUI_X.c     **** *
+ 141:.\GUI_X.c     **** * Purpose:
+ 142:.\GUI_X.c     **** *   Sets up the Systick interrupt and enable it.
+ 143:.\GUI_X.c     **** */
+ 144:.\GUI_X.c     **** void GUI_X_Systick_Init(void){  
+ 184              		.loc 1 144 0
+ 185              		.cfi_startproc
+ 186              		@ args = 0, pretend = 0, frame = 0
+ 187              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 7
+
+
+ 188              		.loc 1 144 0
+ 189 0000 10B5     		push	{r4, lr}
+ 190              		.cfi_def_cfa_offset 8
+ 191              		.cfi_offset 4, -8
+ 192              		.cfi_offset 14, -4
+ 145:.\GUI_X.c     ****   uint32_t i; 
+ 146:.\GUI_X.c     ****   CySysTickStart();
+ 193              		.loc 1 146 0
+ 194 0002 FFF7FEFF 		bl	CySysTickStart
+ 195              	.LVL5:
+ 147:.\GUI_X.c     ****   //
+ 148:.\GUI_X.c     ****   // Find unused callback slot.
+ 149:.\GUI_X.c     ****   //
+ 150:.\GUI_X.c     ****     for (i = 0u; i < CY_SYS_SYST_NUM_OF_CALLBACKS; i++)
+ 196              		.loc 1 150 0
+ 197 0006 0024     		movs	r4, #0
+ 198 0008 09E0     		b	.L16
+ 199              	.LVL6:
+ 200              	.L19:
+ 151:.\GUI_X.c     ****     {
+ 152:.\GUI_X.c     ****         if (CySysTickGetCallback(i) == NULL)
+ 201              		.loc 1 152 0
+ 202 000a 2046     		mov	r0, r4
+ 203 000c FFF7FEFF 		bl	CySysTickGetCallback
+ 204              	.LVL7:
+ 205 0010 20B9     		cbnz	r0, .L17
+ 153:.\GUI_X.c     ****         {
+ 154:.\GUI_X.c     ****             CySysTickSetCallback(i, GUI_X_Systick_Intr);
+ 206              		.loc 1 154 0
+ 207 0012 2046     		mov	r0, r4
+ 208 0014 0649     		ldr	r1, .L22
+ 209 0016 FFF7FEFF 		bl	CySysTickSetCallback
+ 210              	.LVL8:
+ 155:.\GUI_X.c     ****             break;
+ 211              		.loc 1 155 0
+ 212 001a 02E0     		b	.L18
+ 213              	.L17:
+ 150:.\GUI_X.c     ****     {
+ 214              		.loc 1 150 0 discriminator 2
+ 215 001c 0134     		adds	r4, r4, #1
+ 216              	.LVL9:
+ 217              	.L16:
+ 150:.\GUI_X.c     ****     {
+ 218              		.loc 1 150 0 is_stmt 0 discriminator 1
+ 219 001e 042C     		cmp	r4, #4
+ 220 0020 F3D9     		bls	.L19
+ 221              	.L18:
+ 156:.\GUI_X.c     ****         }
+ 157:.\GUI_X.c     ****     }
+ 158:.\GUI_X.c     ****     
+ 159:.\GUI_X.c     ****     CYASSERT(i < CY_SYS_SYST_NUM_OF_CALLBACKS);
+ 222              		.loc 1 159 0 is_stmt 1
+ 223 0022 042C     		cmp	r4, #4
+ 224 0024 02D9     		bls	.L15
+ 225              		.loc 1 159 0 is_stmt 0 discriminator 1
+ 226 0026 0020     		movs	r0, #0
+ 227 0028 FFF7FEFF 		bl	CyHalt
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 8
+
+
+ 228              	.LVL10:
+ 229              	.L15:
+ 230 002c 10BD     		pop	{r4, pc}
+ 231              	.LVL11:
+ 232              	.L23:
+ 233 002e 00BF     		.align	2
+ 234              	.L22:
+ 235 0030 00000000 		.word	GUI_X_Systick_Intr
+ 236              		.cfi_endproc
+ 237              	.LFE75:
+ 238              		.size	GUI_X_Systick_Init, .-GUI_X_Systick_Init
+ 239              		.section	.text.GUI_X_Init,"ax",%progbits
+ 240              		.align	2
+ 241              		.global	GUI_X_Init
+ 242              		.thumb
+ 243              		.thumb_func
+ 244              		.type	GUI_X_Init, %function
+ 245              	GUI_X_Init:
+ 246              	.LFB69:
+  89:.\GUI_X.c     ****   GUI_X_Systick_Init();
+ 247              		.loc 1 89 0 is_stmt 1
+ 248              		.cfi_startproc
+ 249              		@ args = 0, pretend = 0, frame = 0
+ 250              		@ frame_needed = 0, uses_anonymous_args = 0
+ 251 0000 08B5     		push	{r3, lr}
+ 252              		.cfi_def_cfa_offset 8
+ 253              		.cfi_offset 3, -8
+ 254              		.cfi_offset 14, -4
+  90:.\GUI_X.c     **** }
+ 255              		.loc 1 90 0
+ 256 0002 FFF7FEFF 		bl	GUI_X_Systick_Init
+ 257              	.LVL12:
+ 258 0006 08BD     		pop	{r3, pc}
+ 259              		.cfi_endproc
+ 260              	.LFE69:
+ 261              		.size	GUI_X_Init, .-GUI_X_Init
+ 262              		.comm	OS_TimeMS,4,4
+ 263              		.comm	NP_g_nFrameBufferSize,4,4
+ 264              		.comm	NP_g_pFrameBuffer,4,4
+ 265              		.comm	NP_g_bOwnsBuffer,1,1
+ 266              		.comm	NP_g_nDMA_TD,1,1
+ 267              		.comm	NP_g_nDMA_Chan,1,1
+ 268              		.comm	NP_g_nNumberOfPixels,4,4
+ 269              		.text
+ 270              	.Letext0:
+ 271              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+ 272              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+ 273              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 274              		.file 5 "Generated_Source\\PSoC5/CyLib.h"
+ 275              		.file 6 "Generated_Source\\PSoC5/NP_funcs.h"
+ 276              		.file 7 ".\\Core\\Include/cmsis_gcc.h"
+ 277              		.file 8 ".\\Core\\Include/core_cm3.h"
+ 278              		.section	.debug_info,"",%progbits
+ 279              	.Ldebug_info0:
+ 280 0000 C1030000 		.4byte	0x3c1
+ 281 0004 0400     		.2byte	0x4
+ 282 0006 00000000 		.4byte	.Ldebug_abbrev0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 9
+
+
+ 283 000a 04       		.byte	0x4
+ 284 000b 01       		.uleb128 0x1
+ 285 000c A5020000 		.4byte	.LASF47
+ 286 0010 01       		.byte	0x1
+ 287 0011 30010000 		.4byte	.LASF48
+ 288 0015 A0010000 		.4byte	.LASF49
+ 289 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 290 001d 00000000 		.4byte	0
+ 291 0021 00000000 		.4byte	.Ldebug_line0
+ 292 0025 02       		.uleb128 0x2
+ 293 0026 04       		.byte	0x4
+ 294 0027 05       		.byte	0x5
+ 295 0028 696E7400 		.ascii	"int\000"
+ 296 002c 03       		.uleb128 0x3
+ 297 002d 04       		.byte	0x4
+ 298 002e 07       		.byte	0x7
+ 299 002f 93010000 		.4byte	.LASF0
+ 300 0033 03       		.uleb128 0x3
+ 301 0034 04       		.byte	0x4
+ 302 0035 07       		.byte	0x7
+ 303 0036 08010000 		.4byte	.LASF1
+ 304 003a 03       		.uleb128 0x3
+ 305 003b 02       		.byte	0x2
+ 306 003c 05       		.byte	0x5
+ 307 003d 7A000000 		.4byte	.LASF2
+ 308 0041 03       		.uleb128 0x3
+ 309 0042 01       		.byte	0x1
+ 310 0043 08       		.byte	0x8
+ 311 0044 EF010000 		.4byte	.LASF3
+ 312 0048 03       		.uleb128 0x3
+ 313 0049 01       		.byte	0x1
+ 314 004a 08       		.byte	0x8
+ 315 004b C6000000 		.4byte	.LASF4
+ 316 004f 04       		.uleb128 0x4
+ 317 0050 03       		.uleb128 0x3
+ 318 0051 04       		.byte	0x4
+ 319 0052 05       		.byte	0x5
+ 320 0053 54000000 		.4byte	.LASF5
+ 321 0057 05       		.uleb128 0x5
+ 322 0058 04       		.byte	0x4
+ 323 0059 4F000000 		.4byte	0x4f
+ 324 005d 05       		.uleb128 0x5
+ 325 005e 04       		.byte	0x4
+ 326 005f 63000000 		.4byte	0x63
+ 327 0063 06       		.uleb128 0x6
+ 328 0064 41000000 		.4byte	0x41
+ 329 0068 03       		.uleb128 0x3
+ 330 0069 02       		.byte	0x2
+ 331 006a 07       		.byte	0x7
+ 332 006b 5D000000 		.4byte	.LASF6
+ 333 006f 03       		.uleb128 0x3
+ 334 0070 01       		.byte	0x1
+ 335 0071 06       		.byte	0x6
+ 336 0072 71030000 		.4byte	.LASF7
+ 337 0076 03       		.uleb128 0x3
+ 338 0077 04       		.byte	0x4
+ 339 0078 07       		.byte	0x7
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 10
+
+
+ 340 0079 1F020000 		.4byte	.LASF8
+ 341 007d 07       		.uleb128 0x7
+ 342 007e 70000000 		.4byte	.LASF9
+ 343 0082 02       		.byte	0x2
+ 344 0083 3F       		.byte	0x3f
+ 345 0084 50000000 		.4byte	0x50
+ 346 0088 07       		.uleb128 0x7
+ 347 0089 72010000 		.4byte	.LASF10
+ 348 008d 02       		.byte	0x2
+ 349 008e 41       		.byte	0x41
+ 350 008f 33000000 		.4byte	0x33
+ 351 0093 03       		.uleb128 0x3
+ 352 0094 08       		.byte	0x8
+ 353 0095 05       		.byte	0x5
+ 354 0096 2D020000 		.4byte	.LASF11
+ 355 009a 03       		.uleb128 0x3
+ 356 009b 08       		.byte	0x8
+ 357 009c 07       		.byte	0x7
+ 358 009d AF000000 		.4byte	.LASF12
+ 359 00a1 07       		.uleb128 0x7
+ 360 00a2 17020000 		.4byte	.LASF13
+ 361 00a6 03       		.byte	0x3
+ 362 00a7 2C       		.byte	0x2c
+ 363 00a8 7D000000 		.4byte	0x7d
+ 364 00ac 07       		.uleb128 0x7
+ 365 00ad 3E030000 		.4byte	.LASF14
+ 366 00b1 03       		.byte	0x3
+ 367 00b2 2D       		.byte	0x2d
+ 368 00b3 88000000 		.4byte	0x88
+ 369 00b7 08       		.uleb128 0x8
+ 370 00b8 91020000 		.4byte	.LASF15
+ 371 00bc 04       		.byte	0x4
+ 372 00bd 9201     		.2byte	0x192
+ 373 00bf 48000000 		.4byte	0x48
+ 374 00c3 08       		.uleb128 0x8
+ 375 00c4 7D010000 		.4byte	.LASF16
+ 376 00c8 04       		.byte	0x4
+ 377 00c9 9401     		.2byte	0x194
+ 378 00cb 33000000 		.4byte	0x33
+ 379 00cf 03       		.uleb128 0x3
+ 380 00d0 04       		.byte	0x4
+ 381 00d1 04       		.byte	0x4
+ 382 00d2 9E000000 		.4byte	.LASF17
+ 383 00d6 03       		.uleb128 0x3
+ 384 00d7 08       		.byte	0x8
+ 385 00d8 04       		.byte	0x4
+ 386 00d9 5E010000 		.4byte	.LASF18
+ 387 00dd 09       		.uleb128 0x9
+ 388 00de B7000000 		.4byte	0xb7
+ 389 00e2 07       		.uleb128 0x7
+ 390 00e3 3B020000 		.4byte	.LASF19
+ 391 00e7 05       		.byte	0x5
+ 392 00e8 AC       		.byte	0xac
+ 393 00e9 57000000 		.4byte	0x57
+ 394 00ed 0A       		.uleb128 0xa
+ 395 00ee 37000000 		.4byte	.LASF20
+ 396 00f2 01       		.byte	0x1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 11
+
+
+ 397 00f3 85       		.byte	0x85
+ 398 00f4 00000000 		.4byte	.LFB74
+ 399 00f8 10000000 		.4byte	.LFE74-.LFB74
+ 400 00fc 01       		.uleb128 0x1
+ 401 00fd 9C       		.byte	0x9c
+ 402 00fe 0B       		.uleb128 0xb
+ 403 00ff 97020000 		.4byte	.LASF50
+ 404 0103 01       		.byte	0x1
+ 405 0104 48       		.byte	0x48
+ 406 0105 25000000 		.4byte	0x25
+ 407 0109 00000000 		.4byte	.LFB67
+ 408 010d 0C000000 		.4byte	.LFE67-.LFB67
+ 409 0111 01       		.uleb128 0x1
+ 410 0112 9C       		.byte	0x9c
+ 411 0113 0C       		.uleb128 0xc
+ 412 0114 4D020000 		.4byte	.LASF22
+ 413 0118 01       		.byte	0x1
+ 414 0119 4C       		.byte	0x4c
+ 415 011a 00000000 		.4byte	.LFB68
+ 416 011e 18000000 		.4byte	.LFE68-.LFB68
+ 417 0122 01       		.uleb128 0x1
+ 418 0123 9C       		.byte	0x9c
+ 419 0124 44010000 		.4byte	0x144
+ 420 0128 0D       		.uleb128 0xd
+ 421 0129 6D7300   		.ascii	"ms\000"
+ 422 012c 01       		.byte	0x1
+ 423 012d 4C       		.byte	0x4c
+ 424 012e 25000000 		.4byte	0x25
+ 425 0132 00000000 		.4byte	.LLST0
+ 426 0136 0E       		.uleb128 0xe
+ 427 0137 28020000 		.4byte	.LASF27
+ 428 013b 01       		.byte	0x1
+ 429 013c 4D       		.byte	0x4d
+ 430 013d 25000000 		.4byte	0x25
+ 431 0141 01       		.uleb128 0x1
+ 432 0142 50       		.byte	0x50
+ 433 0143 00       		.byte	0
+ 434 0144 0A       		.uleb128 0xa
+ 435 0145 59020000 		.4byte	.LASF21
+ 436 0149 01       		.byte	0x1
+ 437 014a 65       		.byte	0x65
+ 438 014b 00000000 		.4byte	.LFB70
+ 439 014f 02000000 		.4byte	.LFE70-.LFB70
+ 440 0153 01       		.uleb128 0x1
+ 441 0154 9C       		.byte	0x9c
+ 442 0155 0C       		.uleb128 0xc
+ 443 0156 4A000000 		.4byte	.LASF23
+ 444 015a 01       		.byte	0x1
+ 445 015b 75       		.byte	0x75
+ 446 015c 00000000 		.4byte	.LFB71
+ 447 0160 02000000 		.4byte	.LFE71-.LFB71
+ 448 0164 01       		.uleb128 0x1
+ 449 0165 9C       		.byte	0x9c
+ 450 0166 76010000 		.4byte	0x176
+ 451 016a 0F       		.uleb128 0xf
+ 452 016b 7300     		.ascii	"s\000"
+ 453 016d 01       		.byte	0x1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 12
+
+
+ 454 016e 75       		.byte	0x75
+ 455 016f 5D000000 		.4byte	0x5d
+ 456 0173 01       		.uleb128 0x1
+ 457 0174 50       		.byte	0x50
+ 458 0175 00       		.byte	0
+ 459 0176 0C       		.uleb128 0xc
+ 460 0177 A4000000 		.4byte	.LASF24
+ 461 017b 01       		.byte	0x1
+ 462 017c 76       		.byte	0x76
+ 463 017d 00000000 		.4byte	.LFB72
+ 464 0181 02000000 		.4byte	.LFE72-.LFB72
+ 465 0185 01       		.uleb128 0x1
+ 466 0186 9C       		.byte	0x9c
+ 467 0187 97010000 		.4byte	0x197
+ 468 018b 0F       		.uleb128 0xf
+ 469 018c 7300     		.ascii	"s\000"
+ 470 018e 01       		.byte	0x1
+ 471 018f 76       		.byte	0x76
+ 472 0190 5D000000 		.4byte	0x5d
+ 473 0194 01       		.uleb128 0x1
+ 474 0195 50       		.byte	0x50
+ 475 0196 00       		.byte	0
+ 476 0197 0C       		.uleb128 0xc
+ 477 0198 84010000 		.4byte	.LASF25
+ 478 019c 01       		.byte	0x1
+ 479 019d 77       		.byte	0x77
+ 480 019e 00000000 		.4byte	.LFB73
+ 481 01a2 02000000 		.4byte	.LFE73-.LFB73
+ 482 01a6 01       		.uleb128 0x1
+ 483 01a7 9C       		.byte	0x9c
+ 484 01a8 B8010000 		.4byte	0x1b8
+ 485 01ac 0F       		.uleb128 0xf
+ 486 01ad 7300     		.ascii	"s\000"
+ 487 01af 01       		.byte	0x1
+ 488 01b0 77       		.byte	0x77
+ 489 01b1 5D000000 		.4byte	0x5d
+ 490 01b5 01       		.uleb128 0x1
+ 491 01b6 50       		.byte	0x50
+ 492 01b7 00       		.byte	0
+ 493 01b8 0C       		.uleb128 0xc
+ 494 01b9 4B010000 		.4byte	.LASF26
+ 495 01bd 01       		.byte	0x1
+ 496 01be 90       		.byte	0x90
+ 497 01bf 00000000 		.4byte	.LFB75
+ 498 01c3 34000000 		.4byte	.LFE75-.LFB75
+ 499 01c7 01       		.uleb128 0x1
+ 500 01c8 9C       		.byte	0x9c
+ 501 01c9 24020000 		.4byte	0x224
+ 502 01cd 10       		.uleb128 0x10
+ 503 01ce 6900     		.ascii	"i\000"
+ 504 01d0 01       		.byte	0x1
+ 505 01d1 91       		.byte	0x91
+ 506 01d2 AC000000 		.4byte	0xac
+ 507 01d6 21000000 		.4byte	.LLST1
+ 508 01da 11       		.uleb128 0x11
+ 509 01db 06000000 		.4byte	.LVL5
+ 510 01df 81030000 		.4byte	0x381
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 13
+
+
+ 511 01e3 12       		.uleb128 0x12
+ 512 01e4 10000000 		.4byte	.LVL7
+ 513 01e8 88030000 		.4byte	0x388
+ 514 01ec F7010000 		.4byte	0x1f7
+ 515 01f0 13       		.uleb128 0x13
+ 516 01f1 01       		.uleb128 0x1
+ 517 01f2 50       		.byte	0x50
+ 518 01f3 02       		.uleb128 0x2
+ 519 01f4 74       		.byte	0x74
+ 520 01f5 00       		.sleb128 0
+ 521 01f6 00       		.byte	0
+ 522 01f7 12       		.uleb128 0x12
+ 523 01f8 1A000000 		.4byte	.LVL8
+ 524 01fc 9D030000 		.4byte	0x39d
+ 525 0200 14020000 		.4byte	0x214
+ 526 0204 13       		.uleb128 0x13
+ 527 0205 01       		.uleb128 0x1
+ 528 0206 51       		.byte	0x51
+ 529 0207 05       		.uleb128 0x5
+ 530 0208 03       		.byte	0x3
+ 531 0209 00000000 		.4byte	GUI_X_Systick_Intr
+ 532 020d 13       		.uleb128 0x13
+ 533 020e 01       		.uleb128 0x1
+ 534 020f 50       		.byte	0x50
+ 535 0210 02       		.uleb128 0x2
+ 536 0211 74       		.byte	0x74
+ 537 0212 00       		.sleb128 0
+ 538 0213 00       		.byte	0
+ 539 0214 14       		.uleb128 0x14
+ 540 0215 2C000000 		.4byte	.LVL10
+ 541 0219 B7030000 		.4byte	0x3b7
+ 542 021d 13       		.uleb128 0x13
+ 543 021e 01       		.uleb128 0x1
+ 544 021f 50       		.byte	0x50
+ 545 0220 01       		.uleb128 0x1
+ 546 0221 30       		.byte	0x30
+ 547 0222 00       		.byte	0
+ 548 0223 00       		.byte	0
+ 549 0224 0C       		.uleb128 0xc
+ 550 0225 93000000 		.4byte	.LASF28
+ 551 0229 01       		.byte	0x1
+ 552 022a 59       		.byte	0x59
+ 553 022b 00000000 		.4byte	.LFB69
+ 554 022f 08000000 		.4byte	.LFE69-.LFB69
+ 555 0233 01       		.uleb128 0x1
+ 556 0234 9C       		.byte	0x9c
+ 557 0235 43020000 		.4byte	0x243
+ 558 0239 11       		.uleb128 0x11
+ 559 023a 06000000 		.4byte	.LVL12
+ 560 023e B8010000 		.4byte	0x1b8
+ 561 0242 00       		.byte	0
+ 562 0243 15       		.uleb128 0x15
+ 563 0244 7D030000 		.4byte	.LASF29
+ 564 0248 06       		.byte	0x6
+ 565 0249 17       		.byte	0x17
+ 566 024a 2C000000 		.4byte	0x2c
+ 567 024e 05       		.uleb128 0x5
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 14
+
+
+ 568 024f 03       		.byte	0x3
+ 569 0250 00000000 		.4byte	NP_g_nNumberOfPixels
+ 570 0254 15       		.uleb128 0x15
+ 571 0255 68020000 		.4byte	.LASF30
+ 572 0259 06       		.byte	0x6
+ 573 025a 18       		.byte	0x18
+ 574 025b B7000000 		.4byte	0xb7
+ 575 025f 05       		.uleb128 0x5
+ 576 0260 03       		.byte	0x3
+ 577 0261 00000000 		.4byte	NP_g_nDMA_Chan
+ 578 0265 15       		.uleb128 0x15
+ 579 0266 65010000 		.4byte	.LASF31
+ 580 026a 06       		.byte	0x6
+ 581 026b 19       		.byte	0x19
+ 582 026c B7000000 		.4byte	0xb7
+ 583 0270 05       		.uleb128 0x5
+ 584 0271 03       		.byte	0x3
+ 585 0272 00000000 		.4byte	NP_g_nDMA_TD
+ 586 0276 15       		.uleb128 0x15
+ 587 0277 3A010000 		.4byte	.LASF32
+ 588 027b 06       		.byte	0x6
+ 589 027c 1A       		.byte	0x1a
+ 590 027d B7000000 		.4byte	0xb7
+ 591 0281 05       		.uleb128 0x5
+ 592 0282 03       		.byte	0x3
+ 593 0283 00000000 		.4byte	NP_g_bOwnsBuffer
+ 594 0287 15       		.uleb128 0x15
+ 595 0288 E7000000 		.4byte	.LASF33
+ 596 028c 06       		.byte	0x6
+ 597 028d 1C       		.byte	0x1c
+ 598 028e 98020000 		.4byte	0x298
+ 599 0292 05       		.uleb128 0x5
+ 600 0293 03       		.byte	0x3
+ 601 0294 00000000 		.4byte	NP_g_pFrameBuffer
+ 602 0298 05       		.uleb128 0x5
+ 603 0299 04       		.byte	0x4
+ 604 029a DD000000 		.4byte	0xdd
+ 605 029e 15       		.uleb128 0x15
+ 606 029f 1A010000 		.4byte	.LASF34
+ 607 02a3 06       		.byte	0x6
+ 608 02a4 1D       		.byte	0x1d
+ 609 02a5 2C000000 		.4byte	0x2c
+ 610 02a9 05       		.uleb128 0x5
+ 611 02aa 03       		.byte	0x3
+ 612 02ab 00000000 		.4byte	NP_g_nFrameBufferSize
+ 613 02af 07       		.uleb128 0x7
+ 614 02b0 13000000 		.4byte	.LASF35
+ 615 02b4 07       		.byte	0x7
+ 616 02b5 8B       		.byte	0x8b
+ 617 02b6 54030000 		.4byte	0x354
+ 618 02ba 05       		.uleb128 0x5
+ 619 02bb 04       		.byte	0x4
+ 620 02bc C0020000 		.4byte	0x2c0
+ 621 02c0 06       		.uleb128 0x6
+ 622 02c1 AC000000 		.4byte	0xac
+ 623 02c5 05       		.uleb128 0x5
+ 624 02c6 04       		.byte	0x4
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 15
+
+
+ 625 02c7 AC000000 		.4byte	0xac
+ 626 02cb 16       		.uleb128 0x16
+ 627 02cc 47030000 		.4byte	.LASF36
+ 628 02d0 07       		.byte	0x7
+ 629 02d1 92       		.byte	0x92
+ 630 02d2 D6020000 		.4byte	0x2d6
+ 631 02d6 06       		.uleb128 0x6
+ 632 02d7 AF020000 		.4byte	0x2af
+ 633 02db 16       		.uleb128 0x16
+ 634 02dc D4000000 		.4byte	.LASF37
+ 635 02e0 07       		.byte	0x7
+ 636 02e1 93       		.byte	0x93
+ 637 02e2 D6020000 		.4byte	0x2d6
+ 638 02e6 07       		.uleb128 0x7
+ 639 02e7 84000000 		.4byte	.LASF38
+ 640 02eb 07       		.byte	0x7
+ 641 02ec 90       		.byte	0x90
+ 642 02ed 33030000 		.4byte	0x333
+ 643 02f1 16       		.uleb128 0x16
+ 644 02f2 5C030000 		.4byte	.LASF39
+ 645 02f6 07       		.byte	0x7
+ 646 02f7 94       		.byte	0x94
+ 647 02f8 FC020000 		.4byte	0x2fc
+ 648 02fc 06       		.uleb128 0x6
+ 649 02fd E6020000 		.4byte	0x2e6
+ 650 0301 16       		.uleb128 0x16
+ 651 0302 00000000 		.4byte	.LASF40
+ 652 0306 07       		.byte	0x7
+ 653 0307 95       		.byte	0x95
+ 654 0308 FC020000 		.4byte	0x2fc
+ 655 030c 17       		.uleb128 0x17
+ 656 030d F9010000 		.4byte	.LASF41
+ 657 0311 08       		.byte	0x8
+ 658 0312 4A07     		.2byte	0x74a
+ 659 0314 18030000 		.4byte	0x318
+ 660 0318 09       		.uleb128 0x9
+ 661 0319 A1000000 		.4byte	0xa1
+ 662 031d 15       		.uleb128 0x15
+ 663 031e 0D020000 		.4byte	.LASF42
+ 664 0322 01       		.byte	0x1
+ 665 0323 3B       		.byte	0x3b
+ 666 0324 2E030000 		.4byte	0x32e
+ 667 0328 05       		.uleb128 0x5
+ 668 0329 03       		.byte	0x3
+ 669 032a 00000000 		.4byte	OS_TimeMS
+ 670 032e 09       		.uleb128 0x9
+ 671 032f 25000000 		.4byte	0x25
+ 672 0333 18       		.uleb128 0x18
+ 673 0334 08       		.byte	0x8
+ 674 0335 07       		.byte	0x7
+ 675 0336 8D       		.byte	0x8d
+ 676 0337 54030000 		.4byte	0x354
+ 677 033b 19       		.uleb128 0x19
+ 678 033c F4010000 		.4byte	.LASF43
+ 679 0340 07       		.byte	0x7
+ 680 0341 8E       		.byte	0x8e
+ 681 0342 C5020000 		.4byte	0x2c5
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 16
+
+
+ 682 0346 00       		.byte	0
+ 683 0347 19       		.uleb128 0x19
+ 684 0348 77020000 		.4byte	.LASF44
+ 685 034c 07       		.byte	0x7
+ 686 034d 8F       		.byte	0x8f
+ 687 034e AC000000 		.4byte	0xac
+ 688 0352 04       		.byte	0x4
+ 689 0353 00       		.byte	0
+ 690 0354 18       		.uleb128 0x18
+ 691 0355 0C       		.byte	0xc
+ 692 0356 07       		.byte	0x7
+ 693 0357 87       		.byte	0x87
+ 694 0358 81030000 		.4byte	0x381
+ 695 035c 1A       		.uleb128 0x1a
+ 696 035d 73726300 		.ascii	"src\000"
+ 697 0361 07       		.byte	0x7
+ 698 0362 88       		.byte	0x88
+ 699 0363 BA020000 		.4byte	0x2ba
+ 700 0367 00       		.byte	0
+ 701 0368 19       		.uleb128 0x19
+ 702 0369 F4010000 		.4byte	.LASF43
+ 703 036d 07       		.byte	0x7
+ 704 036e 89       		.byte	0x89
+ 705 036f C5020000 		.4byte	0x2c5
+ 706 0373 04       		.byte	0x4
+ 707 0374 19       		.uleb128 0x19
+ 708 0375 77020000 		.4byte	.LASF44
+ 709 0379 07       		.byte	0x7
+ 710 037a 8A       		.byte	0x8a
+ 711 037b AC000000 		.4byte	0xac
+ 712 037f 08       		.byte	0x8
+ 713 0380 00       		.byte	0
+ 714 0381 1B       		.uleb128 0x1b
+ 715 0382 F9000000 		.4byte	.LASF51
+ 716 0386 05       		.byte	0x5
+ 717 0387 AE       		.byte	0xae
+ 718 0388 1C       		.uleb128 0x1c
+ 719 0389 7C020000 		.4byte	.LASF45
+ 720 038d 05       		.byte	0x5
+ 721 038e B8       		.byte	0xb8
+ 722 038f E2000000 		.4byte	0xe2
+ 723 0393 9D030000 		.4byte	0x39d
+ 724 0397 1D       		.uleb128 0x1d
+ 725 0398 C3000000 		.4byte	0xc3
+ 726 039c 00       		.byte	0
+ 727 039d 1C       		.uleb128 0x1c
+ 728 039e 22000000 		.4byte	.LASF46
+ 729 03a2 05       		.byte	0x5
+ 730 03a3 B7       		.byte	0xb7
+ 731 03a4 E2000000 		.4byte	0xe2
+ 732 03a8 B7030000 		.4byte	0x3b7
+ 733 03ac 1D       		.uleb128 0x1d
+ 734 03ad C3000000 		.4byte	0xc3
+ 735 03b1 1D       		.uleb128 0x1d
+ 736 03b2 E2000000 		.4byte	0xe2
+ 737 03b6 00       		.byte	0
+ 738 03b7 1E       		.uleb128 0x1e
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 17
+
+
+ 739 03b8 06020000 		.4byte	.LASF52
+ 740 03bc 05       		.byte	0x5
+ 741 03bd 7F       		.byte	0x7f
+ 742 03be 1D       		.uleb128 0x1d
+ 743 03bf B7000000 		.4byte	0xb7
+ 744 03c3 00       		.byte	0
+ 745 03c4 00       		.byte	0
+ 746              		.section	.debug_abbrev,"",%progbits
+ 747              	.Ldebug_abbrev0:
+ 748 0000 01       		.uleb128 0x1
+ 749 0001 11       		.uleb128 0x11
+ 750 0002 01       		.byte	0x1
+ 751 0003 25       		.uleb128 0x25
+ 752 0004 0E       		.uleb128 0xe
+ 753 0005 13       		.uleb128 0x13
+ 754 0006 0B       		.uleb128 0xb
+ 755 0007 03       		.uleb128 0x3
+ 756 0008 0E       		.uleb128 0xe
+ 757 0009 1B       		.uleb128 0x1b
+ 758 000a 0E       		.uleb128 0xe
+ 759 000b 55       		.uleb128 0x55
+ 760 000c 17       		.uleb128 0x17
+ 761 000d 11       		.uleb128 0x11
+ 762 000e 01       		.uleb128 0x1
+ 763 000f 10       		.uleb128 0x10
+ 764 0010 17       		.uleb128 0x17
+ 765 0011 00       		.byte	0
+ 766 0012 00       		.byte	0
+ 767 0013 02       		.uleb128 0x2
+ 768 0014 24       		.uleb128 0x24
+ 769 0015 00       		.byte	0
+ 770 0016 0B       		.uleb128 0xb
+ 771 0017 0B       		.uleb128 0xb
+ 772 0018 3E       		.uleb128 0x3e
+ 773 0019 0B       		.uleb128 0xb
+ 774 001a 03       		.uleb128 0x3
+ 775 001b 08       		.uleb128 0x8
+ 776 001c 00       		.byte	0
+ 777 001d 00       		.byte	0
+ 778 001e 03       		.uleb128 0x3
+ 779 001f 24       		.uleb128 0x24
+ 780 0020 00       		.byte	0
+ 781 0021 0B       		.uleb128 0xb
+ 782 0022 0B       		.uleb128 0xb
+ 783 0023 3E       		.uleb128 0x3e
+ 784 0024 0B       		.uleb128 0xb
+ 785 0025 03       		.uleb128 0x3
+ 786 0026 0E       		.uleb128 0xe
+ 787 0027 00       		.byte	0
+ 788 0028 00       		.byte	0
+ 789 0029 04       		.uleb128 0x4
+ 790 002a 15       		.uleb128 0x15
+ 791 002b 00       		.byte	0
+ 792 002c 27       		.uleb128 0x27
+ 793 002d 19       		.uleb128 0x19
+ 794 002e 00       		.byte	0
+ 795 002f 00       		.byte	0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 18
+
+
+ 796 0030 05       		.uleb128 0x5
+ 797 0031 0F       		.uleb128 0xf
+ 798 0032 00       		.byte	0
+ 799 0033 0B       		.uleb128 0xb
+ 800 0034 0B       		.uleb128 0xb
+ 801 0035 49       		.uleb128 0x49
+ 802 0036 13       		.uleb128 0x13
+ 803 0037 00       		.byte	0
+ 804 0038 00       		.byte	0
+ 805 0039 06       		.uleb128 0x6
+ 806 003a 26       		.uleb128 0x26
+ 807 003b 00       		.byte	0
+ 808 003c 49       		.uleb128 0x49
+ 809 003d 13       		.uleb128 0x13
+ 810 003e 00       		.byte	0
+ 811 003f 00       		.byte	0
+ 812 0040 07       		.uleb128 0x7
+ 813 0041 16       		.uleb128 0x16
+ 814 0042 00       		.byte	0
+ 815 0043 03       		.uleb128 0x3
+ 816 0044 0E       		.uleb128 0xe
+ 817 0045 3A       		.uleb128 0x3a
+ 818 0046 0B       		.uleb128 0xb
+ 819 0047 3B       		.uleb128 0x3b
+ 820 0048 0B       		.uleb128 0xb
+ 821 0049 49       		.uleb128 0x49
+ 822 004a 13       		.uleb128 0x13
+ 823 004b 00       		.byte	0
+ 824 004c 00       		.byte	0
+ 825 004d 08       		.uleb128 0x8
+ 826 004e 16       		.uleb128 0x16
+ 827 004f 00       		.byte	0
+ 828 0050 03       		.uleb128 0x3
+ 829 0051 0E       		.uleb128 0xe
+ 830 0052 3A       		.uleb128 0x3a
+ 831 0053 0B       		.uleb128 0xb
+ 832 0054 3B       		.uleb128 0x3b
+ 833 0055 05       		.uleb128 0x5
+ 834 0056 49       		.uleb128 0x49
+ 835 0057 13       		.uleb128 0x13
+ 836 0058 00       		.byte	0
+ 837 0059 00       		.byte	0
+ 838 005a 09       		.uleb128 0x9
+ 839 005b 35       		.uleb128 0x35
+ 840 005c 00       		.byte	0
+ 841 005d 49       		.uleb128 0x49
+ 842 005e 13       		.uleb128 0x13
+ 843 005f 00       		.byte	0
+ 844 0060 00       		.byte	0
+ 845 0061 0A       		.uleb128 0xa
+ 846 0062 2E       		.uleb128 0x2e
+ 847 0063 00       		.byte	0
+ 848 0064 3F       		.uleb128 0x3f
+ 849 0065 19       		.uleb128 0x19
+ 850 0066 03       		.uleb128 0x3
+ 851 0067 0E       		.uleb128 0xe
+ 852 0068 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 19
+
+
+ 853 0069 0B       		.uleb128 0xb
+ 854 006a 3B       		.uleb128 0x3b
+ 855 006b 0B       		.uleb128 0xb
+ 856 006c 27       		.uleb128 0x27
+ 857 006d 19       		.uleb128 0x19
+ 858 006e 11       		.uleb128 0x11
+ 859 006f 01       		.uleb128 0x1
+ 860 0070 12       		.uleb128 0x12
+ 861 0071 06       		.uleb128 0x6
+ 862 0072 40       		.uleb128 0x40
+ 863 0073 18       		.uleb128 0x18
+ 864 0074 9742     		.uleb128 0x2117
+ 865 0076 19       		.uleb128 0x19
+ 866 0077 00       		.byte	0
+ 867 0078 00       		.byte	0
+ 868 0079 0B       		.uleb128 0xb
+ 869 007a 2E       		.uleb128 0x2e
+ 870 007b 00       		.byte	0
+ 871 007c 3F       		.uleb128 0x3f
+ 872 007d 19       		.uleb128 0x19
+ 873 007e 03       		.uleb128 0x3
+ 874 007f 0E       		.uleb128 0xe
+ 875 0080 3A       		.uleb128 0x3a
+ 876 0081 0B       		.uleb128 0xb
+ 877 0082 3B       		.uleb128 0x3b
+ 878 0083 0B       		.uleb128 0xb
+ 879 0084 27       		.uleb128 0x27
+ 880 0085 19       		.uleb128 0x19
+ 881 0086 49       		.uleb128 0x49
+ 882 0087 13       		.uleb128 0x13
+ 883 0088 11       		.uleb128 0x11
+ 884 0089 01       		.uleb128 0x1
+ 885 008a 12       		.uleb128 0x12
+ 886 008b 06       		.uleb128 0x6
+ 887 008c 40       		.uleb128 0x40
+ 888 008d 18       		.uleb128 0x18
+ 889 008e 9742     		.uleb128 0x2117
+ 890 0090 19       		.uleb128 0x19
+ 891 0091 00       		.byte	0
+ 892 0092 00       		.byte	0
+ 893 0093 0C       		.uleb128 0xc
+ 894 0094 2E       		.uleb128 0x2e
+ 895 0095 01       		.byte	0x1
+ 896 0096 3F       		.uleb128 0x3f
+ 897 0097 19       		.uleb128 0x19
+ 898 0098 03       		.uleb128 0x3
+ 899 0099 0E       		.uleb128 0xe
+ 900 009a 3A       		.uleb128 0x3a
+ 901 009b 0B       		.uleb128 0xb
+ 902 009c 3B       		.uleb128 0x3b
+ 903 009d 0B       		.uleb128 0xb
+ 904 009e 27       		.uleb128 0x27
+ 905 009f 19       		.uleb128 0x19
+ 906 00a0 11       		.uleb128 0x11
+ 907 00a1 01       		.uleb128 0x1
+ 908 00a2 12       		.uleb128 0x12
+ 909 00a3 06       		.uleb128 0x6
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 20
+
+
+ 910 00a4 40       		.uleb128 0x40
+ 911 00a5 18       		.uleb128 0x18
+ 912 00a6 9742     		.uleb128 0x2117
+ 913 00a8 19       		.uleb128 0x19
+ 914 00a9 01       		.uleb128 0x1
+ 915 00aa 13       		.uleb128 0x13
+ 916 00ab 00       		.byte	0
+ 917 00ac 00       		.byte	0
+ 918 00ad 0D       		.uleb128 0xd
+ 919 00ae 05       		.uleb128 0x5
+ 920 00af 00       		.byte	0
+ 921 00b0 03       		.uleb128 0x3
+ 922 00b1 08       		.uleb128 0x8
+ 923 00b2 3A       		.uleb128 0x3a
+ 924 00b3 0B       		.uleb128 0xb
+ 925 00b4 3B       		.uleb128 0x3b
+ 926 00b5 0B       		.uleb128 0xb
+ 927 00b6 49       		.uleb128 0x49
+ 928 00b7 13       		.uleb128 0x13
+ 929 00b8 02       		.uleb128 0x2
+ 930 00b9 17       		.uleb128 0x17
+ 931 00ba 00       		.byte	0
+ 932 00bb 00       		.byte	0
+ 933 00bc 0E       		.uleb128 0xe
+ 934 00bd 34       		.uleb128 0x34
+ 935 00be 00       		.byte	0
+ 936 00bf 03       		.uleb128 0x3
+ 937 00c0 0E       		.uleb128 0xe
+ 938 00c1 3A       		.uleb128 0x3a
+ 939 00c2 0B       		.uleb128 0xb
+ 940 00c3 3B       		.uleb128 0x3b
+ 941 00c4 0B       		.uleb128 0xb
+ 942 00c5 49       		.uleb128 0x49
+ 943 00c6 13       		.uleb128 0x13
+ 944 00c7 02       		.uleb128 0x2
+ 945 00c8 18       		.uleb128 0x18
+ 946 00c9 00       		.byte	0
+ 947 00ca 00       		.byte	0
+ 948 00cb 0F       		.uleb128 0xf
+ 949 00cc 05       		.uleb128 0x5
+ 950 00cd 00       		.byte	0
+ 951 00ce 03       		.uleb128 0x3
+ 952 00cf 08       		.uleb128 0x8
+ 953 00d0 3A       		.uleb128 0x3a
+ 954 00d1 0B       		.uleb128 0xb
+ 955 00d2 3B       		.uleb128 0x3b
+ 956 00d3 0B       		.uleb128 0xb
+ 957 00d4 49       		.uleb128 0x49
+ 958 00d5 13       		.uleb128 0x13
+ 959 00d6 02       		.uleb128 0x2
+ 960 00d7 18       		.uleb128 0x18
+ 961 00d8 00       		.byte	0
+ 962 00d9 00       		.byte	0
+ 963 00da 10       		.uleb128 0x10
+ 964 00db 34       		.uleb128 0x34
+ 965 00dc 00       		.byte	0
+ 966 00dd 03       		.uleb128 0x3
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 21
+
+
+ 967 00de 08       		.uleb128 0x8
+ 968 00df 3A       		.uleb128 0x3a
+ 969 00e0 0B       		.uleb128 0xb
+ 970 00e1 3B       		.uleb128 0x3b
+ 971 00e2 0B       		.uleb128 0xb
+ 972 00e3 49       		.uleb128 0x49
+ 973 00e4 13       		.uleb128 0x13
+ 974 00e5 02       		.uleb128 0x2
+ 975 00e6 17       		.uleb128 0x17
+ 976 00e7 00       		.byte	0
+ 977 00e8 00       		.byte	0
+ 978 00e9 11       		.uleb128 0x11
+ 979 00ea 898201   		.uleb128 0x4109
+ 980 00ed 00       		.byte	0
+ 981 00ee 11       		.uleb128 0x11
+ 982 00ef 01       		.uleb128 0x1
+ 983 00f0 31       		.uleb128 0x31
+ 984 00f1 13       		.uleb128 0x13
+ 985 00f2 00       		.byte	0
+ 986 00f3 00       		.byte	0
+ 987 00f4 12       		.uleb128 0x12
+ 988 00f5 898201   		.uleb128 0x4109
+ 989 00f8 01       		.byte	0x1
+ 990 00f9 11       		.uleb128 0x11
+ 991 00fa 01       		.uleb128 0x1
+ 992 00fb 31       		.uleb128 0x31
+ 993 00fc 13       		.uleb128 0x13
+ 994 00fd 01       		.uleb128 0x1
+ 995 00fe 13       		.uleb128 0x13
+ 996 00ff 00       		.byte	0
+ 997 0100 00       		.byte	0
+ 998 0101 13       		.uleb128 0x13
+ 999 0102 8A8201   		.uleb128 0x410a
+ 1000 0105 00       		.byte	0
+ 1001 0106 02       		.uleb128 0x2
+ 1002 0107 18       		.uleb128 0x18
+ 1003 0108 9142     		.uleb128 0x2111
+ 1004 010a 18       		.uleb128 0x18
+ 1005 010b 00       		.byte	0
+ 1006 010c 00       		.byte	0
+ 1007 010d 14       		.uleb128 0x14
+ 1008 010e 898201   		.uleb128 0x4109
+ 1009 0111 01       		.byte	0x1
+ 1010 0112 11       		.uleb128 0x11
+ 1011 0113 01       		.uleb128 0x1
+ 1012 0114 31       		.uleb128 0x31
+ 1013 0115 13       		.uleb128 0x13
+ 1014 0116 00       		.byte	0
+ 1015 0117 00       		.byte	0
+ 1016 0118 15       		.uleb128 0x15
+ 1017 0119 34       		.uleb128 0x34
+ 1018 011a 00       		.byte	0
+ 1019 011b 03       		.uleb128 0x3
+ 1020 011c 0E       		.uleb128 0xe
+ 1021 011d 3A       		.uleb128 0x3a
+ 1022 011e 0B       		.uleb128 0xb
+ 1023 011f 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 22
+
+
+ 1024 0120 0B       		.uleb128 0xb
+ 1025 0121 49       		.uleb128 0x49
+ 1026 0122 13       		.uleb128 0x13
+ 1027 0123 3F       		.uleb128 0x3f
+ 1028 0124 19       		.uleb128 0x19
+ 1029 0125 02       		.uleb128 0x2
+ 1030 0126 18       		.uleb128 0x18
+ 1031 0127 00       		.byte	0
+ 1032 0128 00       		.byte	0
+ 1033 0129 16       		.uleb128 0x16
+ 1034 012a 34       		.uleb128 0x34
+ 1035 012b 00       		.byte	0
+ 1036 012c 03       		.uleb128 0x3
+ 1037 012d 0E       		.uleb128 0xe
+ 1038 012e 3A       		.uleb128 0x3a
+ 1039 012f 0B       		.uleb128 0xb
+ 1040 0130 3B       		.uleb128 0x3b
+ 1041 0131 0B       		.uleb128 0xb
+ 1042 0132 49       		.uleb128 0x49
+ 1043 0133 13       		.uleb128 0x13
+ 1044 0134 3F       		.uleb128 0x3f
+ 1045 0135 19       		.uleb128 0x19
+ 1046 0136 3C       		.uleb128 0x3c
+ 1047 0137 19       		.uleb128 0x19
+ 1048 0138 00       		.byte	0
+ 1049 0139 00       		.byte	0
+ 1050 013a 17       		.uleb128 0x17
+ 1051 013b 34       		.uleb128 0x34
+ 1052 013c 00       		.byte	0
+ 1053 013d 03       		.uleb128 0x3
+ 1054 013e 0E       		.uleb128 0xe
+ 1055 013f 3A       		.uleb128 0x3a
+ 1056 0140 0B       		.uleb128 0xb
+ 1057 0141 3B       		.uleb128 0x3b
+ 1058 0142 05       		.uleb128 0x5
+ 1059 0143 49       		.uleb128 0x49
+ 1060 0144 13       		.uleb128 0x13
+ 1061 0145 3F       		.uleb128 0x3f
+ 1062 0146 19       		.uleb128 0x19
+ 1063 0147 3C       		.uleb128 0x3c
+ 1064 0148 19       		.uleb128 0x19
+ 1065 0149 00       		.byte	0
+ 1066 014a 00       		.byte	0
+ 1067 014b 18       		.uleb128 0x18
+ 1068 014c 13       		.uleb128 0x13
+ 1069 014d 01       		.byte	0x1
+ 1070 014e 0B       		.uleb128 0xb
+ 1071 014f 0B       		.uleb128 0xb
+ 1072 0150 3A       		.uleb128 0x3a
+ 1073 0151 0B       		.uleb128 0xb
+ 1074 0152 3B       		.uleb128 0x3b
+ 1075 0153 0B       		.uleb128 0xb
+ 1076 0154 01       		.uleb128 0x1
+ 1077 0155 13       		.uleb128 0x13
+ 1078 0156 00       		.byte	0
+ 1079 0157 00       		.byte	0
+ 1080 0158 19       		.uleb128 0x19
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 23
+
+
+ 1081 0159 0D       		.uleb128 0xd
+ 1082 015a 00       		.byte	0
+ 1083 015b 03       		.uleb128 0x3
+ 1084 015c 0E       		.uleb128 0xe
+ 1085 015d 3A       		.uleb128 0x3a
+ 1086 015e 0B       		.uleb128 0xb
+ 1087 015f 3B       		.uleb128 0x3b
+ 1088 0160 0B       		.uleb128 0xb
+ 1089 0161 49       		.uleb128 0x49
+ 1090 0162 13       		.uleb128 0x13
+ 1091 0163 38       		.uleb128 0x38
+ 1092 0164 0B       		.uleb128 0xb
+ 1093 0165 00       		.byte	0
+ 1094 0166 00       		.byte	0
+ 1095 0167 1A       		.uleb128 0x1a
+ 1096 0168 0D       		.uleb128 0xd
+ 1097 0169 00       		.byte	0
+ 1098 016a 03       		.uleb128 0x3
+ 1099 016b 08       		.uleb128 0x8
+ 1100 016c 3A       		.uleb128 0x3a
+ 1101 016d 0B       		.uleb128 0xb
+ 1102 016e 3B       		.uleb128 0x3b
+ 1103 016f 0B       		.uleb128 0xb
+ 1104 0170 49       		.uleb128 0x49
+ 1105 0171 13       		.uleb128 0x13
+ 1106 0172 38       		.uleb128 0x38
+ 1107 0173 0B       		.uleb128 0xb
+ 1108 0174 00       		.byte	0
+ 1109 0175 00       		.byte	0
+ 1110 0176 1B       		.uleb128 0x1b
+ 1111 0177 2E       		.uleb128 0x2e
+ 1112 0178 00       		.byte	0
+ 1113 0179 3F       		.uleb128 0x3f
+ 1114 017a 19       		.uleb128 0x19
+ 1115 017b 03       		.uleb128 0x3
+ 1116 017c 0E       		.uleb128 0xe
+ 1117 017d 3A       		.uleb128 0x3a
+ 1118 017e 0B       		.uleb128 0xb
+ 1119 017f 3B       		.uleb128 0x3b
+ 1120 0180 0B       		.uleb128 0xb
+ 1121 0181 27       		.uleb128 0x27
+ 1122 0182 19       		.uleb128 0x19
+ 1123 0183 3C       		.uleb128 0x3c
+ 1124 0184 19       		.uleb128 0x19
+ 1125 0185 00       		.byte	0
+ 1126 0186 00       		.byte	0
+ 1127 0187 1C       		.uleb128 0x1c
+ 1128 0188 2E       		.uleb128 0x2e
+ 1129 0189 01       		.byte	0x1
+ 1130 018a 3F       		.uleb128 0x3f
+ 1131 018b 19       		.uleb128 0x19
+ 1132 018c 03       		.uleb128 0x3
+ 1133 018d 0E       		.uleb128 0xe
+ 1134 018e 3A       		.uleb128 0x3a
+ 1135 018f 0B       		.uleb128 0xb
+ 1136 0190 3B       		.uleb128 0x3b
+ 1137 0191 0B       		.uleb128 0xb
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 24
+
+
+ 1138 0192 27       		.uleb128 0x27
+ 1139 0193 19       		.uleb128 0x19
+ 1140 0194 49       		.uleb128 0x49
+ 1141 0195 13       		.uleb128 0x13
+ 1142 0196 3C       		.uleb128 0x3c
+ 1143 0197 19       		.uleb128 0x19
+ 1144 0198 01       		.uleb128 0x1
+ 1145 0199 13       		.uleb128 0x13
+ 1146 019a 00       		.byte	0
+ 1147 019b 00       		.byte	0
+ 1148 019c 1D       		.uleb128 0x1d
+ 1149 019d 05       		.uleb128 0x5
+ 1150 019e 00       		.byte	0
+ 1151 019f 49       		.uleb128 0x49
+ 1152 01a0 13       		.uleb128 0x13
+ 1153 01a1 00       		.byte	0
+ 1154 01a2 00       		.byte	0
+ 1155 01a3 1E       		.uleb128 0x1e
+ 1156 01a4 2E       		.uleb128 0x2e
+ 1157 01a5 01       		.byte	0x1
+ 1158 01a6 3F       		.uleb128 0x3f
+ 1159 01a7 19       		.uleb128 0x19
+ 1160 01a8 03       		.uleb128 0x3
+ 1161 01a9 0E       		.uleb128 0xe
+ 1162 01aa 3A       		.uleb128 0x3a
+ 1163 01ab 0B       		.uleb128 0xb
+ 1164 01ac 3B       		.uleb128 0x3b
+ 1165 01ad 0B       		.uleb128 0xb
+ 1166 01ae 27       		.uleb128 0x27
+ 1167 01af 19       		.uleb128 0x19
+ 1168 01b0 3C       		.uleb128 0x3c
+ 1169 01b1 19       		.uleb128 0x19
+ 1170 01b2 00       		.byte	0
+ 1171 01b3 00       		.byte	0
+ 1172 01b4 00       		.byte	0
+ 1173              		.section	.debug_loc,"",%progbits
+ 1174              	.Ldebug_loc0:
+ 1175              	.LLST0:
+ 1176 0000 00000000 		.4byte	.LVL0
+ 1177 0004 06000000 		.4byte	.LVL1
+ 1178 0008 0100     		.2byte	0x1
+ 1179 000a 50       		.byte	0x50
+ 1180 000b 06000000 		.4byte	.LVL1
+ 1181 000f 18000000 		.4byte	.LFE68
+ 1182 0013 0400     		.2byte	0x4
+ 1183 0015 F3       		.byte	0xf3
+ 1184 0016 01       		.uleb128 0x1
+ 1185 0017 50       		.byte	0x50
+ 1186 0018 9F       		.byte	0x9f
+ 1187 0019 00000000 		.4byte	0
+ 1188 001d 00000000 		.4byte	0
+ 1189              	.LLST1:
+ 1190 0021 06000000 		.4byte	.LVL5
+ 1191 0025 0A000000 		.4byte	.LVL6
+ 1192 0029 0200     		.2byte	0x2
+ 1193 002b 30       		.byte	0x30
+ 1194 002c 9F       		.byte	0x9f
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 25
+
+
+ 1195 002d 0A000000 		.4byte	.LVL6
+ 1196 0031 2E000000 		.4byte	.LVL11
+ 1197 0035 0100     		.2byte	0x1
+ 1198 0037 54       		.byte	0x54
+ 1199 0038 00000000 		.4byte	0
+ 1200 003c 00000000 		.4byte	0
+ 1201              		.section	.debug_aranges,"",%progbits
+ 1202 0000 5C000000 		.4byte	0x5c
+ 1203 0004 0200     		.2byte	0x2
+ 1204 0006 00000000 		.4byte	.Ldebug_info0
+ 1205 000a 04       		.byte	0x4
+ 1206 000b 00       		.byte	0
+ 1207 000c 0000     		.2byte	0
+ 1208 000e 0000     		.2byte	0
+ 1209 0010 00000000 		.4byte	.LFB74
+ 1210 0014 10000000 		.4byte	.LFE74-.LFB74
+ 1211 0018 00000000 		.4byte	.LFB67
+ 1212 001c 0C000000 		.4byte	.LFE67-.LFB67
+ 1213 0020 00000000 		.4byte	.LFB68
+ 1214 0024 18000000 		.4byte	.LFE68-.LFB68
+ 1215 0028 00000000 		.4byte	.LFB70
+ 1216 002c 02000000 		.4byte	.LFE70-.LFB70
+ 1217 0030 00000000 		.4byte	.LFB71
+ 1218 0034 02000000 		.4byte	.LFE71-.LFB71
+ 1219 0038 00000000 		.4byte	.LFB72
+ 1220 003c 02000000 		.4byte	.LFE72-.LFB72
+ 1221 0040 00000000 		.4byte	.LFB73
+ 1222 0044 02000000 		.4byte	.LFE73-.LFB73
+ 1223 0048 00000000 		.4byte	.LFB75
+ 1224 004c 34000000 		.4byte	.LFE75-.LFB75
+ 1225 0050 00000000 		.4byte	.LFB69
+ 1226 0054 08000000 		.4byte	.LFE69-.LFB69
+ 1227 0058 00000000 		.4byte	0
+ 1228 005c 00000000 		.4byte	0
+ 1229              		.section	.debug_ranges,"",%progbits
+ 1230              	.Ldebug_ranges0:
+ 1231 0000 00000000 		.4byte	.LFB74
+ 1232 0004 10000000 		.4byte	.LFE74
+ 1233 0008 00000000 		.4byte	.LFB67
+ 1234 000c 0C000000 		.4byte	.LFE67
+ 1235 0010 00000000 		.4byte	.LFB68
+ 1236 0014 18000000 		.4byte	.LFE68
+ 1237 0018 00000000 		.4byte	.LFB70
+ 1238 001c 02000000 		.4byte	.LFE70
+ 1239 0020 00000000 		.4byte	.LFB71
+ 1240 0024 02000000 		.4byte	.LFE71
+ 1241 0028 00000000 		.4byte	.LFB72
+ 1242 002c 02000000 		.4byte	.LFE72
+ 1243 0030 00000000 		.4byte	.LFB73
+ 1244 0034 02000000 		.4byte	.LFE73
+ 1245 0038 00000000 		.4byte	.LFB75
+ 1246 003c 34000000 		.4byte	.LFE75
+ 1247 0040 00000000 		.4byte	.LFB69
+ 1248 0044 08000000 		.4byte	.LFE69
+ 1249 0048 00000000 		.4byte	0
+ 1250 004c 00000000 		.4byte	0
+ 1251              		.section	.debug_line,"",%progbits
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 26
+
+
+ 1252              	.Ldebug_line0:
+ 1253 0000 3D020000 		.section	.debug_str,"MS",%progbits,1
+ 1253      02008101 
+ 1253      00000201 
+ 1253      FB0E0D00 
+ 1253      01010101 
+ 1254              	.LASF40:
+ 1255 0000 5F5F7A65 		.ascii	"__zero_table_end__\000"
+ 1255      726F5F74 
+ 1255      61626C65 
+ 1255      5F656E64 
+ 1255      5F5F00
+ 1256              	.LASF35:
+ 1257 0013 5F5F636F 		.ascii	"__copy_table_t\000"
+ 1257      70795F74 
+ 1257      61626C65 
+ 1257      5F7400
+ 1258              	.LASF46:
+ 1259 0022 43795379 		.ascii	"CySysTickSetCallback\000"
+ 1259      73546963 
+ 1259      6B536574 
+ 1259      43616C6C 
+ 1259      6261636B 
+ 1260              	.LASF20:
+ 1261 0037 4755495F 		.ascii	"GUI_X_Systick_Intr\000"
+ 1261      585F5379 
+ 1261      73746963 
+ 1261      6B5F496E 
+ 1261      747200
+ 1262              	.LASF23:
+ 1263 004a 4755495F 		.ascii	"GUI_X_Log\000"
+ 1263      585F4C6F 
+ 1263      6700
+ 1264              	.LASF5:
+ 1265 0054 6C6F6E67 		.ascii	"long int\000"
+ 1265      20696E74 
+ 1265      00
+ 1266              	.LASF6:
+ 1267 005d 73686F72 		.ascii	"short unsigned int\000"
+ 1267      7420756E 
+ 1267      7369676E 
+ 1267      65642069 
+ 1267      6E7400
+ 1268              	.LASF9:
+ 1269 0070 5F5F696E 		.ascii	"__int32_t\000"
+ 1269      7433325F 
+ 1269      7400
+ 1270              	.LASF2:
+ 1271 007a 73686F72 		.ascii	"short int\000"
+ 1271      7420696E 
+ 1271      7400
+ 1272              	.LASF38:
+ 1273 0084 5F5F7A65 		.ascii	"__zero_table_t\000"
+ 1273      726F5F74 
+ 1273      61626C65 
+ 1273      5F7400
+ 1274              	.LASF28:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 27
+
+
+ 1275 0093 4755495F 		.ascii	"GUI_X_Init\000"
+ 1275      585F496E 
+ 1275      697400
+ 1276              	.LASF17:
+ 1277 009e 666C6F61 		.ascii	"float\000"
+ 1277      7400
+ 1278              	.LASF24:
+ 1279 00a4 4755495F 		.ascii	"GUI_X_Warn\000"
+ 1279      585F5761 
+ 1279      726E00
+ 1280              	.LASF12:
+ 1281 00af 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1281      206C6F6E 
+ 1281      6720756E 
+ 1281      7369676E 
+ 1281      65642069 
+ 1282              	.LASF4:
+ 1283 00c6 756E7369 		.ascii	"unsigned char\000"
+ 1283      676E6564 
+ 1283      20636861 
+ 1283      7200
+ 1284              	.LASF37:
+ 1285 00d4 5F5F636F 		.ascii	"__copy_table_end__\000"
+ 1285      70795F74 
+ 1285      61626C65 
+ 1285      5F656E64 
+ 1285      5F5F00
+ 1286              	.LASF33:
+ 1287 00e7 4E505F67 		.ascii	"NP_g_pFrameBuffer\000"
+ 1287      5F704672 
+ 1287      616D6542 
+ 1287      75666665 
+ 1287      7200
+ 1288              	.LASF51:
+ 1289 00f9 43795379 		.ascii	"CySysTickStart\000"
+ 1289      73546963 
+ 1289      6B537461 
+ 1289      727400
+ 1290              	.LASF1:
+ 1291 0108 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1291      20756E73 
+ 1291      69676E65 
+ 1291      6420696E 
+ 1291      7400
+ 1292              	.LASF34:
+ 1293 011a 4E505F67 		.ascii	"NP_g_nFrameBufferSize\000"
+ 1293      5F6E4672 
+ 1293      616D6542 
+ 1293      75666665 
+ 1293      7253697A 
+ 1294              	.LASF48:
+ 1295 0130 2E5C4755 		.ascii	".\\GUI_X.c\000"
+ 1295      495F582E 
+ 1295      6300
+ 1296              	.LASF32:
+ 1297 013a 4E505F67 		.ascii	"NP_g_bOwnsBuffer\000"
+ 1297      5F624F77 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 28
+
+
+ 1297      6E734275 
+ 1297      66666572 
+ 1297      00
+ 1298              	.LASF26:
+ 1299 014b 4755495F 		.ascii	"GUI_X_Systick_Init\000"
+ 1299      585F5379 
+ 1299      73746963 
+ 1299      6B5F496E 
+ 1299      697400
+ 1300              	.LASF18:
+ 1301 015e 646F7562 		.ascii	"double\000"
+ 1301      6C6500
+ 1302              	.LASF31:
+ 1303 0165 4E505F67 		.ascii	"NP_g_nDMA_TD\000"
+ 1303      5F6E444D 
+ 1303      415F5444 
+ 1303      00
+ 1304              	.LASF10:
+ 1305 0172 5F5F7569 		.ascii	"__uint32_t\000"
+ 1305      6E743332 
+ 1305      5F7400
+ 1306              	.LASF16:
+ 1307 017d 75696E74 		.ascii	"uint32\000"
+ 1307      333200
+ 1308              	.LASF25:
+ 1309 0184 4755495F 		.ascii	"GUI_X_ErrorOut\000"
+ 1309      585F4572 
+ 1309      726F724F 
+ 1309      757400
+ 1310              	.LASF0:
+ 1311 0193 756E7369 		.ascii	"unsigned int\000"
+ 1311      676E6564 
+ 1311      20696E74 
+ 1311      00
+ 1312              	.LASF49:
+ 1313 01a0 5C5C766D 		.ascii	"\\\\vmware-host\\Shared Folders\\Documents\\PSoC Cr"
+ 1313      77617265 
+ 1313      2D686F73 
+ 1313      745C5368 
+ 1313      61726564 
+ 1314 01ce 6561746F 		.ascii	"eator\\FinalProject\\FinalV2.cydsn\000"
+ 1314      725C4669 
+ 1314      6E616C50 
+ 1314      726F6A65 
+ 1314      63745C46 
+ 1315              	.LASF3:
+ 1316 01ef 63686172 		.ascii	"char\000"
+ 1316      00
+ 1317              	.LASF43:
+ 1318 01f4 64657374 		.ascii	"dest\000"
+ 1318      00
+ 1319              	.LASF41:
+ 1320 01f9 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1320      52784275 
+ 1320      66666572 
+ 1320      00
+ 1321              	.LASF52:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 29
+
+
+ 1322 0206 43794861 		.ascii	"CyHalt\000"
+ 1322      6C7400
+ 1323              	.LASF42:
+ 1324 020d 4F535F54 		.ascii	"OS_TimeMS\000"
+ 1324      696D654D 
+ 1324      5300
+ 1325              	.LASF13:
+ 1326 0217 696E7433 		.ascii	"int32_t\000"
+ 1326      325F7400 
+ 1327              	.LASF8:
+ 1328 021f 73697A65 		.ascii	"sizetype\000"
+ 1328      74797065 
+ 1328      00
+ 1329              	.LASF27:
+ 1330 0228 74456E64 		.ascii	"tEnd\000"
+ 1330      00
+ 1331              	.LASF11:
+ 1332 022d 6C6F6E67 		.ascii	"long long int\000"
+ 1332      206C6F6E 
+ 1332      6720696E 
+ 1332      7400
+ 1333              	.LASF19:
+ 1334 023b 63795379 		.ascii	"cySysTickCallback\000"
+ 1334      73546963 
+ 1334      6B43616C 
+ 1334      6C626163 
+ 1334      6B00
+ 1335              	.LASF22:
+ 1336 024d 4755495F 		.ascii	"GUI_X_Delay\000"
+ 1336      585F4465 
+ 1336      6C617900 
+ 1337              	.LASF21:
+ 1338 0259 4755495F 		.ascii	"GUI_X_ExecIdle\000"
+ 1338      585F4578 
+ 1338      65634964 
+ 1338      6C6500
+ 1339              	.LASF30:
+ 1340 0268 4E505F67 		.ascii	"NP_g_nDMA_Chan\000"
+ 1340      5F6E444D 
+ 1340      415F4368 
+ 1340      616E00
+ 1341              	.LASF44:
+ 1342 0277 776C656E 		.ascii	"wlen\000"
+ 1342      00
+ 1343              	.LASF45:
+ 1344 027c 43795379 		.ascii	"CySysTickGetCallback\000"
+ 1344      73546963 
+ 1344      6B476574 
+ 1344      43616C6C 
+ 1344      6261636B 
+ 1345              	.LASF15:
+ 1346 0291 75696E74 		.ascii	"uint8\000"
+ 1346      3800
+ 1347              	.LASF50:
+ 1348 0297 4755495F 		.ascii	"GUI_X_GetTime\000"
+ 1348      585F4765 
+ 1348      7454696D 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccP5tbad.s 			page 30
+
+
+ 1348      6500
+ 1349              	.LASF47:
+ 1350 02a5 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 1350      4320342E 
+ 1350      392E3320 
+ 1350      32303135 
+ 1350      30333033 
+ 1351 02d8 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 1351      20726576 
+ 1351      6973696F 
+ 1351      6E203232 
+ 1351      31323230 
+ 1352 030b 67202D73 		.ascii	"g -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 1352      74643D67 
+ 1352      6E753939 
+ 1352      202D6666 
+ 1352      756E6374 
+ 1353              	.LASF14:
+ 1354 033e 75696E74 		.ascii	"uint32_t\000"
+ 1354      33325F74 
+ 1354      00
+ 1355              	.LASF36:
+ 1356 0347 5F5F636F 		.ascii	"__copy_table_start__\000"
+ 1356      70795F74 
+ 1356      61626C65 
+ 1356      5F737461 
+ 1356      72745F5F 
+ 1357              	.LASF39:
+ 1358 035c 5F5F7A65 		.ascii	"__zero_table_start__\000"
+ 1358      726F5F74 
+ 1358      61626C65 
+ 1358      5F737461 
+ 1358      72745F5F 
+ 1359              	.LASF7:
+ 1360 0371 7369676E 		.ascii	"signed char\000"
+ 1360      65642063 
+ 1360      68617200 
+ 1361              	.LASF29:
+ 1362 037d 4E505F67 		.ascii	"NP_g_nNumberOfPixels\000"
+ 1362      5F6E4E75 
+ 1362      6D626572 
+ 1362      4F665069 
+ 1362      78656C73 
+ 1363              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

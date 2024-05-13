@@ -1,0 +1,1553 @@
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"arm_cfft_radix4_init_q15.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.text.arm_cfft_radix4_init_q15,"ax",%progbits
+  19              		.align	2
+  20              		.global	arm_cfft_radix4_init_q15
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	arm_cfft_radix4_init_q15, %function
+  24              	arm_cfft_radix4_init_q15:
+  25              	.LFB84:
+  26              		.file 1 ".\\DSP\\Source\\TransformFunctions\\arm_cfft_radix4_init_q15.c"
+   1:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** /* ----------------------------------------------------------------------
+   2:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * Project:      CMSIS DSP Library
+   3:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * Title:        arm_cfft_radix4_init_q15.c
+   4:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * Description:  Radix-4 Decimation in Frequency Q15 FFT & IFFT initialization function
+   5:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  *
+   6:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * $Date:        23 April 2021
+   7:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * $Revision:    V1.9.0
+   8:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  *
+   9:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * Target Processor: Cortex-M and Cortex-A cores
+  10:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * -------------------------------------------------------------------- */
+  11:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** /*
+  12:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * Copyright (C) 2010-2021 ARM Limited or its affiliates. All rights reserved.
+  13:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  *
+  14:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * SPDX-License-Identifier: Apache-2.0
+  15:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  *
+  16:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * Licensed under the Apache License, Version 2.0 (the License); you may
+  17:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * not use this file except in compliance with the License.
+  18:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * You may obtain a copy of the License at
+  19:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  *
+  20:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * www.apache.org/licenses/LICENSE-2.0
+  21:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  *
+  22:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * Unless required by applicable law or agreed to in writing, software
+  23:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+  24:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  25:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * See the License for the specific language governing permissions and
+  26:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  * limitations under the License.
+  27:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  */
+  28:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+  29:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** #include "dsp/transform_functions.h"
+  30:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** #include "arm_common_tables.h"
+  31:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 2
+
+
+  32:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** /**
+  33:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   @ingroup groupTransforms
+  34:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  */
+  35:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+  36:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+  37:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** /**
+  38:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   @addtogroup ComplexFFT
+  39:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   @{
+  40:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  */
+  41:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+  42:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+  43:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** /**
+  44:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   @brief Initialization function for the Q15 CFFT/CIFFT.
+  45:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   @deprecated    Do not use this function. It has been superseded by \ref arm_cfft_q15 and will be 
+  46:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   @param[in,out] S              points to an instance of the Q15 CFFT/CIFFT structure
+  47:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   @param[in]     fftLen         length of the FFT
+  48:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   @param[in]     ifftFlag       flag that selects transform direction
+  49:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****                    - value = 0: forward transform
+  50:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****                    - value = 1: inverse transform
+  51:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   @param[in]     bitReverseFlag flag that enables / disables bit reversal of output
+  52:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****                    - value = 0: disables bit reversal of output
+  53:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****                    - value = 1: enables bit reversal of output
+  54:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   @return        execution status
+  55:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****                    - \ref ARM_MATH_SUCCESS        : Operation successful
+  56:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****                    - \ref ARM_MATH_ARGUMENT_ERROR : <code>fftLen</code> is not a supported length
+  57:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+  58:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   @par           Details
+  59:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****                    The parameter <code>ifftFlag</code> controls whether a forward or inverse transf
+  60:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****                    Set(=1) ifftFlag for calculation of CIFFT otherwise  CFFT is calculated
+  61:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   @par
+  62:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****                    The parameter <code>bitReverseFlag</code> controls whether output is in normal o
+  63:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****                    Set(=1) bitReverseFlag for output to be in normal order otherwise output is in b
+  64:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   @par
+  65:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****                    The parameter <code>fftLen</code> Specifies length of CFFT/CIFFT process. Suppor
+  66:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   @par
+  67:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****                    This Function also initializes Twiddle factor table pointer and Bit reversal tab
+  68:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****  */
+  69:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+  70:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** arm_status arm_cfft_radix4_init_q15(
+  71:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   arm_cfft_radix4_instance_q15 * S,
+  72:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   uint16_t fftLen,
+  73:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   uint8_t ifftFlag,
+  74:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   uint8_t bitReverseFlag)
+  75:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** {
+  27              		.loc 1 75 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  32              	.LVL0:
+  33 0000 10B4     		push	{r4}
+  34              		.cfi_def_cfa_offset 4
+  35              		.cfi_offset 4, -4
+  36              	.LVL1:
+  76:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   /*  Initialise the default arm status */
+  77:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   arm_status status = ARM_MATH_ARGUMENT_ERROR;
+  78:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 3
+
+
+  79:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** #if !defined(ARM_DSP_CONFIG_TABLES) || defined(ARM_FFT_ALLOW_TABLES)
+  80:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+  81:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** #if !defined(ARM_DSP_CONFIG_TABLES) || defined(ARM_ALL_FFT_TABLES) || defined(ARM_TABLE_TWIDDLECOEF
+  82:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+  83:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   /*  Initialise the default arm status */
+  84:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   status = ARM_MATH_SUCCESS;
+  85:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   /*  Initialise the FFT length */
+  86:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   S->fftLen = fftLen;
+  37              		.loc 1 86 0
+  38 0002 0180     		strh	r1, [r0]	@ movhi
+  87:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   /*  Initialise the Twiddle coefficient pointer */
+  88:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   S->pTwiddle = (q15_t *) twiddleCoef_4096_q15;
+  39              		.loc 1 88 0
+  40 0004 1D4C     		ldr	r4, .L11
+  41 0006 4460     		str	r4, [r0, #4]
+  89:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   /*  Initialise the Flag for selection of CFFT or CIFFT */
+  90:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   S->ifftFlag = ifftFlag;
+  42              		.loc 1 90 0
+  43 0008 8270     		strb	r2, [r0, #2]
+  91:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   /*  Initialise the Flag for calculation Bit reversal or not */
+  92:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   S->bitReverseFlag = bitReverseFlag;
+  44              		.loc 1 92 0
+  45 000a C370     		strb	r3, [r0, #3]
+  93:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+  94:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** #if !defined(ARM_DSP_CONFIG_TABLES) || defined(ARM_ALL_FFT_TABLES) || defined(ARM_TABLE_BITREV_1024
+  95:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+  96:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   /*  Initializations of structure parameters depending on the FFT length */
+  97:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   switch (S->fftLen)
+  46              		.loc 1 97 0
+  47 000c B1F5807F 		cmp	r1, #256
+  48 0010 19D0     		beq	.L3
+  49 0012 04D8     		bhi	.L4
+  50 0014 1029     		cmp	r1, #16
+  51 0016 24D0     		beq	.L5
+  52 0018 4029     		cmp	r1, #64
+  53 001a 1BD0     		beq	.L6
+  54 001c 29E0     		b	.L9
+  55              	.L4:
+  56 001e B1F5806F 		cmp	r1, #1024
+  57 0022 09D0     		beq	.L7
+  58 0024 B1F5805F 		cmp	r1, #4096
+  59 0028 23D1     		bne	.L9
+  98:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   {
+  99:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   case 4096U:
+ 100:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     /*  Initializations of structure parameters for 4096 point FFT */
+ 101:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+ 102:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     /*  Initialise the twiddle coef modifier value */
+ 103:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->twidCoefModifier = 1U;
+  60              		.loc 1 103 0
+  61 002a 0123     		movs	r3, #1
+  62              	.LVL2:
+  63 002c 8381     		strh	r3, [r0, #12]	@ movhi
+ 104:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     /*  Initialise the bit reversal table modifier */
+ 105:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->bitRevFactor = 1U;
+  64              		.loc 1 105 0
+  65 002e C381     		strh	r3, [r0, #14]	@ movhi
+ 106:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     /*  Initialise the bit reversal table pointer */
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 4
+
+
+ 107:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->pBitRevTable = (uint16_t *) armBitRevTable;
+  66              		.loc 1 107 0
+  67 0030 134B     		ldr	r3, .L11+4
+  68 0032 8360     		str	r3, [r0, #8]
+  84:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   /*  Initialise the FFT length */
+  69              		.loc 1 84 0
+  70 0034 0020     		movs	r0, #0
+  71              	.LVL3:
+ 108:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+ 109:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     break;
+  72              		.loc 1 109 0
+  73 0036 1DE0     		b	.L2
+  74              	.LVL4:
+  75              	.L7:
+ 110:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+ 111:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   case 1024U:
+ 112:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     /*  Initializations of structure parameters for 1024 point FFT */
+ 113:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->twidCoefModifier = 4U;
+  76              		.loc 1 113 0
+  77 0038 0423     		movs	r3, #4
+  78              	.LVL5:
+  79 003a 8381     		strh	r3, [r0, #12]	@ movhi
+ 114:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->bitRevFactor = 4U;
+  80              		.loc 1 114 0
+  81 003c C381     		strh	r3, [r0, #14]	@ movhi
+ 115:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->pBitRevTable = (uint16_t *) & armBitRevTable[3];
+  82              		.loc 1 115 0
+  83 003e 114B     		ldr	r3, .L11+8
+  84 0040 8360     		str	r3, [r0, #8]
+  84:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   /*  Initialise the FFT length */
+  85              		.loc 1 84 0
+  86 0042 0020     		movs	r0, #0
+  87              	.LVL6:
+ 116:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+ 117:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     break;
+  88              		.loc 1 117 0
+  89 0044 16E0     		b	.L2
+  90              	.LVL7:
+  91              	.L3:
+ 118:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+ 119:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   case 256U:
+ 120:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     /*  Initializations of structure parameters for 256 point FFT */
+ 121:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->twidCoefModifier = 16U;
+  92              		.loc 1 121 0
+  93 0046 1023     		movs	r3, #16
+  94              	.LVL8:
+  95 0048 8381     		strh	r3, [r0, #12]	@ movhi
+ 122:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->bitRevFactor = 16U;
+  96              		.loc 1 122 0
+  97 004a C381     		strh	r3, [r0, #14]	@ movhi
+ 123:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->pBitRevTable = (uint16_t *) & armBitRevTable[15];
+  98              		.loc 1 123 0
+  99 004c 0E4B     		ldr	r3, .L11+12
+ 100 004e 8360     		str	r3, [r0, #8]
+  84:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   /*  Initialise the FFT length */
+ 101              		.loc 1 84 0
+ 102 0050 0020     		movs	r0, #0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 5
+
+
+ 103              	.LVL9:
+ 124:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+ 125:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     break;
+ 104              		.loc 1 125 0
+ 105 0052 0FE0     		b	.L2
+ 106              	.LVL10:
+ 107              	.L6:
+ 126:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+ 127:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   case 64U:
+ 128:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     /*  Initializations of structure parameters for 64 point FFT */
+ 129:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->twidCoefModifier = 64U;
+ 108              		.loc 1 129 0
+ 109 0054 4023     		movs	r3, #64
+ 110              	.LVL11:
+ 111 0056 8381     		strh	r3, [r0, #12]	@ movhi
+ 130:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->bitRevFactor = 64U;
+ 112              		.loc 1 130 0
+ 113 0058 C381     		strh	r3, [r0, #14]	@ movhi
+ 131:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->pBitRevTable = (uint16_t *) & armBitRevTable[63];
+ 114              		.loc 1 131 0
+ 115 005a 0C4B     		ldr	r3, .L11+16
+ 116 005c 8360     		str	r3, [r0, #8]
+  84:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   /*  Initialise the FFT length */
+ 117              		.loc 1 84 0
+ 118 005e 0020     		movs	r0, #0
+ 119              	.LVL12:
+ 132:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+ 133:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     break;
+ 120              		.loc 1 133 0
+ 121 0060 08E0     		b	.L2
+ 122              	.LVL13:
+ 123              	.L5:
+ 134:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+ 135:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   case 16U:
+ 136:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     /*  Initializations of structure parameters for 16 point FFT */
+ 137:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->twidCoefModifier = 256U;
+ 124              		.loc 1 137 0
+ 125 0062 4FF48073 		mov	r3, #256
+ 126              	.LVL14:
+ 127 0066 8381     		strh	r3, [r0, #12]	@ movhi
+ 138:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->bitRevFactor = 256U;
+ 128              		.loc 1 138 0
+ 129 0068 C381     		strh	r3, [r0, #14]	@ movhi
+ 139:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     S->pBitRevTable = (uint16_t *) & armBitRevTable[255];
+ 130              		.loc 1 139 0
+ 131 006a 094B     		ldr	r3, .L11+20
+ 132 006c 8360     		str	r3, [r0, #8]
+  84:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   /*  Initialise the FFT length */
+ 133              		.loc 1 84 0
+ 134 006e 0020     		movs	r0, #0
+ 135              	.LVL15:
+ 140:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+ 141:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     break;
+ 136              		.loc 1 141 0
+ 137 0070 00E0     		b	.L2
+ 138              	.LVL16:
+ 139              	.L9:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 6
+
+
+ 142:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+ 143:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   default:
+ 144:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     /*  Reporting argument error if fftSize is not valid value */
+ 145:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     status = ARM_MATH_ARGUMENT_ERROR;
+ 140              		.loc 1 145 0
+ 141 0072 FF20     		movs	r0, #255
+ 142              	.LVL17:
+ 143              	.L2:
+ 146:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****     break;
+ 147:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   }
+ 148:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** 
+ 149:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** #endif
+ 150:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** #endif 
+ 151:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** #endif
+ 152:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c ****   return (status);
+ 153:.\DSP\Source\TransformFunctions/arm_cfft_radix4_init_q15.c **** }
+ 144              		.loc 1 153 0
+ 145 0074 40B2     		sxtb	r0, r0
+ 146 0076 5DF8044B 		ldr	r4, [sp], #4
+ 147              		.cfi_restore 4
+ 148              		.cfi_def_cfa_offset 0
+ 149 007a 7047     		bx	lr
+ 150              	.L12:
+ 151              		.align	2
+ 152              	.L11:
+ 153 007c 00000000 		.word	twiddleCoef_4096_q15
+ 154 0080 00000000 		.word	armBitRevTable
+ 155 0084 06000000 		.word	armBitRevTable+6
+ 156 0088 1E000000 		.word	armBitRevTable+30
+ 157 008c 7E000000 		.word	armBitRevTable+126
+ 158 0090 FE010000 		.word	armBitRevTable+510
+ 159              		.cfi_endproc
+ 160              	.LFE84:
+ 161              		.size	arm_cfft_radix4_init_q15, .-arm_cfft_radix4_init_q15
+ 162              		.text
+ 163              	.Letext0:
+ 164              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+ 165              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+ 166              		.file 4 ".\\DSP\\Include/arm_math_types.h"
+ 167              		.file 5 ".\\DSP\\Include/dsp/transform_functions.h"
+ 168              		.file 6 ".\\Core\\Include/cmsis_gcc.h"
+ 169              		.file 7 ".\\DSP\\Include/arm_common_tables.h"
+ 170              		.section	.debug_info,"",%progbits
+ 171              	.Ldebug_info0:
+ 172 0000 01030000 		.4byte	0x301
+ 173 0004 0400     		.2byte	0x4
+ 174 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 175 000a 04       		.byte	0x4
+ 176 000b 01       		.uleb128 0x1
+ 177 000c E4020000 		.4byte	.LASF50
+ 178 0010 01       		.byte	0x1
+ 179 0011 A0000000 		.4byte	.LASF51
+ 180 0015 65020000 		.4byte	.LASF52
+ 181 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 182 001d 00000000 		.4byte	0
+ 183 0021 00000000 		.4byte	.Ldebug_line0
+ 184 0025 02       		.uleb128 0x2
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 7
+
+
+ 185 0026 01       		.byte	0x1
+ 186 0027 06       		.byte	0x6
+ 187 0028 B0030000 		.4byte	.LASF0
+ 188 002c 03       		.uleb128 0x3
+ 189 002d 13000000 		.4byte	.LASF2
+ 190 0031 02       		.byte	0x2
+ 191 0032 1D       		.byte	0x1d
+ 192 0033 37000000 		.4byte	0x37
+ 193 0037 02       		.uleb128 0x2
+ 194 0038 01       		.byte	0x1
+ 195 0039 08       		.byte	0x8
+ 196 003a E0000000 		.4byte	.LASF1
+ 197 003e 03       		.uleb128 0x3
+ 198 003f 3B000000 		.4byte	.LASF3
+ 199 0043 02       		.byte	0x2
+ 200 0044 29       		.byte	0x29
+ 201 0045 49000000 		.4byte	0x49
+ 202 0049 02       		.uleb128 0x2
+ 203 004a 02       		.byte	0x2
+ 204 004b 05       		.byte	0x5
+ 205 004c D1020000 		.4byte	.LASF4
+ 206 0050 03       		.uleb128 0x3
+ 207 0051 50010000 		.4byte	.LASF5
+ 208 0055 02       		.byte	0x2
+ 209 0056 2B       		.byte	0x2b
+ 210 0057 5B000000 		.4byte	0x5b
+ 211 005b 02       		.uleb128 0x2
+ 212 005c 02       		.byte	0x2
+ 213 005d 07       		.byte	0x7
+ 214 005e 20010000 		.4byte	.LASF6
+ 215 0062 02       		.uleb128 0x2
+ 216 0063 04       		.byte	0x4
+ 217 0064 05       		.byte	0x5
+ 218 0065 86030000 		.4byte	.LASF7
+ 219 0069 03       		.uleb128 0x3
+ 220 006a 62010000 		.4byte	.LASF8
+ 221 006e 02       		.byte	0x2
+ 222 006f 41       		.byte	0x41
+ 223 0070 74000000 		.4byte	0x74
+ 224 0074 02       		.uleb128 0x2
+ 225 0075 04       		.byte	0x4
+ 226 0076 07       		.byte	0x7
+ 227 0077 0E010000 		.4byte	.LASF9
+ 228 007b 02       		.uleb128 0x2
+ 229 007c 08       		.byte	0x8
+ 230 007d 05       		.byte	0x5
+ 231 007e 49020000 		.4byte	.LASF10
+ 232 0082 02       		.uleb128 0x2
+ 233 0083 08       		.byte	0x8
+ 234 0084 07       		.byte	0x7
+ 235 0085 C5010000 		.4byte	.LASF11
+ 236 0089 04       		.uleb128 0x4
+ 237 008a 04       		.byte	0x4
+ 238 008b 05       		.byte	0x5
+ 239 008c 696E7400 		.ascii	"int\000"
+ 240 0090 02       		.uleb128 0x2
+ 241 0091 04       		.byte	0x4
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 8
+
+
+ 242 0092 07       		.byte	0x7
+ 243 0093 A7010000 		.4byte	.LASF12
+ 244 0097 03       		.uleb128 0x3
+ 245 0098 DC010000 		.4byte	.LASF13
+ 246 009c 03       		.byte	0x3
+ 247 009d 15       		.byte	0x15
+ 248 009e 2C000000 		.4byte	0x2c
+ 249 00a2 03       		.uleb128 0x3
+ 250 00a3 03020000 		.4byte	.LASF14
+ 251 00a7 03       		.byte	0x3
+ 252 00a8 20       		.byte	0x20
+ 253 00a9 3E000000 		.4byte	0x3e
+ 254 00ad 03       		.uleb128 0x3
+ 255 00ae DB020000 		.4byte	.LASF15
+ 256 00b2 03       		.byte	0x3
+ 257 00b3 21       		.byte	0x21
+ 258 00b4 50000000 		.4byte	0x50
+ 259 00b8 03       		.uleb128 0x3
+ 260 00b9 7D030000 		.4byte	.LASF16
+ 261 00bd 03       		.byte	0x3
+ 262 00be 2D       		.byte	0x2d
+ 263 00bf 69000000 		.4byte	0x69
+ 264 00c3 02       		.uleb128 0x2
+ 265 00c4 04       		.byte	0x4
+ 266 00c5 07       		.byte	0x7
+ 267 00c6 40020000 		.4byte	.LASF17
+ 268 00ca 02       		.uleb128 0x2
+ 269 00cb 01       		.byte	0x1
+ 270 00cc 08       		.byte	0x8
+ 271 00cd 60020000 		.4byte	.LASF18
+ 272 00d1 02       		.uleb128 0x2
+ 273 00d2 08       		.byte	0x8
+ 274 00d3 04       		.byte	0x4
+ 275 00d4 5B010000 		.4byte	.LASF19
+ 276 00d8 02       		.uleb128 0x2
+ 277 00d9 04       		.byte	0x4
+ 278 00da 04       		.byte	0x4
+ 279 00db 9A000000 		.4byte	.LASF20
+ 280 00df 02       		.uleb128 0x2
+ 281 00e0 08       		.byte	0x8
+ 282 00e1 04       		.byte	0x4
+ 283 00e2 8F030000 		.4byte	.LASF21
+ 284 00e6 05       		.uleb128 0x5
+ 285 00e7 94000000 		.4byte	.LASF22
+ 286 00eb 04       		.byte	0x4
+ 287 00ec 1F01     		.2byte	0x11f
+ 288 00ee A2000000 		.4byte	0xa2
+ 289 00f2 06       		.uleb128 0x6
+ 290 00f3 01       		.byte	0x1
+ 291 00f4 04       		.byte	0x4
+ 292 00f5 5802     		.2byte	0x258
+ 293 00f7 2C010000 		.4byte	0x12c
+ 294 00fb 07       		.uleb128 0x7
+ 295 00fc BB020000 		.4byte	.LASF23
+ 296 0100 00       		.sleb128 0
+ 297 0101 07       		.uleb128 0x7
+ 298 0102 86010000 		.4byte	.LASF24
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 9
+
+
+ 299 0106 7F       		.sleb128 -1
+ 300 0107 07       		.uleb128 0x7
+ 301 0108 0B020000 		.4byte	.LASF25
+ 302 010c 7E       		.sleb128 -2
+ 303 010d 07       		.uleb128 0x7
+ 304 010e 70000000 		.4byte	.LASF26
+ 305 0112 7D       		.sleb128 -3
+ 306 0113 07       		.uleb128 0x7
+ 307 0114 F3010000 		.4byte	.LASF27
+ 308 0118 7C       		.sleb128 -4
+ 309 0119 07       		.uleb128 0x7
+ 310 011a F9030000 		.4byte	.LASF28
+ 311 011e 7B       		.sleb128 -5
+ 312 011f 07       		.uleb128 0x7
+ 313 0120 3A010000 		.4byte	.LASF29
+ 314 0124 7A       		.sleb128 -6
+ 315 0125 07       		.uleb128 0x7
+ 316 0126 21020000 		.4byte	.LASF30
+ 317 012a 79       		.sleb128 -7
+ 318 012b 00       		.byte	0
+ 319 012c 05       		.uleb128 0x5
+ 320 012d EE030000 		.4byte	.LASF31
+ 321 0131 04       		.byte	0x4
+ 322 0132 6102     		.2byte	0x261
+ 323 0134 F2000000 		.4byte	0xf2
+ 324 0138 08       		.uleb128 0x8
+ 325 0139 04       		.byte	0x4
+ 326 013a 3E010000 		.4byte	0x13e
+ 327 013e 09       		.uleb128 0x9
+ 328 013f E6000000 		.4byte	0xe6
+ 329 0143 08       		.uleb128 0x8
+ 330 0144 04       		.byte	0x4
+ 331 0145 49010000 		.4byte	0x149
+ 332 0149 09       		.uleb128 0x9
+ 333 014a AD000000 		.4byte	0xad
+ 334 014e 0A       		.uleb128 0xa
+ 335 014f 10       		.byte	0x10
+ 336 0150 05       		.byte	0x5
+ 337 0151 50       		.byte	0x50
+ 338 0152 AB010000 		.4byte	0x1ab
+ 339 0156 0B       		.uleb128 0xb
+ 340 0157 33010000 		.4byte	.LASF32
+ 341 015b 05       		.byte	0x5
+ 342 015c 52       		.byte	0x52
+ 343 015d AD000000 		.4byte	0xad
+ 344 0161 00       		.byte	0
+ 345 0162 0B       		.uleb128 0xb
+ 346 0163 9E010000 		.4byte	.LASF33
+ 347 0167 05       		.byte	0x5
+ 348 0168 53       		.byte	0x53
+ 349 0169 97000000 		.4byte	0x97
+ 350 016d 02       		.byte	0x2
+ 351 016e 0B       		.uleb128 0xb
+ 352 016f E4010000 		.4byte	.LASF34
+ 353 0173 05       		.byte	0x5
+ 354 0174 54       		.byte	0x54
+ 355 0175 97000000 		.4byte	0x97
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 10
+
+
+ 356 0179 03       		.byte	0x3
+ 357 017a 0B       		.uleb128 0xb
+ 358 017b 57020000 		.4byte	.LASF35
+ 359 017f 05       		.byte	0x5
+ 360 0180 55       		.byte	0x55
+ 361 0181 38010000 		.4byte	0x138
+ 362 0185 04       		.byte	0x4
+ 363 0186 0B       		.uleb128 0xb
+ 364 0187 87000000 		.4byte	.LASF36
+ 365 018b 05       		.byte	0x5
+ 366 018c 56       		.byte	0x56
+ 367 018d 43010000 		.4byte	0x143
+ 368 0191 08       		.byte	0x8
+ 369 0192 0B       		.uleb128 0xb
+ 370 0193 B4010000 		.4byte	.LASF37
+ 371 0197 05       		.byte	0x5
+ 372 0198 57       		.byte	0x57
+ 373 0199 AD000000 		.4byte	0xad
+ 374 019d 0C       		.byte	0xc
+ 375 019e 0B       		.uleb128 0xb
+ 376 019f EE000000 		.4byte	.LASF38
+ 377 01a3 05       		.byte	0x5
+ 378 01a4 58       		.byte	0x58
+ 379 01a5 AD000000 		.4byte	0xad
+ 380 01a9 0E       		.byte	0xe
+ 381 01aa 00       		.byte	0
+ 382 01ab 03       		.uleb128 0x3
+ 383 01ac BC030000 		.4byte	.LASF39
+ 384 01b0 05       		.byte	0x5
+ 385 01b1 59       		.byte	0x59
+ 386 01b2 4E010000 		.4byte	0x14e
+ 387 01b6 08       		.uleb128 0x8
+ 388 01b7 04       		.byte	0x4
+ 389 01b8 AB010000 		.4byte	0x1ab
+ 390 01bc 08       		.uleb128 0x8
+ 391 01bd 04       		.byte	0x4
+ 392 01be C2010000 		.4byte	0x1c2
+ 393 01c2 09       		.uleb128 0x9
+ 394 01c3 B8000000 		.4byte	0xb8
+ 395 01c7 0C       		.uleb128 0xc
+ 396 01c8 6D010000 		.4byte	.LASF53
+ 397 01cc 01       		.byte	0x1
+ 398 01cd 46       		.byte	0x46
+ 399 01ce 2C010000 		.4byte	0x12c
+ 400 01d2 00000000 		.4byte	.LFB84
+ 401 01d6 94000000 		.4byte	.LFE84-.LFB84
+ 402 01da 01       		.uleb128 0x1
+ 403 01db 9C       		.byte	0x9c
+ 404 01dc 26020000 		.4byte	0x226
+ 405 01e0 0D       		.uleb128 0xd
+ 406 01e1 5300     		.ascii	"S\000"
+ 407 01e3 01       		.byte	0x1
+ 408 01e4 47       		.byte	0x47
+ 409 01e5 B6010000 		.4byte	0x1b6
+ 410 01e9 00000000 		.4byte	.LLST0
+ 411 01ed 0E       		.uleb128 0xe
+ 412 01ee 33010000 		.4byte	.LASF32
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 11
+
+
+ 413 01f2 01       		.byte	0x1
+ 414 01f3 48       		.byte	0x48
+ 415 01f4 AD000000 		.4byte	0xad
+ 416 01f8 01       		.uleb128 0x1
+ 417 01f9 51       		.byte	0x51
+ 418 01fa 0E       		.uleb128 0xe
+ 419 01fb 9E010000 		.4byte	.LASF33
+ 420 01ff 01       		.byte	0x1
+ 421 0200 49       		.byte	0x49
+ 422 0201 97000000 		.4byte	0x97
+ 423 0205 01       		.uleb128 0x1
+ 424 0206 52       		.byte	0x52
+ 425 0207 0F       		.uleb128 0xf
+ 426 0208 E4010000 		.4byte	.LASF34
+ 427 020c 01       		.byte	0x1
+ 428 020d 4A       		.byte	0x4a
+ 429 020e 97000000 		.4byte	0x97
+ 430 0212 9E000000 		.4byte	.LLST1
+ 431 0216 10       		.uleb128 0x10
+ 432 0217 69000000 		.4byte	.LASF54
+ 433 021b 01       		.byte	0x1
+ 434 021c 4D       		.byte	0x4d
+ 435 021d 2C010000 		.4byte	0x12c
+ 436 0221 7E010000 		.4byte	.LLST2
+ 437 0225 00       		.byte	0
+ 438 0226 03       		.uleb128 0x3
+ 439 0227 2C000000 		.4byte	.LASF40
+ 440 022b 06       		.byte	0x6
+ 441 022c 8B       		.byte	0x8b
+ 442 022d DB020000 		.4byte	0x2db
+ 443 0231 08       		.uleb128 0x8
+ 444 0232 04       		.byte	0x4
+ 445 0233 B8000000 		.4byte	0xb8
+ 446 0237 11       		.uleb128 0x11
+ 447 0238 D9030000 		.4byte	.LASF41
+ 448 023c 06       		.byte	0x6
+ 449 023d 92       		.byte	0x92
+ 450 023e 42020000 		.4byte	0x242
+ 451 0242 09       		.uleb128 0x9
+ 452 0243 26020000 		.4byte	0x226
+ 453 0247 11       		.uleb128 0x11
+ 454 0248 FB000000 		.4byte	.LASF42
+ 455 024c 06       		.byte	0x6
+ 456 024d 93       		.byte	0x93
+ 457 024e 42020000 		.4byte	0x242
+ 458 0252 03       		.uleb128 0x3
+ 459 0253 5A000000 		.4byte	.LASF43
+ 460 0257 06       		.byte	0x6
+ 461 0258 90       		.byte	0x90
+ 462 0259 BA020000 		.4byte	0x2ba
+ 463 025d 11       		.uleb128 0x11
+ 464 025e 9B030000 		.4byte	.LASF44
+ 465 0262 06       		.byte	0x6
+ 466 0263 94       		.byte	0x94
+ 467 0264 68020000 		.4byte	0x268
+ 468 0268 09       		.uleb128 0x9
+ 469 0269 52020000 		.4byte	0x252
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 12
+
+
+ 470 026d 11       		.uleb128 0x11
+ 471 026e 00000000 		.4byte	.LASF45
+ 472 0272 06       		.byte	0x6
+ 473 0273 95       		.byte	0x95
+ 474 0274 68020000 		.4byte	0x268
+ 475 0278 12       		.uleb128 0x12
+ 476 0279 AD000000 		.4byte	0xad
+ 477 027d 89020000 		.4byte	0x289
+ 478 0281 13       		.uleb128 0x13
+ 479 0282 C3000000 		.4byte	0xc3
+ 480 0286 FF03     		.2byte	0x3ff
+ 481 0288 00       		.byte	0
+ 482 0289 11       		.uleb128 0x11
+ 483 028a 1D000000 		.4byte	.LASF46
+ 484 028e 07       		.byte	0x7
+ 485 028f 2B       		.byte	0x2b
+ 486 0290 94020000 		.4byte	0x294
+ 487 0294 09       		.uleb128 0x9
+ 488 0295 78020000 		.4byte	0x278
+ 489 0299 12       		.uleb128 0x12
+ 490 029a E6000000 		.4byte	0xe6
+ 491 029e AA020000 		.4byte	0x2aa
+ 492 02a2 13       		.uleb128 0x13
+ 493 02a3 C3000000 		.4byte	0xc3
+ 494 02a7 FF17     		.2byte	0x17ff
+ 495 02a9 00       		.byte	0
+ 496 02aa 11       		.uleb128 0x11
+ 497 02ab 45000000 		.4byte	.LASF47
+ 498 02af 07       		.byte	0x7
+ 499 02b0 BE       		.byte	0xbe
+ 500 02b1 B5020000 		.4byte	0x2b5
+ 501 02b5 09       		.uleb128 0x9
+ 502 02b6 99020000 		.4byte	0x299
+ 503 02ba 0A       		.uleb128 0xa
+ 504 02bb 08       		.byte	0x8
+ 505 02bc 06       		.byte	0x6
+ 506 02bd 8D       		.byte	0x8d
+ 507 02be DB020000 		.4byte	0x2db
+ 508 02c2 0B       		.uleb128 0xb
+ 509 02c3 DB000000 		.4byte	.LASF48
+ 510 02c7 06       		.byte	0x6
+ 511 02c8 8E       		.byte	0x8e
+ 512 02c9 31020000 		.4byte	0x231
+ 513 02cd 00       		.byte	0
+ 514 02ce 0B       		.uleb128 0xb
+ 515 02cf CC020000 		.4byte	.LASF49
+ 516 02d3 06       		.byte	0x6
+ 517 02d4 8F       		.byte	0x8f
+ 518 02d5 B8000000 		.4byte	0xb8
+ 519 02d9 04       		.byte	0x4
+ 520 02da 00       		.byte	0
+ 521 02db 14       		.uleb128 0x14
+ 522 02dc 0C       		.byte	0xc
+ 523 02dd 06       		.byte	0x6
+ 524 02de 87       		.byte	0x87
+ 525 02df 15       		.uleb128 0x15
+ 526 02e0 73726300 		.ascii	"src\000"
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 13
+
+
+ 527 02e4 06       		.byte	0x6
+ 528 02e5 88       		.byte	0x88
+ 529 02e6 BC010000 		.4byte	0x1bc
+ 530 02ea 00       		.byte	0
+ 531 02eb 0B       		.uleb128 0xb
+ 532 02ec DB000000 		.4byte	.LASF48
+ 533 02f0 06       		.byte	0x6
+ 534 02f1 89       		.byte	0x89
+ 535 02f2 31020000 		.4byte	0x231
+ 536 02f6 04       		.byte	0x4
+ 537 02f7 0B       		.uleb128 0xb
+ 538 02f8 CC020000 		.4byte	.LASF49
+ 539 02fc 06       		.byte	0x6
+ 540 02fd 8A       		.byte	0x8a
+ 541 02fe B8000000 		.4byte	0xb8
+ 542 0302 08       		.byte	0x8
+ 543 0303 00       		.byte	0
+ 544 0304 00       		.byte	0
+ 545              		.section	.debug_abbrev,"",%progbits
+ 546              	.Ldebug_abbrev0:
+ 547 0000 01       		.uleb128 0x1
+ 548 0001 11       		.uleb128 0x11
+ 549 0002 01       		.byte	0x1
+ 550 0003 25       		.uleb128 0x25
+ 551 0004 0E       		.uleb128 0xe
+ 552 0005 13       		.uleb128 0x13
+ 553 0006 0B       		.uleb128 0xb
+ 554 0007 03       		.uleb128 0x3
+ 555 0008 0E       		.uleb128 0xe
+ 556 0009 1B       		.uleb128 0x1b
+ 557 000a 0E       		.uleb128 0xe
+ 558 000b 55       		.uleb128 0x55
+ 559 000c 17       		.uleb128 0x17
+ 560 000d 11       		.uleb128 0x11
+ 561 000e 01       		.uleb128 0x1
+ 562 000f 10       		.uleb128 0x10
+ 563 0010 17       		.uleb128 0x17
+ 564 0011 00       		.byte	0
+ 565 0012 00       		.byte	0
+ 566 0013 02       		.uleb128 0x2
+ 567 0014 24       		.uleb128 0x24
+ 568 0015 00       		.byte	0
+ 569 0016 0B       		.uleb128 0xb
+ 570 0017 0B       		.uleb128 0xb
+ 571 0018 3E       		.uleb128 0x3e
+ 572 0019 0B       		.uleb128 0xb
+ 573 001a 03       		.uleb128 0x3
+ 574 001b 0E       		.uleb128 0xe
+ 575 001c 00       		.byte	0
+ 576 001d 00       		.byte	0
+ 577 001e 03       		.uleb128 0x3
+ 578 001f 16       		.uleb128 0x16
+ 579 0020 00       		.byte	0
+ 580 0021 03       		.uleb128 0x3
+ 581 0022 0E       		.uleb128 0xe
+ 582 0023 3A       		.uleb128 0x3a
+ 583 0024 0B       		.uleb128 0xb
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 14
+
+
+ 584 0025 3B       		.uleb128 0x3b
+ 585 0026 0B       		.uleb128 0xb
+ 586 0027 49       		.uleb128 0x49
+ 587 0028 13       		.uleb128 0x13
+ 588 0029 00       		.byte	0
+ 589 002a 00       		.byte	0
+ 590 002b 04       		.uleb128 0x4
+ 591 002c 24       		.uleb128 0x24
+ 592 002d 00       		.byte	0
+ 593 002e 0B       		.uleb128 0xb
+ 594 002f 0B       		.uleb128 0xb
+ 595 0030 3E       		.uleb128 0x3e
+ 596 0031 0B       		.uleb128 0xb
+ 597 0032 03       		.uleb128 0x3
+ 598 0033 08       		.uleb128 0x8
+ 599 0034 00       		.byte	0
+ 600 0035 00       		.byte	0
+ 601 0036 05       		.uleb128 0x5
+ 602 0037 16       		.uleb128 0x16
+ 603 0038 00       		.byte	0
+ 604 0039 03       		.uleb128 0x3
+ 605 003a 0E       		.uleb128 0xe
+ 606 003b 3A       		.uleb128 0x3a
+ 607 003c 0B       		.uleb128 0xb
+ 608 003d 3B       		.uleb128 0x3b
+ 609 003e 05       		.uleb128 0x5
+ 610 003f 49       		.uleb128 0x49
+ 611 0040 13       		.uleb128 0x13
+ 612 0041 00       		.byte	0
+ 613 0042 00       		.byte	0
+ 614 0043 06       		.uleb128 0x6
+ 615 0044 04       		.uleb128 0x4
+ 616 0045 01       		.byte	0x1
+ 617 0046 0B       		.uleb128 0xb
+ 618 0047 0B       		.uleb128 0xb
+ 619 0048 3A       		.uleb128 0x3a
+ 620 0049 0B       		.uleb128 0xb
+ 621 004a 3B       		.uleb128 0x3b
+ 622 004b 05       		.uleb128 0x5
+ 623 004c 01       		.uleb128 0x1
+ 624 004d 13       		.uleb128 0x13
+ 625 004e 00       		.byte	0
+ 626 004f 00       		.byte	0
+ 627 0050 07       		.uleb128 0x7
+ 628 0051 28       		.uleb128 0x28
+ 629 0052 00       		.byte	0
+ 630 0053 03       		.uleb128 0x3
+ 631 0054 0E       		.uleb128 0xe
+ 632 0055 1C       		.uleb128 0x1c
+ 633 0056 0D       		.uleb128 0xd
+ 634 0057 00       		.byte	0
+ 635 0058 00       		.byte	0
+ 636 0059 08       		.uleb128 0x8
+ 637 005a 0F       		.uleb128 0xf
+ 638 005b 00       		.byte	0
+ 639 005c 0B       		.uleb128 0xb
+ 640 005d 0B       		.uleb128 0xb
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 15
+
+
+ 641 005e 49       		.uleb128 0x49
+ 642 005f 13       		.uleb128 0x13
+ 643 0060 00       		.byte	0
+ 644 0061 00       		.byte	0
+ 645 0062 09       		.uleb128 0x9
+ 646 0063 26       		.uleb128 0x26
+ 647 0064 00       		.byte	0
+ 648 0065 49       		.uleb128 0x49
+ 649 0066 13       		.uleb128 0x13
+ 650 0067 00       		.byte	0
+ 651 0068 00       		.byte	0
+ 652 0069 0A       		.uleb128 0xa
+ 653 006a 13       		.uleb128 0x13
+ 654 006b 01       		.byte	0x1
+ 655 006c 0B       		.uleb128 0xb
+ 656 006d 0B       		.uleb128 0xb
+ 657 006e 3A       		.uleb128 0x3a
+ 658 006f 0B       		.uleb128 0xb
+ 659 0070 3B       		.uleb128 0x3b
+ 660 0071 0B       		.uleb128 0xb
+ 661 0072 01       		.uleb128 0x1
+ 662 0073 13       		.uleb128 0x13
+ 663 0074 00       		.byte	0
+ 664 0075 00       		.byte	0
+ 665 0076 0B       		.uleb128 0xb
+ 666 0077 0D       		.uleb128 0xd
+ 667 0078 00       		.byte	0
+ 668 0079 03       		.uleb128 0x3
+ 669 007a 0E       		.uleb128 0xe
+ 670 007b 3A       		.uleb128 0x3a
+ 671 007c 0B       		.uleb128 0xb
+ 672 007d 3B       		.uleb128 0x3b
+ 673 007e 0B       		.uleb128 0xb
+ 674 007f 49       		.uleb128 0x49
+ 675 0080 13       		.uleb128 0x13
+ 676 0081 38       		.uleb128 0x38
+ 677 0082 0B       		.uleb128 0xb
+ 678 0083 00       		.byte	0
+ 679 0084 00       		.byte	0
+ 680 0085 0C       		.uleb128 0xc
+ 681 0086 2E       		.uleb128 0x2e
+ 682 0087 01       		.byte	0x1
+ 683 0088 3F       		.uleb128 0x3f
+ 684 0089 19       		.uleb128 0x19
+ 685 008a 03       		.uleb128 0x3
+ 686 008b 0E       		.uleb128 0xe
+ 687 008c 3A       		.uleb128 0x3a
+ 688 008d 0B       		.uleb128 0xb
+ 689 008e 3B       		.uleb128 0x3b
+ 690 008f 0B       		.uleb128 0xb
+ 691 0090 27       		.uleb128 0x27
+ 692 0091 19       		.uleb128 0x19
+ 693 0092 49       		.uleb128 0x49
+ 694 0093 13       		.uleb128 0x13
+ 695 0094 11       		.uleb128 0x11
+ 696 0095 01       		.uleb128 0x1
+ 697 0096 12       		.uleb128 0x12
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 16
+
+
+ 698 0097 06       		.uleb128 0x6
+ 699 0098 40       		.uleb128 0x40
+ 700 0099 18       		.uleb128 0x18
+ 701 009a 9742     		.uleb128 0x2117
+ 702 009c 19       		.uleb128 0x19
+ 703 009d 01       		.uleb128 0x1
+ 704 009e 13       		.uleb128 0x13
+ 705 009f 00       		.byte	0
+ 706 00a0 00       		.byte	0
+ 707 00a1 0D       		.uleb128 0xd
+ 708 00a2 05       		.uleb128 0x5
+ 709 00a3 00       		.byte	0
+ 710 00a4 03       		.uleb128 0x3
+ 711 00a5 08       		.uleb128 0x8
+ 712 00a6 3A       		.uleb128 0x3a
+ 713 00a7 0B       		.uleb128 0xb
+ 714 00a8 3B       		.uleb128 0x3b
+ 715 00a9 0B       		.uleb128 0xb
+ 716 00aa 49       		.uleb128 0x49
+ 717 00ab 13       		.uleb128 0x13
+ 718 00ac 02       		.uleb128 0x2
+ 719 00ad 17       		.uleb128 0x17
+ 720 00ae 00       		.byte	0
+ 721 00af 00       		.byte	0
+ 722 00b0 0E       		.uleb128 0xe
+ 723 00b1 05       		.uleb128 0x5
+ 724 00b2 00       		.byte	0
+ 725 00b3 03       		.uleb128 0x3
+ 726 00b4 0E       		.uleb128 0xe
+ 727 00b5 3A       		.uleb128 0x3a
+ 728 00b6 0B       		.uleb128 0xb
+ 729 00b7 3B       		.uleb128 0x3b
+ 730 00b8 0B       		.uleb128 0xb
+ 731 00b9 49       		.uleb128 0x49
+ 732 00ba 13       		.uleb128 0x13
+ 733 00bb 02       		.uleb128 0x2
+ 734 00bc 18       		.uleb128 0x18
+ 735 00bd 00       		.byte	0
+ 736 00be 00       		.byte	0
+ 737 00bf 0F       		.uleb128 0xf
+ 738 00c0 05       		.uleb128 0x5
+ 739 00c1 00       		.byte	0
+ 740 00c2 03       		.uleb128 0x3
+ 741 00c3 0E       		.uleb128 0xe
+ 742 00c4 3A       		.uleb128 0x3a
+ 743 00c5 0B       		.uleb128 0xb
+ 744 00c6 3B       		.uleb128 0x3b
+ 745 00c7 0B       		.uleb128 0xb
+ 746 00c8 49       		.uleb128 0x49
+ 747 00c9 13       		.uleb128 0x13
+ 748 00ca 02       		.uleb128 0x2
+ 749 00cb 17       		.uleb128 0x17
+ 750 00cc 00       		.byte	0
+ 751 00cd 00       		.byte	0
+ 752 00ce 10       		.uleb128 0x10
+ 753 00cf 34       		.uleb128 0x34
+ 754 00d0 00       		.byte	0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 17
+
+
+ 755 00d1 03       		.uleb128 0x3
+ 756 00d2 0E       		.uleb128 0xe
+ 757 00d3 3A       		.uleb128 0x3a
+ 758 00d4 0B       		.uleb128 0xb
+ 759 00d5 3B       		.uleb128 0x3b
+ 760 00d6 0B       		.uleb128 0xb
+ 761 00d7 49       		.uleb128 0x49
+ 762 00d8 13       		.uleb128 0x13
+ 763 00d9 02       		.uleb128 0x2
+ 764 00da 17       		.uleb128 0x17
+ 765 00db 00       		.byte	0
+ 766 00dc 00       		.byte	0
+ 767 00dd 11       		.uleb128 0x11
+ 768 00de 34       		.uleb128 0x34
+ 769 00df 00       		.byte	0
+ 770 00e0 03       		.uleb128 0x3
+ 771 00e1 0E       		.uleb128 0xe
+ 772 00e2 3A       		.uleb128 0x3a
+ 773 00e3 0B       		.uleb128 0xb
+ 774 00e4 3B       		.uleb128 0x3b
+ 775 00e5 0B       		.uleb128 0xb
+ 776 00e6 49       		.uleb128 0x49
+ 777 00e7 13       		.uleb128 0x13
+ 778 00e8 3F       		.uleb128 0x3f
+ 779 00e9 19       		.uleb128 0x19
+ 780 00ea 3C       		.uleb128 0x3c
+ 781 00eb 19       		.uleb128 0x19
+ 782 00ec 00       		.byte	0
+ 783 00ed 00       		.byte	0
+ 784 00ee 12       		.uleb128 0x12
+ 785 00ef 01       		.uleb128 0x1
+ 786 00f0 01       		.byte	0x1
+ 787 00f1 49       		.uleb128 0x49
+ 788 00f2 13       		.uleb128 0x13
+ 789 00f3 01       		.uleb128 0x1
+ 790 00f4 13       		.uleb128 0x13
+ 791 00f5 00       		.byte	0
+ 792 00f6 00       		.byte	0
+ 793 00f7 13       		.uleb128 0x13
+ 794 00f8 21       		.uleb128 0x21
+ 795 00f9 00       		.byte	0
+ 796 00fa 49       		.uleb128 0x49
+ 797 00fb 13       		.uleb128 0x13
+ 798 00fc 2F       		.uleb128 0x2f
+ 799 00fd 05       		.uleb128 0x5
+ 800 00fe 00       		.byte	0
+ 801 00ff 00       		.byte	0
+ 802 0100 14       		.uleb128 0x14
+ 803 0101 13       		.uleb128 0x13
+ 804 0102 01       		.byte	0x1
+ 805 0103 0B       		.uleb128 0xb
+ 806 0104 0B       		.uleb128 0xb
+ 807 0105 3A       		.uleb128 0x3a
+ 808 0106 0B       		.uleb128 0xb
+ 809 0107 3B       		.uleb128 0x3b
+ 810 0108 0B       		.uleb128 0xb
+ 811 0109 00       		.byte	0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 18
+
+
+ 812 010a 00       		.byte	0
+ 813 010b 15       		.uleb128 0x15
+ 814 010c 0D       		.uleb128 0xd
+ 815 010d 00       		.byte	0
+ 816 010e 03       		.uleb128 0x3
+ 817 010f 08       		.uleb128 0x8
+ 818 0110 3A       		.uleb128 0x3a
+ 819 0111 0B       		.uleb128 0xb
+ 820 0112 3B       		.uleb128 0x3b
+ 821 0113 0B       		.uleb128 0xb
+ 822 0114 49       		.uleb128 0x49
+ 823 0115 13       		.uleb128 0x13
+ 824 0116 38       		.uleb128 0x38
+ 825 0117 0B       		.uleb128 0xb
+ 826 0118 00       		.byte	0
+ 827 0119 00       		.byte	0
+ 828 011a 00       		.byte	0
+ 829              		.section	.debug_loc,"",%progbits
+ 830              	.Ldebug_loc0:
+ 831              	.LLST0:
+ 832 0000 00000000 		.4byte	.LVL0
+ 833 0004 36000000 		.4byte	.LVL3
+ 834 0008 0100     		.2byte	0x1
+ 835 000a 50       		.byte	0x50
+ 836 000b 36000000 		.4byte	.LVL3
+ 837 000f 38000000 		.4byte	.LVL4
+ 838 0013 0400     		.2byte	0x4
+ 839 0015 F3       		.byte	0xf3
+ 840 0016 01       		.uleb128 0x1
+ 841 0017 50       		.byte	0x50
+ 842 0018 9F       		.byte	0x9f
+ 843 0019 38000000 		.4byte	.LVL4
+ 844 001d 44000000 		.4byte	.LVL6
+ 845 0021 0100     		.2byte	0x1
+ 846 0023 50       		.byte	0x50
+ 847 0024 44000000 		.4byte	.LVL6
+ 848 0028 46000000 		.4byte	.LVL7
+ 849 002c 0400     		.2byte	0x4
+ 850 002e F3       		.byte	0xf3
+ 851 002f 01       		.uleb128 0x1
+ 852 0030 50       		.byte	0x50
+ 853 0031 9F       		.byte	0x9f
+ 854 0032 46000000 		.4byte	.LVL7
+ 855 0036 52000000 		.4byte	.LVL9
+ 856 003a 0100     		.2byte	0x1
+ 857 003c 50       		.byte	0x50
+ 858 003d 52000000 		.4byte	.LVL9
+ 859 0041 54000000 		.4byte	.LVL10
+ 860 0045 0400     		.2byte	0x4
+ 861 0047 F3       		.byte	0xf3
+ 862 0048 01       		.uleb128 0x1
+ 863 0049 50       		.byte	0x50
+ 864 004a 9F       		.byte	0x9f
+ 865 004b 54000000 		.4byte	.LVL10
+ 866 004f 60000000 		.4byte	.LVL12
+ 867 0053 0100     		.2byte	0x1
+ 868 0055 50       		.byte	0x50
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 19
+
+
+ 869 0056 60000000 		.4byte	.LVL12
+ 870 005a 62000000 		.4byte	.LVL13
+ 871 005e 0400     		.2byte	0x4
+ 872 0060 F3       		.byte	0xf3
+ 873 0061 01       		.uleb128 0x1
+ 874 0062 50       		.byte	0x50
+ 875 0063 9F       		.byte	0x9f
+ 876 0064 62000000 		.4byte	.LVL13
+ 877 0068 70000000 		.4byte	.LVL15
+ 878 006c 0100     		.2byte	0x1
+ 879 006e 50       		.byte	0x50
+ 880 006f 70000000 		.4byte	.LVL15
+ 881 0073 72000000 		.4byte	.LVL16
+ 882 0077 0400     		.2byte	0x4
+ 883 0079 F3       		.byte	0xf3
+ 884 007a 01       		.uleb128 0x1
+ 885 007b 50       		.byte	0x50
+ 886 007c 9F       		.byte	0x9f
+ 887 007d 72000000 		.4byte	.LVL16
+ 888 0081 74000000 		.4byte	.LVL17
+ 889 0085 0100     		.2byte	0x1
+ 890 0087 50       		.byte	0x50
+ 891 0088 74000000 		.4byte	.LVL17
+ 892 008c 94000000 		.4byte	.LFE84
+ 893 0090 0400     		.2byte	0x4
+ 894 0092 F3       		.byte	0xf3
+ 895 0093 01       		.uleb128 0x1
+ 896 0094 50       		.byte	0x50
+ 897 0095 9F       		.byte	0x9f
+ 898 0096 00000000 		.4byte	0
+ 899 009a 00000000 		.4byte	0
+ 900              	.LLST1:
+ 901 009e 00000000 		.4byte	.LVL0
+ 902 00a2 2C000000 		.4byte	.LVL2
+ 903 00a6 0100     		.2byte	0x1
+ 904 00a8 53       		.byte	0x53
+ 905 00a9 2C000000 		.4byte	.LVL2
+ 906 00ad 36000000 		.4byte	.LVL3
+ 907 00b1 0200     		.2byte	0x2
+ 908 00b3 70       		.byte	0x70
+ 909 00b4 03       		.sleb128 3
+ 910 00b5 36000000 		.4byte	.LVL3
+ 911 00b9 38000000 		.4byte	.LVL4
+ 912 00bd 0500     		.2byte	0x5
+ 913 00bf F3       		.byte	0xf3
+ 914 00c0 01       		.uleb128 0x1
+ 915 00c1 50       		.byte	0x50
+ 916 00c2 23       		.byte	0x23
+ 917 00c3 03       		.uleb128 0x3
+ 918 00c4 38000000 		.4byte	.LVL4
+ 919 00c8 3A000000 		.4byte	.LVL5
+ 920 00cc 0100     		.2byte	0x1
+ 921 00ce 53       		.byte	0x53
+ 922 00cf 3A000000 		.4byte	.LVL5
+ 923 00d3 44000000 		.4byte	.LVL6
+ 924 00d7 0200     		.2byte	0x2
+ 925 00d9 70       		.byte	0x70
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 20
+
+
+ 926 00da 03       		.sleb128 3
+ 927 00db 44000000 		.4byte	.LVL6
+ 928 00df 46000000 		.4byte	.LVL7
+ 929 00e3 0500     		.2byte	0x5
+ 930 00e5 F3       		.byte	0xf3
+ 931 00e6 01       		.uleb128 0x1
+ 932 00e7 50       		.byte	0x50
+ 933 00e8 23       		.byte	0x23
+ 934 00e9 03       		.uleb128 0x3
+ 935 00ea 46000000 		.4byte	.LVL7
+ 936 00ee 48000000 		.4byte	.LVL8
+ 937 00f2 0100     		.2byte	0x1
+ 938 00f4 53       		.byte	0x53
+ 939 00f5 48000000 		.4byte	.LVL8
+ 940 00f9 52000000 		.4byte	.LVL9
+ 941 00fd 0200     		.2byte	0x2
+ 942 00ff 70       		.byte	0x70
+ 943 0100 03       		.sleb128 3
+ 944 0101 52000000 		.4byte	.LVL9
+ 945 0105 54000000 		.4byte	.LVL10
+ 946 0109 0500     		.2byte	0x5
+ 947 010b F3       		.byte	0xf3
+ 948 010c 01       		.uleb128 0x1
+ 949 010d 50       		.byte	0x50
+ 950 010e 23       		.byte	0x23
+ 951 010f 03       		.uleb128 0x3
+ 952 0110 54000000 		.4byte	.LVL10
+ 953 0114 56000000 		.4byte	.LVL11
+ 954 0118 0100     		.2byte	0x1
+ 955 011a 53       		.byte	0x53
+ 956 011b 56000000 		.4byte	.LVL11
+ 957 011f 60000000 		.4byte	.LVL12
+ 958 0123 0200     		.2byte	0x2
+ 959 0125 70       		.byte	0x70
+ 960 0126 03       		.sleb128 3
+ 961 0127 60000000 		.4byte	.LVL12
+ 962 012b 62000000 		.4byte	.LVL13
+ 963 012f 0500     		.2byte	0x5
+ 964 0131 F3       		.byte	0xf3
+ 965 0132 01       		.uleb128 0x1
+ 966 0133 50       		.byte	0x50
+ 967 0134 23       		.byte	0x23
+ 968 0135 03       		.uleb128 0x3
+ 969 0136 62000000 		.4byte	.LVL13
+ 970 013a 66000000 		.4byte	.LVL14
+ 971 013e 0100     		.2byte	0x1
+ 972 0140 53       		.byte	0x53
+ 973 0141 66000000 		.4byte	.LVL14
+ 974 0145 70000000 		.4byte	.LVL15
+ 975 0149 0200     		.2byte	0x2
+ 976 014b 70       		.byte	0x70
+ 977 014c 03       		.sleb128 3
+ 978 014d 70000000 		.4byte	.LVL15
+ 979 0151 72000000 		.4byte	.LVL16
+ 980 0155 0500     		.2byte	0x5
+ 981 0157 F3       		.byte	0xf3
+ 982 0158 01       		.uleb128 0x1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 21
+
+
+ 983 0159 50       		.byte	0x50
+ 984 015a 23       		.byte	0x23
+ 985 015b 03       		.uleb128 0x3
+ 986 015c 72000000 		.4byte	.LVL16
+ 987 0160 74000000 		.4byte	.LVL17
+ 988 0164 0100     		.2byte	0x1
+ 989 0166 53       		.byte	0x53
+ 990 0167 74000000 		.4byte	.LVL17
+ 991 016b 94000000 		.4byte	.LFE84
+ 992 016f 0500     		.2byte	0x5
+ 993 0171 F3       		.byte	0xf3
+ 994 0172 01       		.uleb128 0x1
+ 995 0173 50       		.byte	0x50
+ 996 0174 23       		.byte	0x23
+ 997 0175 03       		.uleb128 0x3
+ 998 0176 00000000 		.4byte	0
+ 999 017a 00000000 		.4byte	0
+ 1000              	.LLST2:
+ 1001 017e 02000000 		.4byte	.LVL1
+ 1002 0182 74000000 		.4byte	.LVL17
+ 1003 0186 0200     		.2byte	0x2
+ 1004 0188 30       		.byte	0x30
+ 1005 0189 9F       		.byte	0x9f
+ 1006 018a 74000000 		.4byte	.LVL17
+ 1007 018e 94000000 		.4byte	.LFE84
+ 1008 0192 0100     		.2byte	0x1
+ 1009 0194 50       		.byte	0x50
+ 1010 0195 00000000 		.4byte	0
+ 1011 0199 00000000 		.4byte	0
+ 1012              		.section	.debug_aranges,"",%progbits
+ 1013 0000 1C000000 		.4byte	0x1c
+ 1014 0004 0200     		.2byte	0x2
+ 1015 0006 00000000 		.4byte	.Ldebug_info0
+ 1016 000a 04       		.byte	0x4
+ 1017 000b 00       		.byte	0
+ 1018 000c 0000     		.2byte	0
+ 1019 000e 0000     		.2byte	0
+ 1020 0010 00000000 		.4byte	.LFB84
+ 1021 0014 94000000 		.4byte	.LFE84-.LFB84
+ 1022 0018 00000000 		.4byte	0
+ 1023 001c 00000000 		.4byte	0
+ 1024              		.section	.debug_ranges,"",%progbits
+ 1025              	.Ldebug_ranges0:
+ 1026 0000 00000000 		.4byte	.LFB84
+ 1027 0004 94000000 		.4byte	.LFE84
+ 1028 0008 00000000 		.4byte	0
+ 1029 000c 00000000 		.4byte	0
+ 1030              		.section	.debug_line,"",%progbits
+ 1031              	.Ldebug_line0:
+ 1032 0000 17020000 		.section	.debug_str,"MS",%progbits,1
+ 1032      0200CB01 
+ 1032      00000201 
+ 1032      FB0E0D00 
+ 1032      01010101 
+ 1033              	.LASF45:
+ 1034 0000 5F5F7A65 		.ascii	"__zero_table_end__\000"
+ 1034      726F5F74 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 22
+
+
+ 1034      61626C65 
+ 1034      5F656E64 
+ 1034      5F5F00
+ 1035              	.LASF2:
+ 1036 0013 5F5F7569 		.ascii	"__uint8_t\000"
+ 1036      6E74385F 
+ 1036      7400
+ 1037              	.LASF46:
+ 1038 001d 61726D42 		.ascii	"armBitRevTable\000"
+ 1038      69745265 
+ 1038      76546162 
+ 1038      6C6500
+ 1039              	.LASF40:
+ 1040 002c 5F5F636F 		.ascii	"__copy_table_t\000"
+ 1040      70795F74 
+ 1040      61626C65 
+ 1040      5F7400
+ 1041              	.LASF3:
+ 1042 003b 5F5F696E 		.ascii	"__int16_t\000"
+ 1042      7431365F 
+ 1042      7400
+ 1043              	.LASF47:
+ 1044 0045 74776964 		.ascii	"twiddleCoef_4096_q15\000"
+ 1044      646C6543 
+ 1044      6F65665F 
+ 1044      34303936 
+ 1044      5F713135 
+ 1045              	.LASF43:
+ 1046 005a 5F5F7A65 		.ascii	"__zero_table_t\000"
+ 1046      726F5F74 
+ 1046      61626C65 
+ 1046      5F7400
+ 1047              	.LASF54:
+ 1048 0069 73746174 		.ascii	"status\000"
+ 1048      757300
+ 1049              	.LASF26:
+ 1050 0070 41524D5F 		.ascii	"ARM_MATH_SIZE_MISMATCH\000"
+ 1050      4D415448 
+ 1050      5F53495A 
+ 1050      455F4D49 
+ 1050      534D4154 
+ 1051              	.LASF36:
+ 1052 0087 70426974 		.ascii	"pBitRevTable\000"
+ 1052      52657654 
+ 1052      61626C65 
+ 1052      00
+ 1053              	.LASF22:
+ 1054 0094 7131355F 		.ascii	"q15_t\000"
+ 1054      7400
+ 1055              	.LASF20:
+ 1056 009a 666C6F61 		.ascii	"float\000"
+ 1056      7400
+ 1057              	.LASF51:
+ 1058 00a0 2E5C4453 		.ascii	".\\DSP\\Source\\TransformFunctions\\arm_cfft_radix4"
+ 1058      505C536F 
+ 1058      75726365 
+ 1058      5C547261 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 23
+
+
+ 1058      6E73666F 
+ 1059 00cf 5F696E69 		.ascii	"_init_q15.c\000"
+ 1059      745F7131 
+ 1059      352E6300 
+ 1060              	.LASF48:
+ 1061 00db 64657374 		.ascii	"dest\000"
+ 1061      00
+ 1062              	.LASF1:
+ 1063 00e0 756E7369 		.ascii	"unsigned char\000"
+ 1063      676E6564 
+ 1063      20636861 
+ 1063      7200
+ 1064              	.LASF38:
+ 1065 00ee 62697452 		.ascii	"bitRevFactor\000"
+ 1065      65764661 
+ 1065      63746F72 
+ 1065      00
+ 1066              	.LASF42:
+ 1067 00fb 5F5F636F 		.ascii	"__copy_table_end__\000"
+ 1067      70795F74 
+ 1067      61626C65 
+ 1067      5F656E64 
+ 1067      5F5F00
+ 1068              	.LASF9:
+ 1069 010e 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1069      20756E73 
+ 1069      69676E65 
+ 1069      6420696E 
+ 1069      7400
+ 1070              	.LASF6:
+ 1071 0120 73686F72 		.ascii	"short unsigned int\000"
+ 1071      7420756E 
+ 1071      7369676E 
+ 1071      65642069 
+ 1071      6E7400
+ 1072              	.LASF32:
+ 1073 0133 6666744C 		.ascii	"fftLen\000"
+ 1073      656E00
+ 1074              	.LASF29:
+ 1075 013a 41524D5F 		.ascii	"ARM_MATH_TEST_FAILURE\000"
+ 1075      4D415448 
+ 1075      5F544553 
+ 1075      545F4641 
+ 1075      494C5552 
+ 1076              	.LASF5:
+ 1077 0150 5F5F7569 		.ascii	"__uint16_t\000"
+ 1077      6E743136 
+ 1077      5F7400
+ 1078              	.LASF19:
+ 1079 015b 646F7562 		.ascii	"double\000"
+ 1079      6C6500
+ 1080              	.LASF8:
+ 1081 0162 5F5F7569 		.ascii	"__uint32_t\000"
+ 1081      6E743332 
+ 1081      5F7400
+ 1082              	.LASF53:
+ 1083 016d 61726D5F 		.ascii	"arm_cfft_radix4_init_q15\000"
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 24
+
+
+ 1083      63666674 
+ 1083      5F726164 
+ 1083      6978345F 
+ 1083      696E6974 
+ 1084              	.LASF24:
+ 1085 0186 41524D5F 		.ascii	"ARM_MATH_ARGUMENT_ERROR\000"
+ 1085      4D415448 
+ 1085      5F415247 
+ 1085      554D454E 
+ 1085      545F4552 
+ 1086              	.LASF33:
+ 1087 019e 69666674 		.ascii	"ifftFlag\000"
+ 1087      466C6167 
+ 1087      00
+ 1088              	.LASF12:
+ 1089 01a7 756E7369 		.ascii	"unsigned int\000"
+ 1089      676E6564 
+ 1089      20696E74 
+ 1089      00
+ 1090              	.LASF37:
+ 1091 01b4 74776964 		.ascii	"twidCoefModifier\000"
+ 1091      436F6566 
+ 1091      4D6F6469 
+ 1091      66696572 
+ 1091      00
+ 1092              	.LASF11:
+ 1093 01c5 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1093      206C6F6E 
+ 1093      6720756E 
+ 1093      7369676E 
+ 1093      65642069 
+ 1094              	.LASF13:
+ 1095 01dc 75696E74 		.ascii	"uint8_t\000"
+ 1095      385F7400 
+ 1096              	.LASF34:
+ 1097 01e4 62697452 		.ascii	"bitReverseFlag\000"
+ 1097      65766572 
+ 1097      7365466C 
+ 1097      616700
+ 1098              	.LASF27:
+ 1099 01f3 41524D5F 		.ascii	"ARM_MATH_NANINF\000"
+ 1099      4D415448 
+ 1099      5F4E414E 
+ 1099      494E4600 
+ 1100              	.LASF14:
+ 1101 0203 696E7431 		.ascii	"int16_t\000"
+ 1101      365F7400 
+ 1102              	.LASF25:
+ 1103 020b 41524D5F 		.ascii	"ARM_MATH_LENGTH_ERROR\000"
+ 1103      4D415448 
+ 1103      5F4C454E 
+ 1103      4754485F 
+ 1103      4552524F 
+ 1104              	.LASF30:
+ 1105 0221 41524D5F 		.ascii	"ARM_MATH_DECOMPOSITION_FAILURE\000"
+ 1105      4D415448 
+ 1105      5F444543 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 25
+
+
+ 1105      4F4D504F 
+ 1105      53495449 
+ 1106              	.LASF17:
+ 1107 0240 73697A65 		.ascii	"sizetype\000"
+ 1107      74797065 
+ 1107      00
+ 1108              	.LASF10:
+ 1109 0249 6C6F6E67 		.ascii	"long long int\000"
+ 1109      206C6F6E 
+ 1109      6720696E 
+ 1109      7400
+ 1110              	.LASF35:
+ 1111 0257 70547769 		.ascii	"pTwiddle\000"
+ 1111      64646C65 
+ 1111      00
+ 1112              	.LASF18:
+ 1113 0260 63686172 		.ascii	"char\000"
+ 1113      00
+ 1114              	.LASF52:
+ 1115 0265 5C5C766D 		.ascii	"\\\\vmware-host\\Shared Folders\\Documents\\PSoC Cr"
+ 1115      77617265 
+ 1115      2D686F73 
+ 1115      745C5368 
+ 1115      61726564 
+ 1116 0293 6561746F 		.ascii	"eator\\FinalProject\\SoundDetection.cydsn\000"
+ 1116      725C4669 
+ 1116      6E616C50 
+ 1116      726F6A65 
+ 1116      63745C53 
+ 1117              	.LASF23:
+ 1118 02bb 41524D5F 		.ascii	"ARM_MATH_SUCCESS\000"
+ 1118      4D415448 
+ 1118      5F535543 
+ 1118      43455353 
+ 1118      00
+ 1119              	.LASF49:
+ 1120 02cc 776C656E 		.ascii	"wlen\000"
+ 1120      00
+ 1121              	.LASF4:
+ 1122 02d1 73686F72 		.ascii	"short int\000"
+ 1122      7420696E 
+ 1122      7400
+ 1123              	.LASF15:
+ 1124 02db 75696E74 		.ascii	"uint16_t\000"
+ 1124      31365F74 
+ 1124      00
+ 1125              	.LASF50:
+ 1126 02e4 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 1126      4320342E 
+ 1126      392E3320 
+ 1126      32303135 
+ 1126      30333033 
+ 1127 0317 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 1127      20726576 
+ 1127      6973696F 
+ 1127      6E203232 
+ 1127      31323230 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cc0dVQzC.s 			page 26
+
+
+ 1128 034a 67202D73 		.ascii	"g -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 1128      74643D67 
+ 1128      6E753939 
+ 1128      202D6666 
+ 1128      756E6374 
+ 1129              	.LASF16:
+ 1130 037d 75696E74 		.ascii	"uint32_t\000"
+ 1130      33325F74 
+ 1130      00
+ 1131              	.LASF7:
+ 1132 0386 6C6F6E67 		.ascii	"long int\000"
+ 1132      20696E74 
+ 1132      00
+ 1133              	.LASF21:
+ 1134 038f 6C6F6E67 		.ascii	"long double\000"
+ 1134      20646F75 
+ 1134      626C6500 
+ 1135              	.LASF44:
+ 1136 039b 5F5F7A65 		.ascii	"__zero_table_start__\000"
+ 1136      726F5F74 
+ 1136      61626C65 
+ 1136      5F737461 
+ 1136      72745F5F 
+ 1137              	.LASF0:
+ 1138 03b0 7369676E 		.ascii	"signed char\000"
+ 1138      65642063 
+ 1138      68617200 
+ 1139              	.LASF39:
+ 1140 03bc 61726D5F 		.ascii	"arm_cfft_radix4_instance_q15\000"
+ 1140      63666674 
+ 1140      5F726164 
+ 1140      6978345F 
+ 1140      696E7374 
+ 1141              	.LASF41:
+ 1142 03d9 5F5F636F 		.ascii	"__copy_table_start__\000"
+ 1142      70795F74 
+ 1142      61626C65 
+ 1142      5F737461 
+ 1142      72745F5F 
+ 1143              	.LASF31:
+ 1144 03ee 61726D5F 		.ascii	"arm_status\000"
+ 1144      73746174 
+ 1144      757300
+ 1145              	.LASF28:
+ 1146 03f9 41524D5F 		.ascii	"ARM_MATH_SINGULAR\000"
+ 1146      4D415448 
+ 1146      5F53494E 
+ 1146      47554C41 
+ 1146      5200
+ 1147              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

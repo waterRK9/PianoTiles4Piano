@@ -1,0 +1,3410 @@
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"arm_mfcc_q15.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.text.arm_mfcc_q15,"ax",%progbits
+  19              		.align	2
+  20              		.global	arm_mfcc_q15
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	arm_mfcc_q15, %function
+  24              	arm_mfcc_q15:
+  25              	.LFB84:
+  26              		.file 1 ".\\DSP\\Source\\TransformFunctions\\arm_mfcc_q15.c"
+   1:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** /* ----------------------------------------------------------------------
+   2:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * Project:      CMSIS DSP Library
+   3:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * Title:        arm_mfcc_q15.c
+   4:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * Description:  MFCC function for the q15 version
+   5:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  *
+   6:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * $Date:        07 September 2021
+   7:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * $Revision:    V1.10.0
+   8:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  *
+   9:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * Target Processor: Cortex-M and Cortex-A cores
+  10:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * -------------------------------------------------------------------- */
+  11:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** /*
+  12:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * Copyright (C) 2010-2021 ARM Limited or its affiliates. All rights reserved.
+  13:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  *
+  14:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * SPDX-License-Identifier: Apache-2.0
+  15:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  *
+  16:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * Licensed under the Apache License, Version 2.0 (the License); you may
+  17:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * not use this file except in compliance with the License.
+  18:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * You may obtain a copy of the License at
+  19:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  *
+  20:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * www.apache.org/licenses/LICENSE-2.0
+  21:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  *
+  22:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * Unless required by applicable law or agreed to in writing, software
+  23:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+  24:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  25:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * See the License for the specific language governing permissions and
+  26:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  * limitations under the License.
+  27:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  */
+  28:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  29:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  30:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  31:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** #include "dsp/transform_functions.h"
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 2
+
+
+  32:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** #include "dsp/statistics_functions.h"
+  33:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** #include "dsp/basic_math_functions.h"
+  34:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** #include "dsp/complex_math_functions.h"
+  35:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** #include "dsp/fast_math_functions.h"
+  36:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** #include "dsp/matrix_functions.h"
+  37:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  38:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** /* Constants for Q15 implementation */
+  39:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** #define LOG2TOLOG_Q15 0x02C5C860
+  40:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** #define MICRO_Q15 0x00000219
+  41:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** #define SHIFT_MELFILTER_SATURATION_Q15 10
+  42:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** /**
+  43:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   @ingroup groupTransforms
+  44:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  */
+  45:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  46:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  47:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** /**
+  48:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   @defgroup MFCC MFCC
+  49:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  50:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   MFCC Transform
+  51:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  52:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   There are separate functions for floating-point, Q15, and Q15 data types.
+  53:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  */
+  54:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  55:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  56:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  57:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** /**
+  58:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   @addtogroup MFCC
+  59:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   @{
+  60:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  */
+  61:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  62:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** /**
+  63:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   @brief         MFCC Q15
+  64:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   @param[in]    S       points to the mfcc instance structure
+  65:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   @param[in]     pSrc points to the input samples in Q15
+  66:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   @param[out]     pDst  points to the output MFCC values in q8.7 format
+  67:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   @param[inout]     pTmp  points to a temporary buffer of complex
+  68:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  69:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   @return        none
+  70:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  71:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   @par           Description
+  72:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****                    The number of input samples is the FFT length used
+  73:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****                    when initializing the instance data structure.
+  74:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  75:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****                    The temporary buffer has a 2*fft length.
+  76:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  77:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****                    The source buffer is modified by this function.
+  78:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  79:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****                    The function may saturate. If the FFT length is too
+  80:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****                    big and the number of MEL filters too small then the fixed
+  81:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****                    point computations may saturate.
+  82:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  83:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  */
+  84:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+  85:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** arm_status arm_mfcc_q15(
+  86:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   const arm_mfcc_instance_q15 * S,
+  87:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   q15_t *pSrc,
+  88:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   q15_t *pDst,
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 3
+
+
+  89:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   q31_t *pTmp
+  90:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****   )
+  91:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** {
+  27              		.loc 1 91 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 32
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              	.LVL0:
+  32 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+  33              		.cfi_def_cfa_offset 36
+  34              		.cfi_offset 4, -36
+  35              		.cfi_offset 5, -32
+  36              		.cfi_offset 6, -28
+  37              		.cfi_offset 7, -24
+  38              		.cfi_offset 8, -20
+  39              		.cfi_offset 9, -16
+  40              		.cfi_offset 10, -12
+  41              		.cfi_offset 11, -8
+  42              		.cfi_offset 14, -4
+  43 0004 8BB0     		sub	sp, sp, #44
+  44              		.cfi_def_cfa_offset 80
+  45 0006 0446     		mov	r4, r0
+  46 0008 8846     		mov	r8, r1
+  47 000a 9346     		mov	fp, r2
+  48 000c 1F46     		mov	r7, r3
+  49              	.LVL1:
+  92:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     q15_t m;
+  93:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     uint32_t index;
+  94:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     uint32_t fftShift=0;
+  95:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     q31_t logExponent;
+  96:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     q63_t result;
+  97:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     arm_matrix_instance_q15 pDctMat;
+  98:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     uint32_t i;
+  99:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     uint32_t coefsPos;
+ 100:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     uint32_t filterLimit;
+ 101:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     q15_t *pTmp2=(q15_t*)pTmp;
+ 102:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 103:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     arm_status status = ARM_MATH_SUCCESS;
+ 104:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     
+ 105:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     // q15
+ 106:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     arm_absmax_q15(pSrc,S->fftLen,&m,&index);
+  50              		.loc 1 106 0
+  51 000e 0846     		mov	r0, r1
+  52              	.LVL2:
+  53 0010 6169     		ldr	r1, [r4, #20]
+  54              	.LVL3:
+  55 0012 0DF12602 		add	r2, sp, #38
+  56              	.LVL4:
+  57 0016 08AB     		add	r3, sp, #32
+  58              	.LVL5:
+  59 0018 FFF7FEFF 		bl	arm_absmax_q15
+  60              	.LVL6:
+ 107:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 108:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     if (m !=0)
+  61              		.loc 1 108 0
+  62 001c BDF82610 		ldrh	r1, [sp, #38]
+  63 0020 A9B1     		cbz	r1, .L10
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 4
+
+
+  64              	.LBB7:
+ 109:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     {
+ 110:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****        q15_t quotient;
+ 111:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****        int16_t shift;
+ 112:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 113:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****        status = arm_divide_q15(0x7FFF,m,&quotient,&shift);
+  65              		.loc 1 113 0
+  66 0022 47F6FF70 		movw	r0, #32767
+  67 0026 09B2     		sxth	r1, r1
+  68 0028 03AA     		add	r2, sp, #12
+  69 002a 0DF10E03 		add	r3, sp, #14
+  70 002e FFF7FEFF 		bl	arm_divide_q15
+  71              	.LVL7:
+ 114:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****        if (status != ARM_MATH_SUCCESS)
+  72              		.loc 1 114 0
+  73 0032 8246     		mov	r10, r0
+  74 0034 0028     		cmp	r0, #0
+  75 0036 7FD1     		bne	.L4
+ 115:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****        {
+ 116:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****           return(status);
+ 117:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****        }
+ 118:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  
+ 119:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****        arm_scale_q15(pSrc,quotient,shift,pSrc,S->fftLen);
+  76              		.loc 1 119 0
+  77 0038 BDF90C10 		ldrsh	r1, [sp, #12]
+  78 003c 9DF90E20 		ldrsb	r2, [sp, #14]
+  79 0040 6369     		ldr	r3, [r4, #20]
+  80 0042 0093     		str	r3, [sp]
+  81 0044 4046     		mov	r0, r8
+  82              	.LVL8:
+  83 0046 4346     		mov	r3, r8
+  84 0048 FFF7FEFF 		bl	arm_scale_q15
+  85              	.LVL9:
+  86 004c 01E0     		b	.L2
+  87              	.LVL10:
+  88              	.L10:
+  89              	.LBE7:
+ 103:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     
+  90              		.loc 1 103 0
+  91 004e 4FF0000A 		mov	r10, #0
+  92              	.LVL11:
+  93              	.L2:
+ 120:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     }
+ 121:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 122:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 123:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     // q15
+ 124:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     arm_mult_q15(pSrc,S->windowCoefs, pSrc, S->fftLen);
+  94              		.loc 1 124 0
+  95 0052 4046     		mov	r0, r8
+  96 0054 A168     		ldr	r1, [r4, #8]
+  97 0056 4246     		mov	r2, r8
+  98 0058 6369     		ldr	r3, [r4, #20]
+  99 005a FFF7FEFF 		bl	arm_mult_q15
+ 100              	.LVL12:
+ 125:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 126:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 127:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     /* Compute spectrum magnitude 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 5
+
+
+ 128:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     */
+ 129:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     fftShift = 31 - __CLZ(S->fftLen);
+ 101              		.loc 1 129 0
+ 102 005e 6369     		ldr	r3, [r4, #20]
+ 103              	.LVL13:
+ 104              	.LBB8:
+ 105              	.LBB9:
+ 106              		.file 2 ".\\Core\\Include/cmsis_gcc.h"
+   1:.\Core\Include/cmsis_gcc.h **** /**************************************************************************//**
+   2:.\Core\Include/cmsis_gcc.h ****  * @file     cmsis_gcc.h
+   3:.\Core\Include/cmsis_gcc.h ****  * @brief    CMSIS compiler GCC header file
+   4:.\Core\Include/cmsis_gcc.h ****  * @version  V5.4.1
+   5:.\Core\Include/cmsis_gcc.h ****  * @date     27. May 2021
+   6:.\Core\Include/cmsis_gcc.h ****  ******************************************************************************/
+   7:.\Core\Include/cmsis_gcc.h **** /*
+   8:.\Core\Include/cmsis_gcc.h ****  * Copyright (c) 2009-2021 Arm Limited. All rights reserved.
+   9:.\Core\Include/cmsis_gcc.h ****  *
+  10:.\Core\Include/cmsis_gcc.h ****  * SPDX-License-Identifier: Apache-2.0
+  11:.\Core\Include/cmsis_gcc.h ****  *
+  12:.\Core\Include/cmsis_gcc.h ****  * Licensed under the Apache License, Version 2.0 (the License); you may
+  13:.\Core\Include/cmsis_gcc.h ****  * not use this file except in compliance with the License.
+  14:.\Core\Include/cmsis_gcc.h ****  * You may obtain a copy of the License at
+  15:.\Core\Include/cmsis_gcc.h ****  *
+  16:.\Core\Include/cmsis_gcc.h ****  * www.apache.org/licenses/LICENSE-2.0
+  17:.\Core\Include/cmsis_gcc.h ****  *
+  18:.\Core\Include/cmsis_gcc.h ****  * Unless required by applicable law or agreed to in writing, software
+  19:.\Core\Include/cmsis_gcc.h ****  * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+  20:.\Core\Include/cmsis_gcc.h ****  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  21:.\Core\Include/cmsis_gcc.h ****  * See the License for the specific language governing permissions and
+  22:.\Core\Include/cmsis_gcc.h ****  * limitations under the License.
+  23:.\Core\Include/cmsis_gcc.h ****  */
+  24:.\Core\Include/cmsis_gcc.h **** 
+  25:.\Core\Include/cmsis_gcc.h **** #ifndef __CMSIS_GCC_H
+  26:.\Core\Include/cmsis_gcc.h **** #define __CMSIS_GCC_H
+  27:.\Core\Include/cmsis_gcc.h **** 
+  28:.\Core\Include/cmsis_gcc.h **** /* ignore some GCC warnings */
+  29:.\Core\Include/cmsis_gcc.h **** #pragma GCC diagnostic push
+  30:.\Core\Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wsign-conversion"
+  31:.\Core\Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wconversion"
+  32:.\Core\Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wunused-parameter"
+  33:.\Core\Include/cmsis_gcc.h **** 
+  34:.\Core\Include/cmsis_gcc.h **** /* Fallback for __has_builtin */
+  35:.\Core\Include/cmsis_gcc.h **** #ifndef __has_builtin
+  36:.\Core\Include/cmsis_gcc.h ****   #define __has_builtin(x) (0)
+  37:.\Core\Include/cmsis_gcc.h **** #endif
+  38:.\Core\Include/cmsis_gcc.h **** 
+  39:.\Core\Include/cmsis_gcc.h **** /* CMSIS compiler specific defines */
+  40:.\Core\Include/cmsis_gcc.h **** #ifndef   __ASM
+  41:.\Core\Include/cmsis_gcc.h ****   #define __ASM                                  __asm
+  42:.\Core\Include/cmsis_gcc.h **** #endif
+  43:.\Core\Include/cmsis_gcc.h **** #ifndef   __INLINE
+  44:.\Core\Include/cmsis_gcc.h ****   #define __INLINE                               inline
+  45:.\Core\Include/cmsis_gcc.h **** #endif
+  46:.\Core\Include/cmsis_gcc.h **** #ifndef   __STATIC_INLINE
+  47:.\Core\Include/cmsis_gcc.h ****   #define __STATIC_INLINE                        static inline
+  48:.\Core\Include/cmsis_gcc.h **** #endif
+  49:.\Core\Include/cmsis_gcc.h **** #ifndef   __STATIC_FORCEINLINE
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 6
+
+
+  50:.\Core\Include/cmsis_gcc.h ****   #define __STATIC_FORCEINLINE                   __attribute__((always_inline)) static inline
+  51:.\Core\Include/cmsis_gcc.h **** #endif
+  52:.\Core\Include/cmsis_gcc.h **** #ifndef   __NO_RETURN
+  53:.\Core\Include/cmsis_gcc.h ****   #define __NO_RETURN                            __attribute__((__noreturn__))
+  54:.\Core\Include/cmsis_gcc.h **** #endif
+  55:.\Core\Include/cmsis_gcc.h **** #ifndef   __USED
+  56:.\Core\Include/cmsis_gcc.h ****   #define __USED                                 __attribute__((used))
+  57:.\Core\Include/cmsis_gcc.h **** #endif
+  58:.\Core\Include/cmsis_gcc.h **** #ifndef   __WEAK
+  59:.\Core\Include/cmsis_gcc.h ****   #define __WEAK                                 __attribute__((weak))
+  60:.\Core\Include/cmsis_gcc.h **** #endif
+  61:.\Core\Include/cmsis_gcc.h **** #ifndef   __PACKED
+  62:.\Core\Include/cmsis_gcc.h ****   #define __PACKED                               __attribute__((packed, aligned(1)))
+  63:.\Core\Include/cmsis_gcc.h **** #endif
+  64:.\Core\Include/cmsis_gcc.h **** #ifndef   __PACKED_STRUCT
+  65:.\Core\Include/cmsis_gcc.h ****   #define __PACKED_STRUCT                        struct __attribute__((packed, aligned(1)))
+  66:.\Core\Include/cmsis_gcc.h **** #endif
+  67:.\Core\Include/cmsis_gcc.h **** #ifndef   __PACKED_UNION
+  68:.\Core\Include/cmsis_gcc.h ****   #define __PACKED_UNION                         union __attribute__((packed, aligned(1)))
+  69:.\Core\Include/cmsis_gcc.h **** #endif
+  70:.\Core\Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT32        /* deprecated */
+  71:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  72:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  73:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  74:.\Core\Include/cmsis_gcc.h ****   struct __attribute__((packed)) T_UINT32 { uint32_t v; };
+  75:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+  76:.\Core\Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT32(x)                  (((struct T_UINT32 *)(x))->v)
+  77:.\Core\Include/cmsis_gcc.h **** #endif
+  78:.\Core\Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT16_WRITE
+  79:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  80:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  81:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  82:.\Core\Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT16_WRITE { uint16_t v; };
+  83:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+  84:.\Core\Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT16_WRITE(addr, val)    (void)((((struct T_UINT16_WRITE *)(void *)(addr))-
+  85:.\Core\Include/cmsis_gcc.h **** #endif
+  86:.\Core\Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT16_READ
+  87:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  88:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  89:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  90:.\Core\Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT16_READ { uint16_t v; };
+  91:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+  92:.\Core\Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT16_READ(addr)          (((const struct T_UINT16_READ *)(const void *)(add
+  93:.\Core\Include/cmsis_gcc.h **** #endif
+  94:.\Core\Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT32_WRITE
+  95:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  96:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  97:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  98:.\Core\Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT32_WRITE { uint32_t v; };
+  99:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+ 100:.\Core\Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT32_WRITE(addr, val)    (void)((((struct T_UINT32_WRITE *)(void *)(addr))-
+ 101:.\Core\Include/cmsis_gcc.h **** #endif
+ 102:.\Core\Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT32_READ
+ 103:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+ 104:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+ 105:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+ 106:.\Core\Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT32_READ { uint32_t v; };
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 7
+
+
+ 107:.\Core\Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+ 108:.\Core\Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT32_READ(addr)          (((const struct T_UINT32_READ *)(const void *)(add
+ 109:.\Core\Include/cmsis_gcc.h **** #endif
+ 110:.\Core\Include/cmsis_gcc.h **** #ifndef   __ALIGNED
+ 111:.\Core\Include/cmsis_gcc.h ****   #define __ALIGNED(x)                           __attribute__((aligned(x)))
+ 112:.\Core\Include/cmsis_gcc.h **** #endif
+ 113:.\Core\Include/cmsis_gcc.h **** #ifndef   __RESTRICT
+ 114:.\Core\Include/cmsis_gcc.h ****   #define __RESTRICT                             __restrict
+ 115:.\Core\Include/cmsis_gcc.h **** #endif
+ 116:.\Core\Include/cmsis_gcc.h **** #ifndef   __COMPILER_BARRIER
+ 117:.\Core\Include/cmsis_gcc.h ****   #define __COMPILER_BARRIER()                   __ASM volatile("":::"memory")
+ 118:.\Core\Include/cmsis_gcc.h **** #endif
+ 119:.\Core\Include/cmsis_gcc.h **** 
+ 120:.\Core\Include/cmsis_gcc.h **** /* #########################  Startup and Lowlevel Init  ######################## */
+ 121:.\Core\Include/cmsis_gcc.h **** 
+ 122:.\Core\Include/cmsis_gcc.h **** #ifndef __PROGRAM_START
+ 123:.\Core\Include/cmsis_gcc.h **** 
+ 124:.\Core\Include/cmsis_gcc.h **** /**
+ 125:.\Core\Include/cmsis_gcc.h ****   \brief   Initializes data and bss sections
+ 126:.\Core\Include/cmsis_gcc.h ****   \details This default implementations initialized all data and additional bss
+ 127:.\Core\Include/cmsis_gcc.h ****            sections relying on .copy.table and .zero.table specified properly
+ 128:.\Core\Include/cmsis_gcc.h ****            in the used linker script.
+ 129:.\Core\Include/cmsis_gcc.h **** 
+ 130:.\Core\Include/cmsis_gcc.h ****  */
+ 131:.\Core\Include/cmsis_gcc.h **** __STATIC_FORCEINLINE __NO_RETURN void __cmsis_start(void)
+ 132:.\Core\Include/cmsis_gcc.h **** {
+ 133:.\Core\Include/cmsis_gcc.h ****   extern void _start(void) __NO_RETURN;
+ 134:.\Core\Include/cmsis_gcc.h **** 
+ 135:.\Core\Include/cmsis_gcc.h ****   typedef struct {
+ 136:.\Core\Include/cmsis_gcc.h ****     uint32_t const* src;
+ 137:.\Core\Include/cmsis_gcc.h ****     uint32_t* dest;
+ 138:.\Core\Include/cmsis_gcc.h ****     uint32_t  wlen;
+ 139:.\Core\Include/cmsis_gcc.h ****   } __copy_table_t;
+ 140:.\Core\Include/cmsis_gcc.h **** 
+ 141:.\Core\Include/cmsis_gcc.h ****   typedef struct {
+ 142:.\Core\Include/cmsis_gcc.h ****     uint32_t* dest;
+ 143:.\Core\Include/cmsis_gcc.h ****     uint32_t  wlen;
+ 144:.\Core\Include/cmsis_gcc.h ****   } __zero_table_t;
+ 145:.\Core\Include/cmsis_gcc.h **** 
+ 146:.\Core\Include/cmsis_gcc.h ****   extern const __copy_table_t __copy_table_start__;
+ 147:.\Core\Include/cmsis_gcc.h ****   extern const __copy_table_t __copy_table_end__;
+ 148:.\Core\Include/cmsis_gcc.h ****   extern const __zero_table_t __zero_table_start__;
+ 149:.\Core\Include/cmsis_gcc.h ****   extern const __zero_table_t __zero_table_end__;
+ 150:.\Core\Include/cmsis_gcc.h **** 
+ 151:.\Core\Include/cmsis_gcc.h ****   for (__copy_table_t const* pTable = &__copy_table_start__; pTable < &__copy_table_end__; ++pTable
+ 152:.\Core\Include/cmsis_gcc.h ****     for(uint32_t i=0u; i<pTable->wlen; ++i) {
+ 153:.\Core\Include/cmsis_gcc.h ****       pTable->dest[i] = pTable->src[i];
+ 154:.\Core\Include/cmsis_gcc.h ****     }
+ 155:.\Core\Include/cmsis_gcc.h ****   }
+ 156:.\Core\Include/cmsis_gcc.h **** 
+ 157:.\Core\Include/cmsis_gcc.h ****   for (__zero_table_t const* pTable = &__zero_table_start__; pTable < &__zero_table_end__; ++pTable
+ 158:.\Core\Include/cmsis_gcc.h ****     for(uint32_t i=0u; i<pTable->wlen; ++i) {
+ 159:.\Core\Include/cmsis_gcc.h ****       pTable->dest[i] = 0u;
+ 160:.\Core\Include/cmsis_gcc.h ****     }
+ 161:.\Core\Include/cmsis_gcc.h ****   }
+ 162:.\Core\Include/cmsis_gcc.h **** 
+ 163:.\Core\Include/cmsis_gcc.h ****   _start();
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 8
+
+
+ 164:.\Core\Include/cmsis_gcc.h **** }
+ 165:.\Core\Include/cmsis_gcc.h **** 
+ 166:.\Core\Include/cmsis_gcc.h **** #define __PROGRAM_START           __cmsis_start
+ 167:.\Core\Include/cmsis_gcc.h **** #endif
+ 168:.\Core\Include/cmsis_gcc.h **** 
+ 169:.\Core\Include/cmsis_gcc.h **** #ifndef __INITIAL_SP
+ 170:.\Core\Include/cmsis_gcc.h **** #define __INITIAL_SP              __StackTop
+ 171:.\Core\Include/cmsis_gcc.h **** #endif
+ 172:.\Core\Include/cmsis_gcc.h **** 
+ 173:.\Core\Include/cmsis_gcc.h **** #ifndef __STACK_LIMIT
+ 174:.\Core\Include/cmsis_gcc.h **** #define __STACK_LIMIT             __StackLimit
+ 175:.\Core\Include/cmsis_gcc.h **** #endif
+ 176:.\Core\Include/cmsis_gcc.h **** 
+ 177:.\Core\Include/cmsis_gcc.h **** #ifndef __VECTOR_TABLE
+ 178:.\Core\Include/cmsis_gcc.h **** #define __VECTOR_TABLE            __Vectors
+ 179:.\Core\Include/cmsis_gcc.h **** #endif
+ 180:.\Core\Include/cmsis_gcc.h **** 
+ 181:.\Core\Include/cmsis_gcc.h **** #ifndef __VECTOR_TABLE_ATTRIBUTE
+ 182:.\Core\Include/cmsis_gcc.h **** #define __VECTOR_TABLE_ATTRIBUTE  __attribute__((used, section(".vectors")))
+ 183:.\Core\Include/cmsis_gcc.h **** #endif
+ 184:.\Core\Include/cmsis_gcc.h **** 
+ 185:.\Core\Include/cmsis_gcc.h **** #if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
+ 186:.\Core\Include/cmsis_gcc.h **** #ifndef __STACK_SEAL
+ 187:.\Core\Include/cmsis_gcc.h **** #define __STACK_SEAL              __StackSeal
+ 188:.\Core\Include/cmsis_gcc.h **** #endif
+ 189:.\Core\Include/cmsis_gcc.h **** 
+ 190:.\Core\Include/cmsis_gcc.h **** #ifndef __TZ_STACK_SEAL_SIZE
+ 191:.\Core\Include/cmsis_gcc.h **** #define __TZ_STACK_SEAL_SIZE      8U
+ 192:.\Core\Include/cmsis_gcc.h **** #endif
+ 193:.\Core\Include/cmsis_gcc.h **** 
+ 194:.\Core\Include/cmsis_gcc.h **** #ifndef __TZ_STACK_SEAL_VALUE
+ 195:.\Core\Include/cmsis_gcc.h **** #define __TZ_STACK_SEAL_VALUE     0xFEF5EDA5FEF5EDA5ULL
+ 196:.\Core\Include/cmsis_gcc.h **** #endif
+ 197:.\Core\Include/cmsis_gcc.h **** 
+ 198:.\Core\Include/cmsis_gcc.h **** 
+ 199:.\Core\Include/cmsis_gcc.h **** __STATIC_FORCEINLINE void __TZ_set_STACKSEAL_S (uint32_t* stackTop) {
+ 200:.\Core\Include/cmsis_gcc.h ****   *((uint64_t *)stackTop) = __TZ_STACK_SEAL_VALUE;
+ 201:.\Core\Include/cmsis_gcc.h **** }
+ 202:.\Core\Include/cmsis_gcc.h **** #endif
+ 203:.\Core\Include/cmsis_gcc.h **** 
+ 204:.\Core\Include/cmsis_gcc.h **** 
+ 205:.\Core\Include/cmsis_gcc.h **** /* ##########################  Core Instruction Access  ######################### */
+ 206:.\Core\Include/cmsis_gcc.h **** /** \defgroup CMSIS_Core_InstructionInterface CMSIS Core Instruction Interface
+ 207:.\Core\Include/cmsis_gcc.h ****   Access to dedicated instructions
+ 208:.\Core\Include/cmsis_gcc.h ****   @{
+ 209:.\Core\Include/cmsis_gcc.h **** */
+ 210:.\Core\Include/cmsis_gcc.h **** 
+ 211:.\Core\Include/cmsis_gcc.h **** /* Define macros for porting to both thumb1 and thumb2.
+ 212:.\Core\Include/cmsis_gcc.h ****  * For thumb1, use low register (r0-r7), specified by constraint "l"
+ 213:.\Core\Include/cmsis_gcc.h ****  * Otherwise, use general registers, specified by constraint "r" */
+ 214:.\Core\Include/cmsis_gcc.h **** #if defined (__thumb__) && !defined (__thumb2__)
+ 215:.\Core\Include/cmsis_gcc.h **** #define __CMSIS_GCC_OUT_REG(r) "=l" (r)
+ 216:.\Core\Include/cmsis_gcc.h **** #define __CMSIS_GCC_RW_REG(r) "+l" (r)
+ 217:.\Core\Include/cmsis_gcc.h **** #define __CMSIS_GCC_USE_REG(r) "l" (r)
+ 218:.\Core\Include/cmsis_gcc.h **** #else
+ 219:.\Core\Include/cmsis_gcc.h **** #define __CMSIS_GCC_OUT_REG(r) "=r" (r)
+ 220:.\Core\Include/cmsis_gcc.h **** #define __CMSIS_GCC_RW_REG(r) "+r" (r)
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 9
+
+
+ 221:.\Core\Include/cmsis_gcc.h **** #define __CMSIS_GCC_USE_REG(r) "r" (r)
+ 222:.\Core\Include/cmsis_gcc.h **** #endif
+ 223:.\Core\Include/cmsis_gcc.h **** 
+ 224:.\Core\Include/cmsis_gcc.h **** /**
+ 225:.\Core\Include/cmsis_gcc.h ****   \brief   No Operation
+ 226:.\Core\Include/cmsis_gcc.h ****   \details No Operation does nothing. This instruction can be used for code alignment purposes.
+ 227:.\Core\Include/cmsis_gcc.h ****  */
+ 228:.\Core\Include/cmsis_gcc.h **** #define __NOP()                             __ASM volatile ("nop")
+ 229:.\Core\Include/cmsis_gcc.h **** 
+ 230:.\Core\Include/cmsis_gcc.h **** /**
+ 231:.\Core\Include/cmsis_gcc.h ****   \brief   Wait For Interrupt
+ 232:.\Core\Include/cmsis_gcc.h ****   \details Wait For Interrupt is a hint instruction that suspends execution until one of a number o
+ 233:.\Core\Include/cmsis_gcc.h ****  */
+ 234:.\Core\Include/cmsis_gcc.h **** #define __WFI()                             __ASM volatile ("wfi":::"memory")
+ 235:.\Core\Include/cmsis_gcc.h **** 
+ 236:.\Core\Include/cmsis_gcc.h **** 
+ 237:.\Core\Include/cmsis_gcc.h **** /**
+ 238:.\Core\Include/cmsis_gcc.h ****   \brief   Wait For Event
+ 239:.\Core\Include/cmsis_gcc.h ****   \details Wait For Event is a hint instruction that permits the processor to enter
+ 240:.\Core\Include/cmsis_gcc.h ****            a low-power state until one of a number of events occurs.
+ 241:.\Core\Include/cmsis_gcc.h ****  */
+ 242:.\Core\Include/cmsis_gcc.h **** #define __WFE()                             __ASM volatile ("wfe":::"memory")
+ 243:.\Core\Include/cmsis_gcc.h **** 
+ 244:.\Core\Include/cmsis_gcc.h **** 
+ 245:.\Core\Include/cmsis_gcc.h **** /**
+ 246:.\Core\Include/cmsis_gcc.h ****   \brief   Send Event
+ 247:.\Core\Include/cmsis_gcc.h ****   \details Send Event is a hint instruction. It causes an event to be signaled to the CPU.
+ 248:.\Core\Include/cmsis_gcc.h ****  */
+ 249:.\Core\Include/cmsis_gcc.h **** #define __SEV()                             __ASM volatile ("sev")
+ 250:.\Core\Include/cmsis_gcc.h **** 
+ 251:.\Core\Include/cmsis_gcc.h **** 
+ 252:.\Core\Include/cmsis_gcc.h **** /**
+ 253:.\Core\Include/cmsis_gcc.h ****   \brief   Instruction Synchronization Barrier
+ 254:.\Core\Include/cmsis_gcc.h ****   \details Instruction Synchronization Barrier flushes the pipeline in the processor,
+ 255:.\Core\Include/cmsis_gcc.h ****            so that all instructions following the ISB are fetched from cache or memory,
+ 256:.\Core\Include/cmsis_gcc.h ****            after the instruction has been completed.
+ 257:.\Core\Include/cmsis_gcc.h ****  */
+ 258:.\Core\Include/cmsis_gcc.h **** __STATIC_FORCEINLINE void __ISB(void)
+ 259:.\Core\Include/cmsis_gcc.h **** {
+ 260:.\Core\Include/cmsis_gcc.h ****   __ASM volatile ("isb 0xF":::"memory");
+ 261:.\Core\Include/cmsis_gcc.h **** }
+ 262:.\Core\Include/cmsis_gcc.h **** 
+ 263:.\Core\Include/cmsis_gcc.h **** 
+ 264:.\Core\Include/cmsis_gcc.h **** /**
+ 265:.\Core\Include/cmsis_gcc.h ****   \brief   Data Synchronization Barrier
+ 266:.\Core\Include/cmsis_gcc.h ****   \details Acts as a special kind of Data Memory Barrier.
+ 267:.\Core\Include/cmsis_gcc.h ****            It completes when all explicit memory accesses before this instruction complete.
+ 268:.\Core\Include/cmsis_gcc.h ****  */
+ 269:.\Core\Include/cmsis_gcc.h **** __STATIC_FORCEINLINE void __DSB(void)
+ 270:.\Core\Include/cmsis_gcc.h **** {
+ 271:.\Core\Include/cmsis_gcc.h ****   __ASM volatile ("dsb 0xF":::"memory");
+ 272:.\Core\Include/cmsis_gcc.h **** }
+ 273:.\Core\Include/cmsis_gcc.h **** 
+ 274:.\Core\Include/cmsis_gcc.h **** 
+ 275:.\Core\Include/cmsis_gcc.h **** /**
+ 276:.\Core\Include/cmsis_gcc.h ****   \brief   Data Memory Barrier
+ 277:.\Core\Include/cmsis_gcc.h ****   \details Ensures the apparent order of the explicit memory operations before
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 10
+
+
+ 278:.\Core\Include/cmsis_gcc.h ****            and after the instruction, without ensuring their completion.
+ 279:.\Core\Include/cmsis_gcc.h ****  */
+ 280:.\Core\Include/cmsis_gcc.h **** __STATIC_FORCEINLINE void __DMB(void)
+ 281:.\Core\Include/cmsis_gcc.h **** {
+ 282:.\Core\Include/cmsis_gcc.h ****   __ASM volatile ("dmb 0xF":::"memory");
+ 283:.\Core\Include/cmsis_gcc.h **** }
+ 284:.\Core\Include/cmsis_gcc.h **** 
+ 285:.\Core\Include/cmsis_gcc.h **** 
+ 286:.\Core\Include/cmsis_gcc.h **** /**
+ 287:.\Core\Include/cmsis_gcc.h ****   \brief   Reverse byte order (32 bit)
+ 288:.\Core\Include/cmsis_gcc.h ****   \details Reverses the byte order in unsigned integer value. For example, 0x12345678 becomes 0x785
+ 289:.\Core\Include/cmsis_gcc.h ****   \param [in]    value  Value to reverse
+ 290:.\Core\Include/cmsis_gcc.h ****   \return               Reversed value
+ 291:.\Core\Include/cmsis_gcc.h ****  */
+ 292:.\Core\Include/cmsis_gcc.h **** __STATIC_FORCEINLINE uint32_t __REV(uint32_t value)
+ 293:.\Core\Include/cmsis_gcc.h **** {
+ 294:.\Core\Include/cmsis_gcc.h **** #if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
+ 295:.\Core\Include/cmsis_gcc.h ****   return __builtin_bswap32(value);
+ 296:.\Core\Include/cmsis_gcc.h **** #else
+ 297:.\Core\Include/cmsis_gcc.h ****   uint32_t result;
+ 298:.\Core\Include/cmsis_gcc.h **** 
+ 299:.\Core\Include/cmsis_gcc.h ****   __ASM ("rev %0, %1" : __CMSIS_GCC_OUT_REG (result) : __CMSIS_GCC_USE_REG (value) );
+ 300:.\Core\Include/cmsis_gcc.h ****   return result;
+ 301:.\Core\Include/cmsis_gcc.h **** #endif
+ 302:.\Core\Include/cmsis_gcc.h **** }
+ 303:.\Core\Include/cmsis_gcc.h **** 
+ 304:.\Core\Include/cmsis_gcc.h **** 
+ 305:.\Core\Include/cmsis_gcc.h **** /**
+ 306:.\Core\Include/cmsis_gcc.h ****   \brief   Reverse byte order (16 bit)
+ 307:.\Core\Include/cmsis_gcc.h ****   \details Reverses the byte order within each halfword of a word. For example, 0x12345678 becomes 
+ 308:.\Core\Include/cmsis_gcc.h ****   \param [in]    value  Value to reverse
+ 309:.\Core\Include/cmsis_gcc.h ****   \return               Reversed value
+ 310:.\Core\Include/cmsis_gcc.h ****  */
+ 311:.\Core\Include/cmsis_gcc.h **** __STATIC_FORCEINLINE uint32_t __REV16(uint32_t value)
+ 312:.\Core\Include/cmsis_gcc.h **** {
+ 313:.\Core\Include/cmsis_gcc.h ****   uint32_t result;
+ 314:.\Core\Include/cmsis_gcc.h **** 
+ 315:.\Core\Include/cmsis_gcc.h ****   __ASM ("rev16 %0, %1" : __CMSIS_GCC_OUT_REG (result) : __CMSIS_GCC_USE_REG (value) );
+ 316:.\Core\Include/cmsis_gcc.h ****   return result;
+ 317:.\Core\Include/cmsis_gcc.h **** }
+ 318:.\Core\Include/cmsis_gcc.h **** 
+ 319:.\Core\Include/cmsis_gcc.h **** 
+ 320:.\Core\Include/cmsis_gcc.h **** /**
+ 321:.\Core\Include/cmsis_gcc.h ****   \brief   Reverse byte order (16 bit)
+ 322:.\Core\Include/cmsis_gcc.h ****   \details Reverses the byte order in a 16-bit value and returns the signed 16-bit result. For exam
+ 323:.\Core\Include/cmsis_gcc.h ****   \param [in]    value  Value to reverse
+ 324:.\Core\Include/cmsis_gcc.h ****   \return               Reversed value
+ 325:.\Core\Include/cmsis_gcc.h ****  */
+ 326:.\Core\Include/cmsis_gcc.h **** __STATIC_FORCEINLINE int16_t __REVSH(int16_t value)
+ 327:.\Core\Include/cmsis_gcc.h **** {
+ 328:.\Core\Include/cmsis_gcc.h **** #if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)
+ 329:.\Core\Include/cmsis_gcc.h ****   return (int16_t)__builtin_bswap16(value);
+ 330:.\Core\Include/cmsis_gcc.h **** #else
+ 331:.\Core\Include/cmsis_gcc.h ****   int16_t result;
+ 332:.\Core\Include/cmsis_gcc.h **** 
+ 333:.\Core\Include/cmsis_gcc.h ****   __ASM ("revsh %0, %1" : __CMSIS_GCC_OUT_REG (result) : __CMSIS_GCC_USE_REG (value) );
+ 334:.\Core\Include/cmsis_gcc.h ****   return result;
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 11
+
+
+ 335:.\Core\Include/cmsis_gcc.h **** #endif
+ 336:.\Core\Include/cmsis_gcc.h **** }
+ 337:.\Core\Include/cmsis_gcc.h **** 
+ 338:.\Core\Include/cmsis_gcc.h **** 
+ 339:.\Core\Include/cmsis_gcc.h **** /**
+ 340:.\Core\Include/cmsis_gcc.h ****   \brief   Rotate Right in unsigned value (32 bit)
+ 341:.\Core\Include/cmsis_gcc.h ****   \details Rotate Right (immediate) provides the value of the contents of a register rotated by a v
+ 342:.\Core\Include/cmsis_gcc.h ****   \param [in]    op1  Value to rotate
+ 343:.\Core\Include/cmsis_gcc.h ****   \param [in]    op2  Number of Bits to rotate
+ 344:.\Core\Include/cmsis_gcc.h ****   \return               Rotated value
+ 345:.\Core\Include/cmsis_gcc.h ****  */
+ 346:.\Core\Include/cmsis_gcc.h **** __STATIC_FORCEINLINE uint32_t __ROR(uint32_t op1, uint32_t op2)
+ 347:.\Core\Include/cmsis_gcc.h **** {
+ 348:.\Core\Include/cmsis_gcc.h ****   op2 %= 32U;
+ 349:.\Core\Include/cmsis_gcc.h ****   if (op2 == 0U)
+ 350:.\Core\Include/cmsis_gcc.h ****   {
+ 351:.\Core\Include/cmsis_gcc.h ****     return op1;
+ 352:.\Core\Include/cmsis_gcc.h ****   }
+ 353:.\Core\Include/cmsis_gcc.h ****   return (op1 >> op2) | (op1 << (32U - op2));
+ 354:.\Core\Include/cmsis_gcc.h **** }
+ 355:.\Core\Include/cmsis_gcc.h **** 
+ 356:.\Core\Include/cmsis_gcc.h **** 
+ 357:.\Core\Include/cmsis_gcc.h **** /**
+ 358:.\Core\Include/cmsis_gcc.h ****   \brief   Breakpoint
+ 359:.\Core\Include/cmsis_gcc.h ****   \details Causes the processor to enter Debug state.
+ 360:.\Core\Include/cmsis_gcc.h ****            Debug tools can use this to investigate system state when the instruction at a particula
+ 361:.\Core\Include/cmsis_gcc.h ****   \param [in]    value  is ignored by the processor.
+ 362:.\Core\Include/cmsis_gcc.h ****                  If required, a debugger can use it to store additional information about the break
+ 363:.\Core\Include/cmsis_gcc.h ****  */
+ 364:.\Core\Include/cmsis_gcc.h **** #define __BKPT(value)                       __ASM volatile ("bkpt "#value)
+ 365:.\Core\Include/cmsis_gcc.h **** 
+ 366:.\Core\Include/cmsis_gcc.h **** 
+ 367:.\Core\Include/cmsis_gcc.h **** /**
+ 368:.\Core\Include/cmsis_gcc.h ****   \brief   Reverse bit order of value
+ 369:.\Core\Include/cmsis_gcc.h ****   \details Reverses the bit order of the given value.
+ 370:.\Core\Include/cmsis_gcc.h ****   \param [in]    value  Value to reverse
+ 371:.\Core\Include/cmsis_gcc.h ****   \return               Reversed value
+ 372:.\Core\Include/cmsis_gcc.h ****  */
+ 373:.\Core\Include/cmsis_gcc.h **** __STATIC_FORCEINLINE uint32_t __RBIT(uint32_t value)
+ 374:.\Core\Include/cmsis_gcc.h **** {
+ 375:.\Core\Include/cmsis_gcc.h ****   uint32_t result;
+ 376:.\Core\Include/cmsis_gcc.h **** 
+ 377:.\Core\Include/cmsis_gcc.h **** #if ((defined (__ARM_ARCH_7M__      ) && (__ARM_ARCH_7M__      == 1)) || \
+ 378:.\Core\Include/cmsis_gcc.h ****      (defined (__ARM_ARCH_7EM__     ) && (__ARM_ARCH_7EM__     == 1)) || \
+ 379:.\Core\Include/cmsis_gcc.h ****      (defined (__ARM_ARCH_8M_MAIN__ ) && (__ARM_ARCH_8M_MAIN__ == 1))    )
+ 380:.\Core\Include/cmsis_gcc.h ****    __ASM ("rbit %0, %1" : "=r" (result) : "r" (value) );
+ 381:.\Core\Include/cmsis_gcc.h **** #else
+ 382:.\Core\Include/cmsis_gcc.h ****   uint32_t s = (4U /*sizeof(v)*/ * 8U) - 1U; /* extra shift needed at end */
+ 383:.\Core\Include/cmsis_gcc.h **** 
+ 384:.\Core\Include/cmsis_gcc.h ****   result = value;                      /* r will be reversed bits of v; first get LSB of v */
+ 385:.\Core\Include/cmsis_gcc.h ****   for (value >>= 1U; value != 0U; value >>= 1U)
+ 386:.\Core\Include/cmsis_gcc.h ****   {
+ 387:.\Core\Include/cmsis_gcc.h ****     result <<= 1U;
+ 388:.\Core\Include/cmsis_gcc.h ****     result |= value & 1U;
+ 389:.\Core\Include/cmsis_gcc.h ****     s--;
+ 390:.\Core\Include/cmsis_gcc.h ****   }
+ 391:.\Core\Include/cmsis_gcc.h ****   result <<= s;                        /* shift when v's highest bits are zero */
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 12
+
+
+ 392:.\Core\Include/cmsis_gcc.h **** #endif
+ 393:.\Core\Include/cmsis_gcc.h ****   return result;
+ 394:.\Core\Include/cmsis_gcc.h **** }
+ 395:.\Core\Include/cmsis_gcc.h **** 
+ 396:.\Core\Include/cmsis_gcc.h **** 
+ 397:.\Core\Include/cmsis_gcc.h **** /**
+ 398:.\Core\Include/cmsis_gcc.h ****   \brief   Count leading zeros
+ 399:.\Core\Include/cmsis_gcc.h ****   \details Counts the number of leading zeros of a data value.
+ 400:.\Core\Include/cmsis_gcc.h ****   \param [in]  value  Value to count the leading zeros
+ 401:.\Core\Include/cmsis_gcc.h ****   \return             number of leading zeros in value
+ 402:.\Core\Include/cmsis_gcc.h ****  */
+ 403:.\Core\Include/cmsis_gcc.h **** __STATIC_FORCEINLINE uint8_t __CLZ(uint32_t value)
+ 404:.\Core\Include/cmsis_gcc.h **** {
+ 405:.\Core\Include/cmsis_gcc.h ****   /* Even though __builtin_clz produces a CLZ instruction on ARM, formally
+ 406:.\Core\Include/cmsis_gcc.h ****      __builtin_clz(0) is undefined behaviour, so handle this case specially.
+ 407:.\Core\Include/cmsis_gcc.h ****      This guarantees ARM-compatible results if happening to compile on a non-ARM
+ 408:.\Core\Include/cmsis_gcc.h ****      target, and ensures the compiler doesn't decide to activate any
+ 409:.\Core\Include/cmsis_gcc.h ****      optimisations using the logic "value was passed to __builtin_clz, so it
+ 410:.\Core\Include/cmsis_gcc.h ****      is non-zero".
+ 411:.\Core\Include/cmsis_gcc.h ****      ARM GCC 7.3 and possibly earlier will optimise this test away, leaving a
+ 412:.\Core\Include/cmsis_gcc.h ****      single CLZ instruction.
+ 413:.\Core\Include/cmsis_gcc.h ****    */
+ 414:.\Core\Include/cmsis_gcc.h ****   if (value == 0U)
+ 107              		.loc 2 414 0
+ 108 0060 13B1     		cbz	r3, .L11
+ 415:.\Core\Include/cmsis_gcc.h ****   {
+ 416:.\Core\Include/cmsis_gcc.h ****     return 32U;
+ 417:.\Core\Include/cmsis_gcc.h ****   }
+ 418:.\Core\Include/cmsis_gcc.h ****   return __builtin_clz(value);
+ 109              		.loc 2 418 0
+ 110 0062 B3FA83F9 		clz	r9, r3
+ 111 0066 01E0     		b	.L5
+ 112              	.L11:
+ 416:.\Core\Include/cmsis_gcc.h ****   }
+ 113              		.loc 2 416 0
+ 114 0068 4FF02009 		mov	r9, #32
+ 115              	.L5:
+ 116              	.LBE9:
+ 117              	.LBE8:
+ 118              		.loc 1 129 0
+ 119 006c C9F11F09 		rsb	r9, r9, #31
+ 120              	.LVL14:
+ 130:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** #if defined(ARM_MFCC_CFFT_BASED)
+ 131:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     /* some HW accelerator for CMSIS-DSP used in some boards
+ 132:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****        are only providing acceleration for CFFT.
+ 133:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****        With ARM_MFCC_CFFT_BASED enabled, CFFT is used and the MFCC
+ 134:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****        will be accelerated on those boards.
+ 135:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****  
+ 136:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****        The default is to use RFFT
+ 137:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     */
+ 138:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     /* Convert from real to complex */
+ 139:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     for(i=0; i < S->fftLen ; i++)
+ 140:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     {
+ 141:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****       pTmp2[2*i] = pSrc[i];
+ 142:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****       pTmp2[2*i+1] = 0;
+ 143:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     }
+ 144:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     arm_cfft_q15(&(S->cfft),pTmp2,0,1);
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 13
+
+
+ 145:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** #else
+ 146:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     /* Default RFFT based implementation */
+ 147:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     arm_rfft_q15(&(S->rfft),pSrc,pTmp2);
+ 121              		.loc 1 147 0
+ 122 0070 04F12000 		add	r0, r4, #32
+ 123 0074 4146     		mov	r1, r8
+ 124 0076 3A46     		mov	r2, r7
+ 125 0078 FFF7FEFF 		bl	arm_rfft_q15
+ 126              	.LVL15:
+ 148:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** #endif
+ 149:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     filterLimit = 1 + (S->fftLen >> 1);
+ 127              		.loc 1 149 0
+ 128 007c 6269     		ldr	r2, [r4, #20]
+ 129 007e 5208     		lsrs	r2, r2, #1
+ 130              	.LVL16:
+ 150:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 151:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 152:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     // q15 - fftShift
+ 153:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     arm_cmplx_mag_q15(pTmp2,pSrc,filterLimit);
+ 131              		.loc 1 153 0
+ 132 0080 3846     		mov	r0, r7
+ 133 0082 4146     		mov	r1, r8
+ 134 0084 0132     		adds	r2, r2, #1
+ 135              	.LVL17:
+ 136 0086 FFF7FEFF 		bl	arm_cmplx_mag_q15
+ 137              	.LVL18:
+ 154:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     // q14 - fftShift
+ 155:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 156:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     /* Apply MEL filters */
+ 157:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     coefsPos = 0;
+ 138              		.loc 1 157 0
+ 139 008a 0026     		movs	r6, #0
+ 158:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     for(i=0; i<S->nbMelFilters; i++)
+ 140              		.loc 1 158 0
+ 141 008c 3546     		mov	r5, r6
+ 142 008e 23E0     		b	.L6
+ 143              	.LVL19:
+ 144              	.L7:
+ 159:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     {
+ 160:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****       arm_dot_prod_q15(pSrc+S->filterPos[i],
+ 145              		.loc 1 160 0 discriminator 3
+ 146 0090 E368     		ldr	r3, [r4, #12]
+ 147 0092 53F82500 		ldr	r0, [r3, r5, lsl #2]
+ 161:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****         &(S->filterCoefs[coefsPos]),
+ 148              		.loc 1 161 0 discriminator 3
+ 149 0096 6168     		ldr	r1, [r4, #4]
+ 162:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****         S->filterLengths[i],
+ 150              		.loc 1 162 0 discriminator 3
+ 151 0098 2369     		ldr	r3, [r4, #16]
+ 160:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****         &(S->filterCoefs[coefsPos]),
+ 152              		.loc 1 160 0 discriminator 3
+ 153 009a 08EB4000 		add	r0, r8, r0, lsl #1
+ 154 009e 01EB4601 		add	r1, r1, r6, lsl #1
+ 155 00a2 53F82520 		ldr	r2, [r3, r5, lsl #2]
+ 156 00a6 06AB     		add	r3, sp, #24
+ 157 00a8 FFF7FEFF 		bl	arm_dot_prod_q15
+ 158              	.LVL20:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 14
+
+
+ 163:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****         &result);
+ 164:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 165:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****       coefsPos += S->filterLengths[i];
+ 159              		.loc 1 165 0 discriminator 3
+ 160 00ac 2369     		ldr	r3, [r4, #16]
+ 161 00ae 53F82530 		ldr	r3, [r3, r5, lsl #2]
+ 162 00b2 1E44     		add	r6, r6, r3
+ 163              	.LVL21:
+ 166:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 167:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****       // q34.29 - fftShift
+ 168:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****       result += MICRO_Q15;
+ 164              		.loc 1 168 0 discriminator 3
+ 165 00b4 40F21920 		movw	r0, #537
+ 166 00b8 0021     		movs	r1, #0
+ 167 00ba DDE90623 		ldrd	r2, [sp, #24]
+ 168 00be 8018     		adds	r0, r0, r2
+ 169 00c0 5941     		adcs	r1, r1, r3
+ 169:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****       result >>= SHIFT_MELFILTER_SATURATION_Q15;
+ 170              		.loc 1 169 0 discriminator 3
+ 171 00c2 830A     		lsrs	r3, r0, #10
+ 172 00c4 43EA8153 		orr	r3, r3, r1, lsl #22
+ 173 00c8 8A12     		asrs	r2, r1, #10
+ 174 00ca 0693     		str	r3, [sp, #24]
+ 175 00cc 0792     		str	r2, [sp, #28]
+ 176              	.LVL22:
+ 177              	.LBB10:
+ 170:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****       // q34.29 - fftShift - satShift
+ 171:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****       pTmp[i] = __SSAT(result,31) ;
+ 178              		.loc 1 171 0 discriminator 3
+ 179              	@ 171 ".\DSP\Source\TransformFunctions\arm_mfcc_q15.c" 1
+ 180 00ce 03F31E03 		ssat r3, #31, r3
+ 181              	@ 0 "" 2
+ 182              	.LVL23:
+ 183              		.thumb
+ 184              	.LBE10:
+ 185 00d2 47F82530 		str	r3, [r7, r5, lsl #2]
+ 186              	.LVL24:
+ 158:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     {
+ 187              		.loc 1 158 0 discriminator 3
+ 188 00d6 0135     		adds	r5, r5, #1
+ 189              	.LVL25:
+ 190              	.L6:
+ 158:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     {
+ 191              		.loc 1 158 0 is_stmt 0 discriminator 1
+ 192 00d8 A269     		ldr	r2, [r4, #24]
+ 193 00da AA42     		cmp	r2, r5
+ 194 00dc D8D8     		bhi	.L7
+ 172:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 173:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     }
+ 174:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 175:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 176:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     // q34.29 - fftShift - satShift
+ 177:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     /* Compute the log */
+ 178:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     arm_vlog_q31(pTmp,pTmp,S->nbMelFilters);
+ 195              		.loc 1 178 0 is_stmt 1
+ 196 00de 3846     		mov	r0, r7
+ 197 00e0 3946     		mov	r1, r7
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 15
+
+
+ 198 00e2 FFF7FEFF 		bl	arm_vlog_q31
+ 199              	.LVL26:
+ 179:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 180:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 181:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     // q5.26
+ 182:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****    
+ 183:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     logExponent = fftShift + 2 + SHIFT_MELFILTER_SATURATION_Q15;
+ 200              		.loc 1 183 0
+ 201 00e6 09F10C09 		add	r9, r9, #12
+ 202              	.LVL27:
+ 184:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     logExponent = logExponent * LOG2TOLOG_Q15;
+ 185:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 186:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 187:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     // q8.26
+ 188:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     arm_offset_q31(pTmp,logExponent,pTmp,S->nbMelFilters);
+ 203              		.loc 1 188 0
+ 204 00ea 3846     		mov	r0, r7
+ 205 00ec 1549     		ldr	r1, .L13
+ 206 00ee 01FB09F1 		mul	r1, r1, r9
+ 207              	.LVL28:
+ 208 00f2 3A46     		mov	r2, r7
+ 209 00f4 A369     		ldr	r3, [r4, #24]
+ 210 00f6 FFF7FEFF 		bl	arm_offset_q31
+ 211              	.LVL29:
+ 189:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     arm_shift_q31(pTmp,-19,pTmp,S->nbMelFilters);
+ 212              		.loc 1 189 0
+ 213 00fa 3846     		mov	r0, r7
+ 214 00fc 6FF01201 		mvn	r1, #18
+ 215 0100 3A46     		mov	r2, r7
+ 216 0102 A369     		ldr	r3, [r4, #24]
+ 217 0104 FFF7FEFF 		bl	arm_shift_q31
+ 218              	.LVL30:
+ 190:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     for(i=0; i<S->nbMelFilters; i++)
+ 219              		.loc 1 190 0
+ 220 0108 0023     		movs	r3, #0
+ 221 010a 06E0     		b	.L8
+ 222              	.LVL31:
+ 223              	.L9:
+ 224              	.LBB11:
+ 191:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     { 
+ 192:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****       pSrc[i] = __SSAT((q15_t)pTmp[i],16);
+ 225              		.loc 1 192 0 discriminator 3
+ 226 010c 37F92320 		ldrsh	r2, [r7, r3, lsl #2]
+ 227              	.LVL32:
+ 228              	@ 192 ".\DSP\Source\TransformFunctions\arm_mfcc_q15.c" 1
+ 229 0110 02F30F02 		ssat r2, #16, r2
+ 230              	@ 0 "" 2
+ 231              	.LVL33:
+ 232              		.thumb
+ 233              	.LBE11:
+ 234 0114 28F81320 		strh	r2, [r8, r3, lsl #1]	@ movhi
+ 235              	.LVL34:
+ 190:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     for(i=0; i<S->nbMelFilters; i++)
+ 236              		.loc 1 190 0 discriminator 3
+ 237 0118 0133     		adds	r3, r3, #1
+ 238              	.LVL35:
+ 239              	.L8:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 16
+
+
+ 190:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     for(i=0; i<S->nbMelFilters; i++)
+ 240              		.loc 1 190 0 is_stmt 0 discriminator 1
+ 241 011a A269     		ldr	r2, [r4, #24]
+ 242 011c 9A42     		cmp	r2, r3
+ 243 011e F5D8     		bhi	.L9
+ 193:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     }
+ 194:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 195:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     // q8.7
+ 196:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 197:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     pDctMat.numRows=S->nbDctOutputs;
+ 244              		.loc 1 197 0 is_stmt 1
+ 245 0120 E369     		ldr	r3, [r4, #28]
+ 246              	.LVL36:
+ 247 0122 ADF81030 		strh	r3, [sp, #16]	@ movhi
+ 198:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     pDctMat.numCols=S->nbMelFilters;
+ 248              		.loc 1 198 0
+ 249 0126 ADF81220 		strh	r2, [sp, #18]	@ movhi
+ 199:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     pDctMat.pData=(q15_t*)S->dctCoefs;
+ 250              		.loc 1 199 0
+ 251 012a 2368     		ldr	r3, [r4]
+ 252 012c 0593     		str	r3, [sp, #20]
+ 200:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 201:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     arm_mat_vec_mult_q15(&pDctMat, pSrc, pDst);
+ 253              		.loc 1 201 0
+ 254 012e 04A8     		add	r0, sp, #16
+ 255 0130 4146     		mov	r1, r8
+ 256 0132 5A46     		mov	r2, fp
+ 257 0134 FFF7FEFF 		bl	arm_mat_vec_mult_q15
+ 258              	.LVL37:
+ 259              	.L4:
+ 202:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** 
+ 203:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c ****     return(status);
+ 204:.\DSP\Source\TransformFunctions/arm_mfcc_q15.c **** }
+ 260              		.loc 1 204 0
+ 261 0138 4FFA8AF0 		sxtb	r0, r10
+ 262 013c 0BB0     		add	sp, sp, #44
+ 263              		.cfi_def_cfa_offset 36
+ 264              		@ sp needed
+ 265 013e BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 266              	.LVL38:
+ 267              	.L14:
+ 268 0142 00BF     		.align	2
+ 269              	.L13:
+ 270 0144 60C8C502 		.word	46516320
+ 271              		.cfi_endproc
+ 272              	.LFE84:
+ 273              		.size	arm_mfcc_q15, .-arm_mfcc_q15
+ 274              		.text
+ 275              	.Letext0:
+ 276              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+ 277              		.file 4 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+ 278              		.file 5 ".\\DSP\\Include/arm_math_types.h"
+ 279              		.file 6 ".\\DSP\\Include/dsp/transform_functions.h"
+ 280              		.file 7 ".\\DSP\\Include/dsp/matrix_functions.h"
+ 281              		.file 8 ".\\DSP\\Include/dsp/basic_math_functions.h"
+ 282              		.file 9 ".\\DSP\\Include/dsp/statistics_functions.h"
+ 283              		.file 10 ".\\DSP\\Include/dsp/complex_math_functions.h"
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 17
+
+
+ 284              		.file 11 ".\\DSP\\Include/dsp/fast_math_functions.h"
+ 285              		.section	.debug_info,"",%progbits
+ 286              	.Ldebug_info0:
+ 287 0000 61080000 		.4byte	0x861
+ 288 0004 0400     		.2byte	0x4
+ 289 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 290 000a 04       		.byte	0x4
+ 291 000b 01       		.uleb128 0x1
+ 292 000c 5D050000 		.4byte	.LASF100
+ 293 0010 01       		.byte	0x1
+ 294 0011 D3030000 		.4byte	.LASF101
+ 295 0015 1F040000 		.4byte	.LASF102
+ 296 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 297 001d 00000000 		.4byte	0
+ 298 0021 00000000 		.4byte	.Ldebug_line0
+ 299 0025 02       		.uleb128 0x2
+ 300 0026 A5000000 		.4byte	.LASF0
+ 301 002a 03       		.byte	0x3
+ 302 002b 1B       		.byte	0x1b
+ 303 002c 30000000 		.4byte	0x30
+ 304 0030 03       		.uleb128 0x3
+ 305 0031 01       		.byte	0x1
+ 306 0032 06       		.byte	0x6
+ 307 0033 D7000000 		.4byte	.LASF2
+ 308 0037 02       		.uleb128 0x2
+ 309 0038 3C000000 		.4byte	.LASF1
+ 310 003c 03       		.byte	0x3
+ 311 003d 1D       		.byte	0x1d
+ 312 003e 42000000 		.4byte	0x42
+ 313 0042 03       		.uleb128 0x3
+ 314 0043 01       		.byte	0x1
+ 315 0044 08       		.byte	0x8
+ 316 0045 67030000 		.4byte	.LASF3
+ 317 0049 02       		.uleb128 0x2
+ 318 004a 9E010000 		.4byte	.LASF4
+ 319 004e 03       		.byte	0x3
+ 320 004f 29       		.byte	0x29
+ 321 0050 54000000 		.4byte	0x54
+ 322 0054 03       		.uleb128 0x3
+ 323 0055 02       		.byte	0x2
+ 324 0056 05       		.byte	0x5
+ 325 0057 9D030000 		.4byte	.LASF5
+ 326 005b 02       		.uleb128 0x2
+ 327 005c 99040000 		.4byte	.LASF6
+ 328 0060 03       		.byte	0x3
+ 329 0061 2B       		.byte	0x2b
+ 330 0062 66000000 		.4byte	0x66
+ 331 0066 03       		.uleb128 0x3
+ 332 0067 02       		.byte	0x2
+ 333 0068 07       		.byte	0x7
+ 334 0069 28020000 		.4byte	.LASF7
+ 335 006d 02       		.uleb128 0x2
+ 336 006e C1040000 		.4byte	.LASF8
+ 337 0072 03       		.byte	0x3
+ 338 0073 3F       		.byte	0x3f
+ 339 0074 78000000 		.4byte	0x78
+ 340 0078 03       		.uleb128 0x3
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 18
+
+
+ 341 0079 04       		.byte	0x4
+ 342 007a 05       		.byte	0x5
+ 343 007b 22010000 		.4byte	.LASF9
+ 344 007f 02       		.uleb128 0x2
+ 345 0080 85010000 		.4byte	.LASF10
+ 346 0084 03       		.byte	0x3
+ 347 0085 41       		.byte	0x41
+ 348 0086 8A000000 		.4byte	0x8a
+ 349 008a 03       		.uleb128 0x3
+ 350 008b 04       		.byte	0x4
+ 351 008c 07       		.byte	0x7
+ 352 008d EE010000 		.4byte	.LASF11
+ 353 0091 02       		.uleb128 0x2
+ 354 0092 9B000000 		.4byte	.LASF12
+ 355 0096 03       		.byte	0x3
+ 356 0097 59       		.byte	0x59
+ 357 0098 9C000000 		.4byte	0x9c
+ 358 009c 03       		.uleb128 0x3
+ 359 009d 08       		.byte	0x8
+ 360 009e 05       		.byte	0x5
+ 361 009f C9000000 		.4byte	.LASF13
+ 362 00a3 03       		.uleb128 0x3
+ 363 00a4 08       		.byte	0x8
+ 364 00a5 07       		.byte	0x7
+ 365 00a6 60000000 		.4byte	.LASF14
+ 366 00aa 04       		.uleb128 0x4
+ 367 00ab 04       		.byte	0x4
+ 368 00ac 05       		.byte	0x5
+ 369 00ad 696E7400 		.ascii	"int\000"
+ 370 00b1 03       		.uleb128 0x3
+ 371 00b2 04       		.byte	0x4
+ 372 00b3 07       		.byte	0x7
+ 373 00b4 DC010000 		.4byte	.LASF15
+ 374 00b8 02       		.uleb128 0x2
+ 375 00b9 F4040000 		.4byte	.LASF16
+ 376 00bd 04       		.byte	0x4
+ 377 00be 14       		.byte	0x14
+ 378 00bf 25000000 		.4byte	0x25
+ 379 00c3 02       		.uleb128 0x2
+ 380 00c4 30050000 		.4byte	.LASF17
+ 381 00c8 04       		.byte	0x4
+ 382 00c9 15       		.byte	0x15
+ 383 00ca 37000000 		.4byte	0x37
+ 384 00ce 02       		.uleb128 0x2
+ 385 00cf C1000000 		.4byte	.LASF18
+ 386 00d3 04       		.byte	0x4
+ 387 00d4 20       		.byte	0x20
+ 388 00d5 49000000 		.4byte	0x49
+ 389 00d9 02       		.uleb128 0x2
+ 390 00da 43010000 		.4byte	.LASF19
+ 391 00de 04       		.byte	0x4
+ 392 00df 21       		.byte	0x21
+ 393 00e0 5B000000 		.4byte	0x5b
+ 394 00e4 02       		.uleb128 0x2
+ 395 00e5 5F030000 		.4byte	.LASF20
+ 396 00e9 04       		.byte	0x4
+ 397 00ea 2C       		.byte	0x2c
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 19
+
+
+ 398 00eb 6D000000 		.4byte	0x6d
+ 399 00ef 02       		.uleb128 0x2
+ 400 00f0 0E040000 		.4byte	.LASF21
+ 401 00f4 04       		.byte	0x4
+ 402 00f5 2D       		.byte	0x2d
+ 403 00f6 7F000000 		.4byte	0x7f
+ 404 00fa 02       		.uleb128 0x2
+ 405 00fb 4A050000 		.4byte	.LASF22
+ 406 00ff 04       		.byte	0x4
+ 407 0100 38       		.byte	0x38
+ 408 0101 91000000 		.4byte	0x91
+ 409 0105 03       		.uleb128 0x3
+ 410 0106 04       		.byte	0x4
+ 411 0107 07       		.byte	0x7
+ 412 0108 9F020000 		.4byte	.LASF23
+ 413 010c 03       		.uleb128 0x3
+ 414 010d 01       		.byte	0x1
+ 415 010e 08       		.byte	0x8
+ 416 010f 87040000 		.4byte	.LASF24
+ 417 0113 03       		.uleb128 0x3
+ 418 0114 08       		.byte	0x8
+ 419 0115 04       		.byte	0x4
+ 420 0116 4C010000 		.4byte	.LASF25
+ 421 011a 03       		.uleb128 0x3
+ 422 011b 04       		.byte	0x4
+ 423 011c 04       		.byte	0x4
+ 424 011d 1D030000 		.4byte	.LASF26
+ 425 0121 03       		.uleb128 0x3
+ 426 0122 08       		.byte	0x8
+ 427 0123 04       		.byte	0x4
+ 428 0124 A8020000 		.4byte	.LASF27
+ 429 0128 05       		.uleb128 0x5
+ 430 0129 30010000 		.4byte	.LASF28
+ 431 012d 05       		.byte	0x5
+ 432 012e 1F01     		.2byte	0x11f
+ 433 0130 CE000000 		.4byte	0xce
+ 434 0134 05       		.uleb128 0x5
+ 435 0135 02040000 		.4byte	.LASF29
+ 436 0139 05       		.byte	0x5
+ 437 013a 2401     		.2byte	0x124
+ 438 013c E4000000 		.4byte	0xe4
+ 439 0140 05       		.uleb128 0x5
+ 440 0141 0F000000 		.4byte	.LASF30
+ 441 0145 05       		.byte	0x5
+ 442 0146 2901     		.2byte	0x129
+ 443 0148 FA000000 		.4byte	0xfa
+ 444 014c 06       		.uleb128 0x6
+ 445 014d 01       		.byte	0x1
+ 446 014e 05       		.byte	0x5
+ 447 014f 5802     		.2byte	0x258
+ 448 0151 86010000 		.4byte	0x186
+ 449 0155 07       		.uleb128 0x7
+ 450 0156 4F000000 		.4byte	.LASF31
+ 451 015a 00       		.sleb128 0
+ 452 015b 07       		.uleb128 0x7
+ 453 015c A7030000 		.4byte	.LASF32
+ 454 0160 7F       		.sleb128 -1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 20
+
+
+ 455 0161 07       		.uleb128 0x7
+ 456 0162 EC020000 		.4byte	.LASF33
+ 457 0166 7E       		.sleb128 -2
+ 458 0167 07       		.uleb128 0x7
+ 459 0168 AA040000 		.4byte	.LASF34
+ 460 016c 7D       		.sleb128 -3
+ 461 016d 07       		.uleb128 0x7
+ 462 016e 42030000 		.4byte	.LASF35
+ 463 0172 7C       		.sleb128 -4
+ 464 0173 07       		.uleb128 0x7
+ 465 0174 23030000 		.4byte	.LASF36
+ 466 0178 7B       		.sleb128 -5
+ 467 0179 07       		.uleb128 0x7
+ 468 017a 63020000 		.4byte	.LASF37
+ 469 017e 7A       		.sleb128 -6
+ 470 017f 07       		.uleb128 0x7
+ 471 0180 3B020000 		.4byte	.LASF38
+ 472 0184 79       		.sleb128 -7
+ 473 0185 00       		.byte	0
+ 474 0186 05       		.uleb128 0x5
+ 475 0187 3F050000 		.4byte	.LASF39
+ 476 018b 05       		.byte	0x5
+ 477 018c 6102     		.2byte	0x261
+ 478 018e 4C010000 		.4byte	0x14c
+ 479 0192 08       		.uleb128 0x8
+ 480 0193 04       		.byte	0x4
+ 481 0194 98010000 		.4byte	0x198
+ 482 0198 09       		.uleb128 0x9
+ 483 0199 28010000 		.4byte	0x128
+ 484 019d 08       		.uleb128 0x8
+ 485 019e 04       		.byte	0x4
+ 486 019f A3010000 		.4byte	0x1a3
+ 487 01a3 09       		.uleb128 0x9
+ 488 01a4 D9000000 		.4byte	0xd9
+ 489 01a8 08       		.uleb128 0x8
+ 490 01a9 04       		.byte	0x4
+ 491 01aa AE010000 		.4byte	0x1ae
+ 492 01ae 09       		.uleb128 0x9
+ 493 01af 34010000 		.4byte	0x134
+ 494 01b3 0A       		.uleb128 0xa
+ 495 01b4 10       		.byte	0x10
+ 496 01b5 06       		.byte	0x6
+ 497 01b6 D7       		.byte	0xd7
+ 498 01b7 EC010000 		.4byte	0x1ec
+ 499 01bb 0B       		.uleb128 0xb
+ 500 01bc B0010000 		.4byte	.LASF40
+ 501 01c0 06       		.byte	0x6
+ 502 01c1 D9       		.byte	0xd9
+ 503 01c2 D9000000 		.4byte	0xd9
+ 504 01c6 00       		.byte	0
+ 505 01c7 0B       		.uleb128 0xb
+ 506 01c8 13050000 		.4byte	.LASF41
+ 507 01cc 06       		.byte	0x6
+ 508 01cd DA       		.byte	0xda
+ 509 01ce 92010000 		.4byte	0x192
+ 510 01d2 04       		.byte	0x4
+ 511 01d3 0B       		.uleb128 0xb
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 21
+
+
+ 512 01d4 36010000 		.4byte	.LASF42
+ 513 01d8 06       		.byte	0x6
+ 514 01d9 DB       		.byte	0xdb
+ 515 01da 9D010000 		.4byte	0x19d
+ 516 01de 08       		.byte	0x8
+ 517 01df 0B       		.uleb128 0xb
+ 518 01e0 52030000 		.4byte	.LASF43
+ 519 01e4 06       		.byte	0x6
+ 520 01e5 DC       		.byte	0xdc
+ 521 01e6 D9000000 		.4byte	0xd9
+ 522 01ea 0C       		.byte	0xc
+ 523 01eb 00       		.byte	0
+ 524 01ec 02       		.uleb128 0x2
+ 525 01ed 77000000 		.4byte	.LASF44
+ 526 01f1 06       		.byte	0x6
+ 527 01f2 E5       		.byte	0xe5
+ 528 01f3 B3010000 		.4byte	0x1b3
+ 529 01f7 0C       		.uleb128 0xc
+ 530 01f8 18       		.byte	0x18
+ 531 01f9 06       		.byte	0x6
+ 532 01fa 4601     		.2byte	0x146
+ 533 01fc 5C020000 		.4byte	0x25c
+ 534 0200 0D       		.uleb128 0xd
+ 535 0201 52050000 		.4byte	.LASF45
+ 536 0205 06       		.byte	0x6
+ 537 0206 4801     		.2byte	0x148
+ 538 0208 EF000000 		.4byte	0xef
+ 539 020c 00       		.byte	0
+ 540 020d 0D       		.uleb128 0xd
+ 541 020e 59010000 		.4byte	.LASF46
+ 542 0212 06       		.byte	0x6
+ 543 0213 4901     		.2byte	0x149
+ 544 0215 C3000000 		.4byte	0xc3
+ 545 0219 04       		.byte	0x4
+ 546 021a 0D       		.uleb128 0xd
+ 547 021b B4020000 		.4byte	.LASF47
+ 548 021f 06       		.byte	0x6
+ 549 0220 4A01     		.2byte	0x14a
+ 550 0222 C3000000 		.4byte	0xc3
+ 551 0226 05       		.byte	0x5
+ 552 0227 0D       		.uleb128 0xd
+ 553 0228 75040000 		.4byte	.LASF48
+ 554 022c 06       		.byte	0x6
+ 555 022d 4B01     		.2byte	0x14b
+ 556 022f EF000000 		.4byte	0xef
+ 557 0233 08       		.byte	0x8
+ 558 0234 0D       		.uleb128 0xd
+ 559 0235 8F030000 		.4byte	.LASF49
+ 560 0239 06       		.byte	0x6
+ 561 023a 4C01     		.2byte	0x14c
+ 562 023c 92010000 		.4byte	0x192
+ 563 0240 0C       		.byte	0xc
+ 564 0241 0D       		.uleb128 0xd
+ 565 0242 90010000 		.4byte	.LASF50
+ 566 0246 06       		.byte	0x6
+ 567 0247 4D01     		.2byte	0x14d
+ 568 0249 92010000 		.4byte	0x192
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 22
+
+
+ 569 024d 10       		.byte	0x10
+ 570 024e 0D       		.uleb128 0xd
+ 571 024f BF030000 		.4byte	.LASF51
+ 572 0253 06       		.byte	0x6
+ 573 0254 5101     		.2byte	0x151
+ 574 0256 5C020000 		.4byte	0x25c
+ 575 025a 14       		.byte	0x14
+ 576 025b 00       		.byte	0
+ 577 025c 08       		.uleb128 0x8
+ 578 025d 04       		.byte	0x4
+ 579 025e 62020000 		.4byte	0x262
+ 580 0262 09       		.uleb128 0x9
+ 581 0263 EC010000 		.4byte	0x1ec
+ 582 0267 05       		.uleb128 0x5
+ 583 0268 CB040000 		.4byte	.LASF52
+ 584 026c 06       		.byte	0x6
+ 585 026d 5301     		.2byte	0x153
+ 586 026f F7010000 		.4byte	0x1f7
+ 587 0273 08       		.uleb128 0x8
+ 588 0274 04       		.byte	0x4
+ 589 0275 79020000 		.4byte	0x279
+ 590 0279 09       		.uleb128 0x9
+ 591 027a EF000000 		.4byte	0xef
+ 592 027e 0C       		.uleb128 0xc
+ 593 027f 38       		.byte	0x38
+ 594 0280 06       		.byte	0x6
+ 595 0281 AB02     		.2byte	0x2ab
+ 596 0283 FD020000 		.4byte	0x2fd
+ 597 0287 0D       		.uleb128 0xd
+ 598 0288 5A020000 		.4byte	.LASF53
+ 599 028c 06       		.byte	0x6
+ 600 028d AD02     		.2byte	0x2ad
+ 601 028f 92010000 		.4byte	0x192
+ 602 0293 00       		.byte	0
+ 603 0294 0D       		.uleb128 0xd
+ 604 0295 E3000000 		.4byte	.LASF54
+ 605 0299 06       		.byte	0x6
+ 606 029a AE02     		.2byte	0x2ae
+ 607 029c 92010000 		.4byte	0x192
+ 608 02a0 04       		.byte	0x4
+ 609 02a1 0D       		.uleb128 0xd
+ 610 02a2 7E020000 		.4byte	.LASF55
+ 611 02a6 06       		.byte	0x6
+ 612 02a7 AF02     		.2byte	0x2af
+ 613 02a9 92010000 		.4byte	0x192
+ 614 02ad 08       		.byte	0x8
+ 615 02ae 0D       		.uleb128 0xd
+ 616 02af D2010000 		.4byte	.LASF56
+ 617 02b3 06       		.byte	0x6
+ 618 02b4 B002     		.2byte	0x2b0
+ 619 02b6 73020000 		.4byte	0x273
+ 620 02ba 0C       		.byte	0xc
+ 621 02bb 0D       		.uleb128 0xd
+ 622 02bc C5030000 		.4byte	.LASF57
+ 623 02c0 06       		.byte	0x6
+ 624 02c1 B102     		.2byte	0x2b1
+ 625 02c3 73020000 		.4byte	0x273
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 23
+
+
+ 626 02c7 10       		.byte	0x10
+ 627 02c8 0D       		.uleb128 0xd
+ 628 02c9 B0010000 		.4byte	.LASF40
+ 629 02cd 06       		.byte	0x6
+ 630 02ce B202     		.2byte	0x2b2
+ 631 02d0 EF000000 		.4byte	0xef
+ 632 02d4 14       		.byte	0x14
+ 633 02d5 0D       		.uleb128 0xd
+ 634 02d6 1B020000 		.4byte	.LASF58
+ 635 02da 06       		.byte	0x6
+ 636 02db B302     		.2byte	0x2b3
+ 637 02dd EF000000 		.4byte	0xef
+ 638 02e1 18       		.byte	0x18
+ 639 02e2 0D       		.uleb128 0xd
+ 640 02e3 0E020000 		.4byte	.LASF59
+ 641 02e7 06       		.byte	0x6
+ 642 02e8 B402     		.2byte	0x2b4
+ 643 02ea EF000000 		.4byte	0xef
+ 644 02ee 1C       		.byte	0x1c
+ 645 02ef 0D       		.uleb128 0xd
+ 646 02f0 79020000 		.4byte	.LASF60
+ 647 02f4 06       		.byte	0x6
+ 648 02f5 BA02     		.2byte	0x2ba
+ 649 02f7 67020000 		.4byte	0x267
+ 650 02fb 20       		.byte	0x20
+ 651 02fc 00       		.byte	0
+ 652 02fd 05       		.uleb128 0x5
+ 653 02fe 69010000 		.4byte	.LASF61
+ 654 0302 06       		.byte	0x6
+ 655 0303 BC02     		.2byte	0x2bc
+ 656 0305 7E020000 		.4byte	0x27e
+ 657 0309 0A       		.uleb128 0xa
+ 658 030a 08       		.byte	0x8
+ 659 030b 07       		.byte	0x7
+ 660 030c 91       		.byte	0x91
+ 661 030d 36030000 		.4byte	0x336
+ 662 0311 0B       		.uleb128 0xb
+ 663 0312 A8010000 		.4byte	.LASF62
+ 664 0316 07       		.byte	0x7
+ 665 0317 93       		.byte	0x93
+ 666 0318 D9000000 		.4byte	0xd9
+ 667 031c 00       		.byte	0
+ 668 031d 0B       		.uleb128 0xb
+ 669 031e 97020000 		.4byte	.LASF63
+ 670 0322 07       		.byte	0x7
+ 671 0323 94       		.byte	0x94
+ 672 0324 D9000000 		.4byte	0xd9
+ 673 0328 02       		.byte	0x2
+ 674 0329 0B       		.uleb128 0xb
+ 675 032a 7F010000 		.4byte	.LASF64
+ 676 032e 07       		.byte	0x7
+ 677 032f 95       		.byte	0x95
+ 678 0330 36030000 		.4byte	0x336
+ 679 0334 04       		.byte	0x4
+ 680 0335 00       		.byte	0
+ 681 0336 08       		.uleb128 0x8
+ 682 0337 04       		.byte	0x4
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 24
+
+
+ 683 0338 28010000 		.4byte	0x128
+ 684 033c 02       		.uleb128 0x2
+ 685 033d FB040000 		.4byte	.LASF65
+ 686 0341 07       		.byte	0x7
+ 687 0342 96       		.byte	0x96
+ 688 0343 09030000 		.4byte	0x309
+ 689 0347 08       		.uleb128 0x8
+ 690 0348 04       		.byte	0x4
+ 691 0349 34010000 		.4byte	0x134
+ 692 034d 0E       		.uleb128 0xe
+ 693 034e 15000000 		.4byte	.LASF103
+ 694 0352 02       		.byte	0x2
+ 695 0353 9301     		.2byte	0x193
+ 696 0355 C3000000 		.4byte	0xc3
+ 697 0359 03       		.byte	0x3
+ 698 035a 6B030000 		.4byte	0x36b
+ 699 035e 0F       		.uleb128 0xf
+ 700 035f CC010000 		.4byte	.LASF104
+ 701 0363 02       		.byte	0x2
+ 702 0364 9301     		.2byte	0x193
+ 703 0366 EF000000 		.4byte	0xef
+ 704 036a 00       		.byte	0
+ 705 036b 10       		.uleb128 0x10
+ 706 036c 8C040000 		.4byte	.LASF105
+ 707 0370 01       		.byte	0x1
+ 708 0371 55       		.byte	0x55
+ 709 0372 86010000 		.4byte	0x186
+ 710 0376 00000000 		.4byte	.LFB84
+ 711 037a 48010000 		.4byte	.LFE84-.LFB84
+ 712 037e 01       		.uleb128 0x1
+ 713 037f 9C       		.byte	0x9c
+ 714 0380 3A060000 		.4byte	0x63a
+ 715 0384 11       		.uleb128 0x11
+ 716 0385 5300     		.ascii	"S\000"
+ 717 0387 01       		.byte	0x1
+ 718 0388 56       		.byte	0x56
+ 719 0389 3A060000 		.4byte	0x63a
+ 720 038d 00000000 		.4byte	.LLST0
+ 721 0391 12       		.uleb128 0x12
+ 722 0392 E9010000 		.4byte	.LASF66
+ 723 0396 01       		.byte	0x1
+ 724 0397 57       		.byte	0x57
+ 725 0398 36030000 		.4byte	0x336
+ 726 039c 2C000000 		.4byte	.LLST1
+ 727 03a0 12       		.uleb128 0x12
+ 728 03a1 2B010000 		.4byte	.LASF67
+ 729 03a5 01       		.byte	0x1
+ 730 03a6 58       		.byte	0x58
+ 731 03a7 36030000 		.4byte	0x336
+ 732 03ab 63000000 		.4byte	.LLST2
+ 733 03af 12       		.uleb128 0x12
+ 734 03b0 C4020000 		.4byte	.LASF68
+ 735 03b4 01       		.byte	0x1
+ 736 03b5 59       		.byte	0x59
+ 737 03b6 47030000 		.4byte	0x347
+ 738 03ba 8F000000 		.4byte	.LLST3
+ 739 03be 13       		.uleb128 0x13
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 25
+
+
+ 740 03bf 6D00     		.ascii	"m\000"
+ 741 03c1 01       		.byte	0x1
+ 742 03c2 5C       		.byte	0x5c
+ 743 03c3 28010000 		.4byte	0x128
+ 744 03c7 02       		.uleb128 0x2
+ 745 03c8 91       		.byte	0x91
+ 746 03c9 56       		.sleb128 -42
+ 747 03ca 14       		.uleb128 0x14
+ 748 03cb A4040000 		.4byte	.LASF69
+ 749 03cf 01       		.byte	0x1
+ 750 03d0 5D       		.byte	0x5d
+ 751 03d1 EF000000 		.4byte	0xef
+ 752 03d5 02       		.uleb128 0x2
+ 753 03d6 91       		.byte	0x91
+ 754 03d7 50       		.sleb128 -48
+ 755 03d8 15       		.uleb128 0x15
+ 756 03d9 D2020000 		.4byte	.LASF70
+ 757 03dd 01       		.byte	0x1
+ 758 03de 5E       		.byte	0x5e
+ 759 03df EF000000 		.4byte	0xef
+ 760 03e3 BB000000 		.4byte	.LLST4
+ 761 03e7 15       		.uleb128 0x15
+ 762 03e8 11030000 		.4byte	.LASF71
+ 763 03ec 01       		.byte	0x1
+ 764 03ed 5F       		.byte	0x5f
+ 765 03ee 34010000 		.4byte	0x134
+ 766 03f2 E7000000 		.4byte	.LLST5
+ 767 03f6 14       		.uleb128 0x14
+ 768 03f7 F6050000 		.4byte	.LASF72
+ 769 03fb 01       		.byte	0x1
+ 770 03fc 60       		.byte	0x60
+ 771 03fd 40010000 		.4byte	0x140
+ 772 0401 02       		.uleb128 0x2
+ 773 0402 91       		.byte	0x91
+ 774 0403 48       		.sleb128 -56
+ 775 0404 14       		.uleb128 0x14
+ 776 0405 17040000 		.4byte	.LASF73
+ 777 0409 01       		.byte	0x1
+ 778 040a 61       		.byte	0x61
+ 779 040b 3C030000 		.4byte	0x33c
+ 780 040f 02       		.uleb128 0x2
+ 781 0410 91       		.byte	0x91
+ 782 0411 40       		.sleb128 -64
+ 783 0412 16       		.uleb128 0x16
+ 784 0413 6900     		.ascii	"i\000"
+ 785 0415 01       		.byte	0x1
+ 786 0416 62       		.byte	0x62
+ 787 0417 EF000000 		.4byte	0xef
+ 788 041b 20010000 		.4byte	.LLST6
+ 789 041f 15       		.uleb128 0x15
+ 790 0420 C9020000 		.4byte	.LASF74
+ 791 0424 01       		.byte	0x1
+ 792 0425 63       		.byte	0x63
+ 793 0426 EF000000 		.4byte	0xef
+ 794 042a 56010000 		.4byte	.LLST7
+ 795 042e 15       		.uleb128 0x15
+ 796 042f E0020000 		.4byte	.LASF75
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 26
+
+
+ 797 0433 01       		.byte	0x1
+ 798 0434 64       		.byte	0x64
+ 799 0435 EF000000 		.4byte	0xef
+ 800 0439 75010000 		.4byte	.LLST8
+ 801 043d 15       		.uleb128 0x15
+ 802 043e 08040000 		.4byte	.LASF76
+ 803 0442 01       		.byte	0x1
+ 804 0443 65       		.byte	0x65
+ 805 0444 36030000 		.4byte	0x336
+ 806 0448 95010000 		.4byte	.LLST9
+ 807 044c 15       		.uleb128 0x15
+ 808 044d 1C050000 		.4byte	.LASF77
+ 809 0451 01       		.byte	0x1
+ 810 0452 67       		.byte	0x67
+ 811 0453 86010000 		.4byte	0x186
+ 812 0457 C1010000 		.4byte	.LLST10
+ 813 045b 17       		.uleb128 0x17
+ 814 045c 22000000 		.4byte	.LBB7
+ 815 0460 2C000000 		.4byte	.LBE7-.LBB7
+ 816 0464 C0040000 		.4byte	0x4c0
+ 817 0468 14       		.uleb128 0x14
+ 818 0469 46000000 		.4byte	.LASF78
+ 819 046d 01       		.byte	0x1
+ 820 046e 6E       		.byte	0x6e
+ 821 046f 28010000 		.4byte	0x128
+ 822 0473 03       		.uleb128 0x3
+ 823 0474 91       		.byte	0x91
+ 824 0475 BC7F     		.sleb128 -68
+ 825 0477 14       		.uleb128 0x14
+ 826 0478 53010000 		.4byte	.LASF79
+ 827 047c 01       		.byte	0x1
+ 828 047d 6F       		.byte	0x6f
+ 829 047e CE000000 		.4byte	0xce
+ 830 0482 03       		.uleb128 0x3
+ 831 0483 91       		.byte	0x91
+ 832 0484 BE7F     		.sleb128 -66
+ 833 0486 18       		.uleb128 0x18
+ 834 0487 32000000 		.4byte	.LVL7
+ 835 048b E5060000 		.4byte	0x6e5
+ 836 048f A9040000 		.4byte	0x4a9
+ 837 0493 19       		.uleb128 0x19
+ 838 0494 01       		.uleb128 0x1
+ 839 0495 53       		.byte	0x53
+ 840 0496 03       		.uleb128 0x3
+ 841 0497 91       		.byte	0x91
+ 842 0498 BE7F     		.sleb128 -66
+ 843 049a 19       		.uleb128 0x19
+ 844 049b 01       		.uleb128 0x1
+ 845 049c 52       		.byte	0x52
+ 846 049d 03       		.uleb128 0x3
+ 847 049e 91       		.byte	0x91
+ 848 049f BC7F     		.sleb128 -68
+ 849 04a1 19       		.uleb128 0x19
+ 850 04a2 01       		.uleb128 0x1
+ 851 04a3 50       		.byte	0x50
+ 852 04a4 03       		.uleb128 0x3
+ 853 04a5 0A       		.byte	0xa
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 27
+
+
+ 854 04a6 FF7F     		.2byte	0x7fff
+ 855 04a8 00       		.byte	0
+ 856 04a9 1A       		.uleb128 0x1a
+ 857 04aa 4C000000 		.4byte	.LVL9
+ 858 04ae 10070000 		.4byte	0x710
+ 859 04b2 19       		.uleb128 0x19
+ 860 04b3 01       		.uleb128 0x1
+ 861 04b4 53       		.byte	0x53
+ 862 04b5 02       		.uleb128 0x2
+ 863 04b6 78       		.byte	0x78
+ 864 04b7 00       		.sleb128 0
+ 865 04b8 19       		.uleb128 0x19
+ 866 04b9 01       		.uleb128 0x1
+ 867 04ba 50       		.byte	0x50
+ 868 04bb 02       		.uleb128 0x2
+ 869 04bc 78       		.byte	0x78
+ 870 04bd 00       		.sleb128 0
+ 871 04be 00       		.byte	0
+ 872 04bf 00       		.byte	0
+ 873 04c0 1B       		.uleb128 0x1b
+ 874 04c1 4D030000 		.4byte	0x34d
+ 875 04c5 60000000 		.4byte	.LBB8
+ 876 04c9 0C000000 		.4byte	.LBE8-.LBB8
+ 877 04cd 01       		.byte	0x1
+ 878 04ce 81       		.byte	0x81
+ 879 04cf DD040000 		.4byte	0x4dd
+ 880 04d3 1C       		.uleb128 0x1c
+ 881 04d4 5E030000 		.4byte	0x35e
+ 882 04d8 F7010000 		.4byte	.LLST11
+ 883 04dc 00       		.byte	0
+ 884 04dd 17       		.uleb128 0x17
+ 885 04de CE000000 		.4byte	.LBB10
+ 886 04e2 04000000 		.4byte	.LBE10-.LBB10
+ 887 04e6 09050000 		.4byte	0x509
+ 888 04ea 15       		.uleb128 0x15
+ 889 04eb 63010000 		.4byte	.LASF80
+ 890 04ef 01       		.byte	0x1
+ 891 04f0 AB       		.byte	0xab
+ 892 04f1 E4000000 		.4byte	0xe4
+ 893 04f5 0A020000 		.4byte	.LLST12
+ 894 04f9 15       		.uleb128 0x15
+ 895 04fa 38050000 		.4byte	.LASF81
+ 896 04fe 01       		.byte	0x1
+ 897 04ff AB       		.byte	0xab
+ 898 0500 E4000000 		.4byte	0xe4
+ 899 0504 1D020000 		.4byte	.LLST13
+ 900 0508 00       		.byte	0
+ 901 0509 17       		.uleb128 0x17
+ 902 050a 0C010000 		.4byte	.LBB11
+ 903 050e 08000000 		.4byte	.LBE11-.LBB11
+ 904 0512 35050000 		.4byte	0x535
+ 905 0516 15       		.uleb128 0x15
+ 906 0517 63010000 		.4byte	.LASF80
+ 907 051b 01       		.byte	0x1
+ 908 051c C0       		.byte	0xc0
+ 909 051d E4000000 		.4byte	0xe4
+ 910 0521 50020000 		.4byte	.LLST14
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 28
+
+
+ 911 0525 15       		.uleb128 0x15
+ 912 0526 38050000 		.4byte	.LASF81
+ 913 052a 01       		.byte	0x1
+ 914 052b C0       		.byte	0xc0
+ 915 052c E4000000 		.4byte	0xe4
+ 916 0530 63020000 		.4byte	.LLST15
+ 917 0534 00       		.byte	0
+ 918 0535 18       		.uleb128 0x18
+ 919 0536 1C000000 		.4byte	.LVL6
+ 920 053a 36070000 		.4byte	0x736
+ 921 053e 55050000 		.4byte	0x555
+ 922 0542 19       		.uleb128 0x19
+ 923 0543 01       		.uleb128 0x1
+ 924 0544 53       		.byte	0x53
+ 925 0545 02       		.uleb128 0x2
+ 926 0546 91       		.byte	0x91
+ 927 0547 50       		.sleb128 -48
+ 928 0548 19       		.uleb128 0x19
+ 929 0549 01       		.uleb128 0x1
+ 930 054a 52       		.byte	0x52
+ 931 054b 02       		.uleb128 0x2
+ 932 054c 91       		.byte	0x91
+ 933 054d 56       		.sleb128 -42
+ 934 054e 19       		.uleb128 0x19
+ 935 054f 01       		.uleb128 0x1
+ 936 0550 50       		.byte	0x50
+ 937 0551 02       		.uleb128 0x2
+ 938 0552 78       		.byte	0x78
+ 939 0553 00       		.sleb128 0
+ 940 0554 00       		.byte	0
+ 941 0555 18       		.uleb128 0x18
+ 942 0556 5E000000 		.4byte	.LVL12
+ 943 055a 57070000 		.4byte	0x757
+ 944 055e 6F050000 		.4byte	0x56f
+ 945 0562 19       		.uleb128 0x19
+ 946 0563 01       		.uleb128 0x1
+ 947 0564 52       		.byte	0x52
+ 948 0565 02       		.uleb128 0x2
+ 949 0566 78       		.byte	0x78
+ 950 0567 00       		.sleb128 0
+ 951 0568 19       		.uleb128 0x19
+ 952 0569 01       		.uleb128 0x1
+ 953 056a 50       		.byte	0x50
+ 954 056b 02       		.uleb128 0x2
+ 955 056c 78       		.byte	0x78
+ 956 056d 00       		.sleb128 0
+ 957 056e 00       		.byte	0
+ 958 056f 18       		.uleb128 0x18
+ 959 0570 7C000000 		.4byte	.LVL15
+ 960 0574 77070000 		.4byte	0x777
+ 961 0578 8F050000 		.4byte	0x58f
+ 962 057c 19       		.uleb128 0x19
+ 963 057d 01       		.uleb128 0x1
+ 964 057e 52       		.byte	0x52
+ 965 057f 02       		.uleb128 0x2
+ 966 0580 77       		.byte	0x77
+ 967 0581 00       		.sleb128 0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 29
+
+
+ 968 0582 19       		.uleb128 0x19
+ 969 0583 01       		.uleb128 0x1
+ 970 0584 51       		.byte	0x51
+ 971 0585 02       		.uleb128 0x2
+ 972 0586 78       		.byte	0x78
+ 973 0587 00       		.sleb128 0
+ 974 0588 19       		.uleb128 0x19
+ 975 0589 01       		.uleb128 0x1
+ 976 058a 50       		.byte	0x50
+ 977 058b 02       		.uleb128 0x2
+ 978 058c 74       		.byte	0x74
+ 979 058d 20       		.sleb128 32
+ 980 058e 00       		.byte	0
+ 981 058f 18       		.uleb128 0x18
+ 982 0590 8A000000 		.4byte	.LVL18
+ 983 0594 9E070000 		.4byte	0x79e
+ 984 0598 A9050000 		.4byte	0x5a9
+ 985 059c 19       		.uleb128 0x19
+ 986 059d 01       		.uleb128 0x1
+ 987 059e 51       		.byte	0x51
+ 988 059f 02       		.uleb128 0x2
+ 989 05a0 78       		.byte	0x78
+ 990 05a1 00       		.sleb128 0
+ 991 05a2 19       		.uleb128 0x19
+ 992 05a3 01       		.uleb128 0x1
+ 993 05a4 50       		.byte	0x50
+ 994 05a5 02       		.uleb128 0x2
+ 995 05a6 77       		.byte	0x77
+ 996 05a7 00       		.sleb128 0
+ 997 05a8 00       		.byte	0
+ 998 05a9 18       		.uleb128 0x18
+ 999 05aa AC000000 		.4byte	.LVL20
+ 1000 05ae B9070000 		.4byte	0x7b9
+ 1001 05b2 BD050000 		.4byte	0x5bd
+ 1002 05b6 19       		.uleb128 0x19
+ 1003 05b7 01       		.uleb128 0x1
+ 1004 05b8 53       		.byte	0x53
+ 1005 05b9 02       		.uleb128 0x2
+ 1006 05ba 91       		.byte	0x91
+ 1007 05bb 48       		.sleb128 -56
+ 1008 05bc 00       		.byte	0
+ 1009 05bd 18       		.uleb128 0x18
+ 1010 05be E6000000 		.4byte	.LVL26
+ 1011 05c2 E0070000 		.4byte	0x7e0
+ 1012 05c6 D7050000 		.4byte	0x5d7
+ 1013 05ca 19       		.uleb128 0x19
+ 1014 05cb 01       		.uleb128 0x1
+ 1015 05cc 51       		.byte	0x51
+ 1016 05cd 02       		.uleb128 0x2
+ 1017 05ce 77       		.byte	0x77
+ 1018 05cf 00       		.sleb128 0
+ 1019 05d0 19       		.uleb128 0x19
+ 1020 05d1 01       		.uleb128 0x1
+ 1021 05d2 50       		.byte	0x50
+ 1022 05d3 02       		.uleb128 0x2
+ 1023 05d4 77       		.byte	0x77
+ 1024 05d5 00       		.sleb128 0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 30
+
+
+ 1025 05d6 00       		.byte	0
+ 1026 05d7 18       		.uleb128 0x18
+ 1027 05d8 FA000000 		.4byte	.LVL29
+ 1028 05dc FB070000 		.4byte	0x7fb
+ 1029 05e0 FD050000 		.4byte	0x5fd
+ 1030 05e4 19       		.uleb128 0x19
+ 1031 05e5 01       		.uleb128 0x1
+ 1032 05e6 52       		.byte	0x52
+ 1033 05e7 02       		.uleb128 0x2
+ 1034 05e8 77       		.byte	0x77
+ 1035 05e9 00       		.sleb128 0
+ 1036 05ea 19       		.uleb128 0x19
+ 1037 05eb 01       		.uleb128 0x1
+ 1038 05ec 51       		.byte	0x51
+ 1039 05ed 08       		.uleb128 0x8
+ 1040 05ee 79       		.byte	0x79
+ 1041 05ef 00       		.sleb128 0
+ 1042 05f0 0C       		.byte	0xc
+ 1043 05f1 60C8C502 		.4byte	0x2c5c860
+ 1044 05f5 1E       		.byte	0x1e
+ 1045 05f6 19       		.uleb128 0x19
+ 1046 05f7 01       		.uleb128 0x1
+ 1047 05f8 50       		.byte	0x50
+ 1048 05f9 02       		.uleb128 0x2
+ 1049 05fa 77       		.byte	0x77
+ 1050 05fb 00       		.sleb128 0
+ 1051 05fc 00       		.byte	0
+ 1052 05fd 18       		.uleb128 0x18
+ 1053 05fe 08010000 		.4byte	.LVL30
+ 1054 0602 1C080000 		.4byte	0x81c
+ 1055 0606 1D060000 		.4byte	0x61d
+ 1056 060a 19       		.uleb128 0x19
+ 1057 060b 01       		.uleb128 0x1
+ 1058 060c 52       		.byte	0x52
+ 1059 060d 02       		.uleb128 0x2
+ 1060 060e 77       		.byte	0x77
+ 1061 060f 00       		.sleb128 0
+ 1062 0610 19       		.uleb128 0x19
+ 1063 0611 01       		.uleb128 0x1
+ 1064 0612 51       		.byte	0x51
+ 1065 0613 02       		.uleb128 0x2
+ 1066 0614 09       		.byte	0x9
+ 1067 0615 ED       		.byte	0xed
+ 1068 0616 19       		.uleb128 0x19
+ 1069 0617 01       		.uleb128 0x1
+ 1070 0618 50       		.byte	0x50
+ 1071 0619 02       		.uleb128 0x2
+ 1072 061a 77       		.byte	0x77
+ 1073 061b 00       		.sleb128 0
+ 1074 061c 00       		.byte	0
+ 1075 061d 1A       		.uleb128 0x1a
+ 1076 061e 38010000 		.4byte	.LVL37
+ 1077 0622 3D080000 		.4byte	0x83d
+ 1078 0626 19       		.uleb128 0x19
+ 1079 0627 01       		.uleb128 0x1
+ 1080 0628 52       		.byte	0x52
+ 1081 0629 02       		.uleb128 0x2
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 31
+
+
+ 1082 062a 7B       		.byte	0x7b
+ 1083 062b 00       		.sleb128 0
+ 1084 062c 19       		.uleb128 0x19
+ 1085 062d 01       		.uleb128 0x1
+ 1086 062e 51       		.byte	0x51
+ 1087 062f 02       		.uleb128 0x2
+ 1088 0630 78       		.byte	0x78
+ 1089 0631 00       		.sleb128 0
+ 1090 0632 19       		.uleb128 0x19
+ 1091 0633 01       		.uleb128 0x1
+ 1092 0634 50       		.byte	0x50
+ 1093 0635 02       		.uleb128 0x2
+ 1094 0636 91       		.byte	0x91
+ 1095 0637 40       		.sleb128 -64
+ 1096 0638 00       		.byte	0
+ 1097 0639 00       		.byte	0
+ 1098 063a 08       		.uleb128 0x8
+ 1099 063b 04       		.byte	0x4
+ 1100 063c 40060000 		.4byte	0x640
+ 1101 0640 09       		.uleb128 0x9
+ 1102 0641 FD020000 		.4byte	0x2fd
+ 1103 0645 02       		.uleb128 0x2
+ 1104 0646 00000000 		.4byte	.LASF82
+ 1105 064a 02       		.byte	0x2
+ 1106 064b 8B       		.byte	0x8b
+ 1107 064c B8060000 		.4byte	0x6b8
+ 1108 0650 08       		.uleb128 0x8
+ 1109 0651 04       		.byte	0x4
+ 1110 0652 EF000000 		.4byte	0xef
+ 1111 0656 1D       		.uleb128 0x1d
+ 1112 0657 B7010000 		.4byte	.LASF83
+ 1113 065b 02       		.byte	0x2
+ 1114 065c 92       		.byte	0x92
+ 1115 065d 61060000 		.4byte	0x661
+ 1116 0661 09       		.uleb128 0x9
+ 1117 0662 45060000 		.4byte	0x645
+ 1118 0666 1D       		.uleb128 0x1d
+ 1119 0667 AE000000 		.4byte	.LASF84
+ 1120 066b 02       		.byte	0x2
+ 1121 066c 93       		.byte	0x93
+ 1122 066d 61060000 		.4byte	0x661
+ 1123 0671 02       		.uleb128 0x2
+ 1124 0672 2D000000 		.4byte	.LASF85
+ 1125 0676 02       		.byte	0x2
+ 1126 0677 90       		.byte	0x90
+ 1127 0678 97060000 		.4byte	0x697
+ 1128 067c 1D       		.uleb128 0x1d
+ 1129 067d FE000000 		.4byte	.LASF86
+ 1130 0681 02       		.byte	0x2
+ 1131 0682 94       		.byte	0x94
+ 1132 0683 87060000 		.4byte	0x687
+ 1133 0687 09       		.uleb128 0x9
+ 1134 0688 71060000 		.4byte	0x671
+ 1135 068c 1D       		.uleb128 0x1d
+ 1136 068d E1040000 		.4byte	.LASF87
+ 1137 0691 02       		.byte	0x2
+ 1138 0692 95       		.byte	0x95
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 32
+
+
+ 1139 0693 87060000 		.4byte	0x687
+ 1140 0697 0A       		.uleb128 0xa
+ 1141 0698 08       		.byte	0x8
+ 1142 0699 02       		.byte	0x2
+ 1143 069a 8D       		.byte	0x8d
+ 1144 069b B8060000 		.4byte	0x6b8
+ 1145 069f 0B       		.uleb128 0xb
+ 1146 06a0 DB020000 		.4byte	.LASF88
+ 1147 06a4 02       		.byte	0x2
+ 1148 06a5 8E       		.byte	0x8e
+ 1149 06a6 50060000 		.4byte	0x650
+ 1150 06aa 00       		.byte	0
+ 1151 06ab 0B       		.uleb128 0xb
+ 1152 06ac 8A030000 		.4byte	.LASF89
+ 1153 06b0 02       		.byte	0x2
+ 1154 06b1 8F       		.byte	0x8f
+ 1155 06b2 EF000000 		.4byte	0xef
+ 1156 06b6 04       		.byte	0x4
+ 1157 06b7 00       		.byte	0
+ 1158 06b8 0A       		.uleb128 0xa
+ 1159 06b9 0C       		.byte	0xc
+ 1160 06ba 02       		.byte	0x2
+ 1161 06bb 87       		.byte	0x87
+ 1162 06bc E5060000 		.4byte	0x6e5
+ 1163 06c0 1E       		.uleb128 0x1e
+ 1164 06c1 73726300 		.ascii	"src\000"
+ 1165 06c5 02       		.byte	0x2
+ 1166 06c6 88       		.byte	0x88
+ 1167 06c7 73020000 		.4byte	0x273
+ 1168 06cb 00       		.byte	0
+ 1169 06cc 0B       		.uleb128 0xb
+ 1170 06cd DB020000 		.4byte	.LASF88
+ 1171 06d1 02       		.byte	0x2
+ 1172 06d2 89       		.byte	0x89
+ 1173 06d3 50060000 		.4byte	0x650
+ 1174 06d7 04       		.byte	0x4
+ 1175 06d8 0B       		.uleb128 0xb
+ 1176 06d9 8A030000 		.4byte	.LASF89
+ 1177 06dd 02       		.byte	0x2
+ 1178 06de 8A       		.byte	0x8a
+ 1179 06df EF000000 		.4byte	0xef
+ 1180 06e3 08       		.byte	0x8
+ 1181 06e4 00       		.byte	0
+ 1182 06e5 1F       		.uleb128 0x1f
+ 1183 06e6 EF000000 		.4byte	.LASF106
+ 1184 06ea 0B       		.byte	0xb
+ 1185 06eb 4D01     		.2byte	0x14d
+ 1186 06ed 86010000 		.4byte	0x186
+ 1187 06f1 0A070000 		.4byte	0x70a
+ 1188 06f5 20       		.uleb128 0x20
+ 1189 06f6 28010000 		.4byte	0x128
+ 1190 06fa 20       		.uleb128 0x20
+ 1191 06fb 28010000 		.4byte	0x128
+ 1192 06ff 20       		.uleb128 0x20
+ 1193 0700 36030000 		.4byte	0x336
+ 1194 0704 20       		.uleb128 0x20
+ 1195 0705 0A070000 		.4byte	0x70a
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 33
+
+
+ 1196 0709 00       		.byte	0
+ 1197 070a 08       		.uleb128 0x8
+ 1198 070b 04       		.byte	0x4
+ 1199 070c CE000000 		.4byte	0xce
+ 1200 0710 21       		.uleb128 0x21
+ 1201 0711 8D000000 		.4byte	.LASF90
+ 1202 0715 08       		.byte	0x8
+ 1203 0716 3C01     		.2byte	0x13c
+ 1204 0718 36070000 		.4byte	0x736
+ 1205 071c 20       		.uleb128 0x20
+ 1206 071d 92010000 		.4byte	0x192
+ 1207 0721 20       		.uleb128 0x20
+ 1208 0722 28010000 		.4byte	0x128
+ 1209 0726 20       		.uleb128 0x20
+ 1210 0727 B8000000 		.4byte	0xb8
+ 1211 072b 20       		.uleb128 0x20
+ 1212 072c 36030000 		.4byte	0x336
+ 1213 0730 20       		.uleb128 0x20
+ 1214 0731 EF000000 		.4byte	0xef
+ 1215 0735 00       		.byte	0
+ 1216 0736 21       		.uleb128 0x21
+ 1217 0737 02030000 		.4byte	.LASF91
+ 1218 073b 09       		.byte	0x9
+ 1219 073c 8A02     		.2byte	0x28a
+ 1220 073e 57070000 		.4byte	0x757
+ 1221 0742 20       		.uleb128 0x20
+ 1222 0743 92010000 		.4byte	0x192
+ 1223 0747 20       		.uleb128 0x20
+ 1224 0748 EF000000 		.4byte	0xef
+ 1225 074c 20       		.uleb128 0x20
+ 1226 074d 36030000 		.4byte	0x336
+ 1227 0751 20       		.uleb128 0x20
+ 1228 0752 50060000 		.4byte	0x650
+ 1229 0756 00       		.byte	0
+ 1230 0757 22       		.uleb128 0x22
+ 1231 0758 8A020000 		.4byte	.LASF92
+ 1232 075c 08       		.byte	0x8
+ 1233 075d 43       		.byte	0x43
+ 1234 075e 77070000 		.4byte	0x777
+ 1235 0762 20       		.uleb128 0x20
+ 1236 0763 92010000 		.4byte	0x192
+ 1237 0767 20       		.uleb128 0x20
+ 1238 0768 92010000 		.4byte	0x192
+ 1239 076c 20       		.uleb128 0x20
+ 1240 076d 36030000 		.4byte	0x336
+ 1241 0771 20       		.uleb128 0x20
+ 1242 0772 EF000000 		.4byte	0xef
+ 1243 0776 00       		.byte	0
+ 1244 0777 21       		.uleb128 0x21
+ 1245 0778 35030000 		.4byte	.LASF93
+ 1246 077c 06       		.byte	0x6
+ 1247 077d 5B01     		.2byte	0x15b
+ 1248 077f 93070000 		.4byte	0x793
+ 1249 0783 20       		.uleb128 0x20
+ 1250 0784 93070000 		.4byte	0x793
+ 1251 0788 20       		.uleb128 0x20
+ 1252 0789 36030000 		.4byte	0x336
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 34
+
+
+ 1253 078d 20       		.uleb128 0x20
+ 1254 078e 36030000 		.4byte	0x336
+ 1255 0792 00       		.byte	0
+ 1256 0793 08       		.uleb128 0x8
+ 1257 0794 04       		.byte	0x4
+ 1258 0795 99070000 		.4byte	0x799
+ 1259 0799 09       		.uleb128 0x9
+ 1260 079a 67020000 		.4byte	0x267
+ 1261 079e 22       		.uleb128 0x22
+ 1262 079f 1B000000 		.4byte	.LASF94
+ 1263 07a3 0A       		.byte	0xa
+ 1264 07a4 B1       		.byte	0xb1
+ 1265 07a5 B9070000 		.4byte	0x7b9
+ 1266 07a9 20       		.uleb128 0x20
+ 1267 07aa 92010000 		.4byte	0x192
+ 1268 07ae 20       		.uleb128 0x20
+ 1269 07af 36030000 		.4byte	0x336
+ 1270 07b3 20       		.uleb128 0x20
+ 1271 07b4 EF000000 		.4byte	0xef
+ 1272 07b8 00       		.byte	0
+ 1273 07b9 21       		.uleb128 0x21
+ 1274 07ba FD050000 		.4byte	.LASF95
+ 1275 07be 08       		.byte	0x8
+ 1276 07bf C501     		.2byte	0x1c5
+ 1277 07c1 DA070000 		.4byte	0x7da
+ 1278 07c5 20       		.uleb128 0x20
+ 1279 07c6 92010000 		.4byte	0x192
+ 1280 07ca 20       		.uleb128 0x20
+ 1281 07cb 92010000 		.4byte	0x192
+ 1282 07cf 20       		.uleb128 0x20
+ 1283 07d0 EF000000 		.4byte	0xef
+ 1284 07d4 20       		.uleb128 0x20
+ 1285 07d5 DA070000 		.4byte	0x7da
+ 1286 07d9 00       		.byte	0
+ 1287 07da 08       		.uleb128 0x8
+ 1288 07db 04       		.byte	0x4
+ 1289 07dc 40010000 		.4byte	0x140
+ 1290 07e0 22       		.uleb128 0x22
+ 1291 07e1 23050000 		.4byte	.LASF96
+ 1292 07e5 0B       		.byte	0xb
+ 1293 07e6 B1       		.byte	0xb1
+ 1294 07e7 FB070000 		.4byte	0x7fb
+ 1295 07eb 20       		.uleb128 0x20
+ 1296 07ec A8010000 		.4byte	0x1a8
+ 1297 07f0 20       		.uleb128 0x20
+ 1298 07f1 47030000 		.4byte	0x347
+ 1299 07f5 20       		.uleb128 0x20
+ 1300 07f6 EF000000 		.4byte	0xef
+ 1301 07fa 00       		.byte	0
+ 1302 07fb 21       		.uleb128 0x21
+ 1303 07fc 13010000 		.4byte	.LASF97
+ 1304 0800 08       		.byte	0x8
+ 1305 0801 4502     		.2byte	0x245
+ 1306 0803 1C080000 		.4byte	0x81c
+ 1307 0807 20       		.uleb128 0x20
+ 1308 0808 A8010000 		.4byte	0x1a8
+ 1309 080c 20       		.uleb128 0x20
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 35
+
+
+ 1310 080d 34010000 		.4byte	0x134
+ 1311 0811 20       		.uleb128 0x20
+ 1312 0812 47030000 		.4byte	0x347
+ 1313 0816 20       		.uleb128 0x20
+ 1314 0817 EF000000 		.4byte	0xef
+ 1315 081b 00       		.byte	0
+ 1316 081c 21       		.uleb128 0x21
+ 1317 081d 00020000 		.4byte	.LASF98
+ 1318 0821 08       		.byte	0x8
+ 1319 0822 FD01     		.2byte	0x1fd
+ 1320 0824 3D080000 		.4byte	0x83d
+ 1321 0828 20       		.uleb128 0x20
+ 1322 0829 A8010000 		.4byte	0x1a8
+ 1323 082d 20       		.uleb128 0x20
+ 1324 082e B8000000 		.4byte	0xb8
+ 1325 0832 20       		.uleb128 0x20
+ 1326 0833 47030000 		.4byte	0x347
+ 1327 0837 20       		.uleb128 0x20
+ 1328 0838 EF000000 		.4byte	0xef
+ 1329 083c 00       		.byte	0
+ 1330 083d 21       		.uleb128 0x21
+ 1331 083e 75030000 		.4byte	.LASF99
+ 1332 0842 07       		.byte	0x7
+ 1333 0843 9E01     		.2byte	0x19e
+ 1334 0845 59080000 		.4byte	0x859
+ 1335 0849 20       		.uleb128 0x20
+ 1336 084a 59080000 		.4byte	0x859
+ 1337 084e 20       		.uleb128 0x20
+ 1338 084f 92010000 		.4byte	0x192
+ 1339 0853 20       		.uleb128 0x20
+ 1340 0854 36030000 		.4byte	0x336
+ 1341 0858 00       		.byte	0
+ 1342 0859 08       		.uleb128 0x8
+ 1343 085a 04       		.byte	0x4
+ 1344 085b 5F080000 		.4byte	0x85f
+ 1345 085f 09       		.uleb128 0x9
+ 1346 0860 3C030000 		.4byte	0x33c
+ 1347 0864 00       		.byte	0
+ 1348              		.section	.debug_abbrev,"",%progbits
+ 1349              	.Ldebug_abbrev0:
+ 1350 0000 01       		.uleb128 0x1
+ 1351 0001 11       		.uleb128 0x11
+ 1352 0002 01       		.byte	0x1
+ 1353 0003 25       		.uleb128 0x25
+ 1354 0004 0E       		.uleb128 0xe
+ 1355 0005 13       		.uleb128 0x13
+ 1356 0006 0B       		.uleb128 0xb
+ 1357 0007 03       		.uleb128 0x3
+ 1358 0008 0E       		.uleb128 0xe
+ 1359 0009 1B       		.uleb128 0x1b
+ 1360 000a 0E       		.uleb128 0xe
+ 1361 000b 55       		.uleb128 0x55
+ 1362 000c 17       		.uleb128 0x17
+ 1363 000d 11       		.uleb128 0x11
+ 1364 000e 01       		.uleb128 0x1
+ 1365 000f 10       		.uleb128 0x10
+ 1366 0010 17       		.uleb128 0x17
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 36
+
+
+ 1367 0011 00       		.byte	0
+ 1368 0012 00       		.byte	0
+ 1369 0013 02       		.uleb128 0x2
+ 1370 0014 16       		.uleb128 0x16
+ 1371 0015 00       		.byte	0
+ 1372 0016 03       		.uleb128 0x3
+ 1373 0017 0E       		.uleb128 0xe
+ 1374 0018 3A       		.uleb128 0x3a
+ 1375 0019 0B       		.uleb128 0xb
+ 1376 001a 3B       		.uleb128 0x3b
+ 1377 001b 0B       		.uleb128 0xb
+ 1378 001c 49       		.uleb128 0x49
+ 1379 001d 13       		.uleb128 0x13
+ 1380 001e 00       		.byte	0
+ 1381 001f 00       		.byte	0
+ 1382 0020 03       		.uleb128 0x3
+ 1383 0021 24       		.uleb128 0x24
+ 1384 0022 00       		.byte	0
+ 1385 0023 0B       		.uleb128 0xb
+ 1386 0024 0B       		.uleb128 0xb
+ 1387 0025 3E       		.uleb128 0x3e
+ 1388 0026 0B       		.uleb128 0xb
+ 1389 0027 03       		.uleb128 0x3
+ 1390 0028 0E       		.uleb128 0xe
+ 1391 0029 00       		.byte	0
+ 1392 002a 00       		.byte	0
+ 1393 002b 04       		.uleb128 0x4
+ 1394 002c 24       		.uleb128 0x24
+ 1395 002d 00       		.byte	0
+ 1396 002e 0B       		.uleb128 0xb
+ 1397 002f 0B       		.uleb128 0xb
+ 1398 0030 3E       		.uleb128 0x3e
+ 1399 0031 0B       		.uleb128 0xb
+ 1400 0032 03       		.uleb128 0x3
+ 1401 0033 08       		.uleb128 0x8
+ 1402 0034 00       		.byte	0
+ 1403 0035 00       		.byte	0
+ 1404 0036 05       		.uleb128 0x5
+ 1405 0037 16       		.uleb128 0x16
+ 1406 0038 00       		.byte	0
+ 1407 0039 03       		.uleb128 0x3
+ 1408 003a 0E       		.uleb128 0xe
+ 1409 003b 3A       		.uleb128 0x3a
+ 1410 003c 0B       		.uleb128 0xb
+ 1411 003d 3B       		.uleb128 0x3b
+ 1412 003e 05       		.uleb128 0x5
+ 1413 003f 49       		.uleb128 0x49
+ 1414 0040 13       		.uleb128 0x13
+ 1415 0041 00       		.byte	0
+ 1416 0042 00       		.byte	0
+ 1417 0043 06       		.uleb128 0x6
+ 1418 0044 04       		.uleb128 0x4
+ 1419 0045 01       		.byte	0x1
+ 1420 0046 0B       		.uleb128 0xb
+ 1421 0047 0B       		.uleb128 0xb
+ 1422 0048 3A       		.uleb128 0x3a
+ 1423 0049 0B       		.uleb128 0xb
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 37
+
+
+ 1424 004a 3B       		.uleb128 0x3b
+ 1425 004b 05       		.uleb128 0x5
+ 1426 004c 01       		.uleb128 0x1
+ 1427 004d 13       		.uleb128 0x13
+ 1428 004e 00       		.byte	0
+ 1429 004f 00       		.byte	0
+ 1430 0050 07       		.uleb128 0x7
+ 1431 0051 28       		.uleb128 0x28
+ 1432 0052 00       		.byte	0
+ 1433 0053 03       		.uleb128 0x3
+ 1434 0054 0E       		.uleb128 0xe
+ 1435 0055 1C       		.uleb128 0x1c
+ 1436 0056 0D       		.uleb128 0xd
+ 1437 0057 00       		.byte	0
+ 1438 0058 00       		.byte	0
+ 1439 0059 08       		.uleb128 0x8
+ 1440 005a 0F       		.uleb128 0xf
+ 1441 005b 00       		.byte	0
+ 1442 005c 0B       		.uleb128 0xb
+ 1443 005d 0B       		.uleb128 0xb
+ 1444 005e 49       		.uleb128 0x49
+ 1445 005f 13       		.uleb128 0x13
+ 1446 0060 00       		.byte	0
+ 1447 0061 00       		.byte	0
+ 1448 0062 09       		.uleb128 0x9
+ 1449 0063 26       		.uleb128 0x26
+ 1450 0064 00       		.byte	0
+ 1451 0065 49       		.uleb128 0x49
+ 1452 0066 13       		.uleb128 0x13
+ 1453 0067 00       		.byte	0
+ 1454 0068 00       		.byte	0
+ 1455 0069 0A       		.uleb128 0xa
+ 1456 006a 13       		.uleb128 0x13
+ 1457 006b 01       		.byte	0x1
+ 1458 006c 0B       		.uleb128 0xb
+ 1459 006d 0B       		.uleb128 0xb
+ 1460 006e 3A       		.uleb128 0x3a
+ 1461 006f 0B       		.uleb128 0xb
+ 1462 0070 3B       		.uleb128 0x3b
+ 1463 0071 0B       		.uleb128 0xb
+ 1464 0072 01       		.uleb128 0x1
+ 1465 0073 13       		.uleb128 0x13
+ 1466 0074 00       		.byte	0
+ 1467 0075 00       		.byte	0
+ 1468 0076 0B       		.uleb128 0xb
+ 1469 0077 0D       		.uleb128 0xd
+ 1470 0078 00       		.byte	0
+ 1471 0079 03       		.uleb128 0x3
+ 1472 007a 0E       		.uleb128 0xe
+ 1473 007b 3A       		.uleb128 0x3a
+ 1474 007c 0B       		.uleb128 0xb
+ 1475 007d 3B       		.uleb128 0x3b
+ 1476 007e 0B       		.uleb128 0xb
+ 1477 007f 49       		.uleb128 0x49
+ 1478 0080 13       		.uleb128 0x13
+ 1479 0081 38       		.uleb128 0x38
+ 1480 0082 0B       		.uleb128 0xb
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 38
+
+
+ 1481 0083 00       		.byte	0
+ 1482 0084 00       		.byte	0
+ 1483 0085 0C       		.uleb128 0xc
+ 1484 0086 13       		.uleb128 0x13
+ 1485 0087 01       		.byte	0x1
+ 1486 0088 0B       		.uleb128 0xb
+ 1487 0089 0B       		.uleb128 0xb
+ 1488 008a 3A       		.uleb128 0x3a
+ 1489 008b 0B       		.uleb128 0xb
+ 1490 008c 3B       		.uleb128 0x3b
+ 1491 008d 05       		.uleb128 0x5
+ 1492 008e 01       		.uleb128 0x1
+ 1493 008f 13       		.uleb128 0x13
+ 1494 0090 00       		.byte	0
+ 1495 0091 00       		.byte	0
+ 1496 0092 0D       		.uleb128 0xd
+ 1497 0093 0D       		.uleb128 0xd
+ 1498 0094 00       		.byte	0
+ 1499 0095 03       		.uleb128 0x3
+ 1500 0096 0E       		.uleb128 0xe
+ 1501 0097 3A       		.uleb128 0x3a
+ 1502 0098 0B       		.uleb128 0xb
+ 1503 0099 3B       		.uleb128 0x3b
+ 1504 009a 05       		.uleb128 0x5
+ 1505 009b 49       		.uleb128 0x49
+ 1506 009c 13       		.uleb128 0x13
+ 1507 009d 38       		.uleb128 0x38
+ 1508 009e 0B       		.uleb128 0xb
+ 1509 009f 00       		.byte	0
+ 1510 00a0 00       		.byte	0
+ 1511 00a1 0E       		.uleb128 0xe
+ 1512 00a2 2E       		.uleb128 0x2e
+ 1513 00a3 01       		.byte	0x1
+ 1514 00a4 03       		.uleb128 0x3
+ 1515 00a5 0E       		.uleb128 0xe
+ 1516 00a6 3A       		.uleb128 0x3a
+ 1517 00a7 0B       		.uleb128 0xb
+ 1518 00a8 3B       		.uleb128 0x3b
+ 1519 00a9 05       		.uleb128 0x5
+ 1520 00aa 27       		.uleb128 0x27
+ 1521 00ab 19       		.uleb128 0x19
+ 1522 00ac 49       		.uleb128 0x49
+ 1523 00ad 13       		.uleb128 0x13
+ 1524 00ae 20       		.uleb128 0x20
+ 1525 00af 0B       		.uleb128 0xb
+ 1526 00b0 01       		.uleb128 0x1
+ 1527 00b1 13       		.uleb128 0x13
+ 1528 00b2 00       		.byte	0
+ 1529 00b3 00       		.byte	0
+ 1530 00b4 0F       		.uleb128 0xf
+ 1531 00b5 05       		.uleb128 0x5
+ 1532 00b6 00       		.byte	0
+ 1533 00b7 03       		.uleb128 0x3
+ 1534 00b8 0E       		.uleb128 0xe
+ 1535 00b9 3A       		.uleb128 0x3a
+ 1536 00ba 0B       		.uleb128 0xb
+ 1537 00bb 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 39
+
+
+ 1538 00bc 05       		.uleb128 0x5
+ 1539 00bd 49       		.uleb128 0x49
+ 1540 00be 13       		.uleb128 0x13
+ 1541 00bf 00       		.byte	0
+ 1542 00c0 00       		.byte	0
+ 1543 00c1 10       		.uleb128 0x10
+ 1544 00c2 2E       		.uleb128 0x2e
+ 1545 00c3 01       		.byte	0x1
+ 1546 00c4 3F       		.uleb128 0x3f
+ 1547 00c5 19       		.uleb128 0x19
+ 1548 00c6 03       		.uleb128 0x3
+ 1549 00c7 0E       		.uleb128 0xe
+ 1550 00c8 3A       		.uleb128 0x3a
+ 1551 00c9 0B       		.uleb128 0xb
+ 1552 00ca 3B       		.uleb128 0x3b
+ 1553 00cb 0B       		.uleb128 0xb
+ 1554 00cc 27       		.uleb128 0x27
+ 1555 00cd 19       		.uleb128 0x19
+ 1556 00ce 49       		.uleb128 0x49
+ 1557 00cf 13       		.uleb128 0x13
+ 1558 00d0 11       		.uleb128 0x11
+ 1559 00d1 01       		.uleb128 0x1
+ 1560 00d2 12       		.uleb128 0x12
+ 1561 00d3 06       		.uleb128 0x6
+ 1562 00d4 40       		.uleb128 0x40
+ 1563 00d5 18       		.uleb128 0x18
+ 1564 00d6 9742     		.uleb128 0x2117
+ 1565 00d8 19       		.uleb128 0x19
+ 1566 00d9 01       		.uleb128 0x1
+ 1567 00da 13       		.uleb128 0x13
+ 1568 00db 00       		.byte	0
+ 1569 00dc 00       		.byte	0
+ 1570 00dd 11       		.uleb128 0x11
+ 1571 00de 05       		.uleb128 0x5
+ 1572 00df 00       		.byte	0
+ 1573 00e0 03       		.uleb128 0x3
+ 1574 00e1 08       		.uleb128 0x8
+ 1575 00e2 3A       		.uleb128 0x3a
+ 1576 00e3 0B       		.uleb128 0xb
+ 1577 00e4 3B       		.uleb128 0x3b
+ 1578 00e5 0B       		.uleb128 0xb
+ 1579 00e6 49       		.uleb128 0x49
+ 1580 00e7 13       		.uleb128 0x13
+ 1581 00e8 02       		.uleb128 0x2
+ 1582 00e9 17       		.uleb128 0x17
+ 1583 00ea 00       		.byte	0
+ 1584 00eb 00       		.byte	0
+ 1585 00ec 12       		.uleb128 0x12
+ 1586 00ed 05       		.uleb128 0x5
+ 1587 00ee 00       		.byte	0
+ 1588 00ef 03       		.uleb128 0x3
+ 1589 00f0 0E       		.uleb128 0xe
+ 1590 00f1 3A       		.uleb128 0x3a
+ 1591 00f2 0B       		.uleb128 0xb
+ 1592 00f3 3B       		.uleb128 0x3b
+ 1593 00f4 0B       		.uleb128 0xb
+ 1594 00f5 49       		.uleb128 0x49
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 40
+
+
+ 1595 00f6 13       		.uleb128 0x13
+ 1596 00f7 02       		.uleb128 0x2
+ 1597 00f8 17       		.uleb128 0x17
+ 1598 00f9 00       		.byte	0
+ 1599 00fa 00       		.byte	0
+ 1600 00fb 13       		.uleb128 0x13
+ 1601 00fc 34       		.uleb128 0x34
+ 1602 00fd 00       		.byte	0
+ 1603 00fe 03       		.uleb128 0x3
+ 1604 00ff 08       		.uleb128 0x8
+ 1605 0100 3A       		.uleb128 0x3a
+ 1606 0101 0B       		.uleb128 0xb
+ 1607 0102 3B       		.uleb128 0x3b
+ 1608 0103 0B       		.uleb128 0xb
+ 1609 0104 49       		.uleb128 0x49
+ 1610 0105 13       		.uleb128 0x13
+ 1611 0106 02       		.uleb128 0x2
+ 1612 0107 18       		.uleb128 0x18
+ 1613 0108 00       		.byte	0
+ 1614 0109 00       		.byte	0
+ 1615 010a 14       		.uleb128 0x14
+ 1616 010b 34       		.uleb128 0x34
+ 1617 010c 00       		.byte	0
+ 1618 010d 03       		.uleb128 0x3
+ 1619 010e 0E       		.uleb128 0xe
+ 1620 010f 3A       		.uleb128 0x3a
+ 1621 0110 0B       		.uleb128 0xb
+ 1622 0111 3B       		.uleb128 0x3b
+ 1623 0112 0B       		.uleb128 0xb
+ 1624 0113 49       		.uleb128 0x49
+ 1625 0114 13       		.uleb128 0x13
+ 1626 0115 02       		.uleb128 0x2
+ 1627 0116 18       		.uleb128 0x18
+ 1628 0117 00       		.byte	0
+ 1629 0118 00       		.byte	0
+ 1630 0119 15       		.uleb128 0x15
+ 1631 011a 34       		.uleb128 0x34
+ 1632 011b 00       		.byte	0
+ 1633 011c 03       		.uleb128 0x3
+ 1634 011d 0E       		.uleb128 0xe
+ 1635 011e 3A       		.uleb128 0x3a
+ 1636 011f 0B       		.uleb128 0xb
+ 1637 0120 3B       		.uleb128 0x3b
+ 1638 0121 0B       		.uleb128 0xb
+ 1639 0122 49       		.uleb128 0x49
+ 1640 0123 13       		.uleb128 0x13
+ 1641 0124 02       		.uleb128 0x2
+ 1642 0125 17       		.uleb128 0x17
+ 1643 0126 00       		.byte	0
+ 1644 0127 00       		.byte	0
+ 1645 0128 16       		.uleb128 0x16
+ 1646 0129 34       		.uleb128 0x34
+ 1647 012a 00       		.byte	0
+ 1648 012b 03       		.uleb128 0x3
+ 1649 012c 08       		.uleb128 0x8
+ 1650 012d 3A       		.uleb128 0x3a
+ 1651 012e 0B       		.uleb128 0xb
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 41
+
+
+ 1652 012f 3B       		.uleb128 0x3b
+ 1653 0130 0B       		.uleb128 0xb
+ 1654 0131 49       		.uleb128 0x49
+ 1655 0132 13       		.uleb128 0x13
+ 1656 0133 02       		.uleb128 0x2
+ 1657 0134 17       		.uleb128 0x17
+ 1658 0135 00       		.byte	0
+ 1659 0136 00       		.byte	0
+ 1660 0137 17       		.uleb128 0x17
+ 1661 0138 0B       		.uleb128 0xb
+ 1662 0139 01       		.byte	0x1
+ 1663 013a 11       		.uleb128 0x11
+ 1664 013b 01       		.uleb128 0x1
+ 1665 013c 12       		.uleb128 0x12
+ 1666 013d 06       		.uleb128 0x6
+ 1667 013e 01       		.uleb128 0x1
+ 1668 013f 13       		.uleb128 0x13
+ 1669 0140 00       		.byte	0
+ 1670 0141 00       		.byte	0
+ 1671 0142 18       		.uleb128 0x18
+ 1672 0143 898201   		.uleb128 0x4109
+ 1673 0146 01       		.byte	0x1
+ 1674 0147 11       		.uleb128 0x11
+ 1675 0148 01       		.uleb128 0x1
+ 1676 0149 31       		.uleb128 0x31
+ 1677 014a 13       		.uleb128 0x13
+ 1678 014b 01       		.uleb128 0x1
+ 1679 014c 13       		.uleb128 0x13
+ 1680 014d 00       		.byte	0
+ 1681 014e 00       		.byte	0
+ 1682 014f 19       		.uleb128 0x19
+ 1683 0150 8A8201   		.uleb128 0x410a
+ 1684 0153 00       		.byte	0
+ 1685 0154 02       		.uleb128 0x2
+ 1686 0155 18       		.uleb128 0x18
+ 1687 0156 9142     		.uleb128 0x2111
+ 1688 0158 18       		.uleb128 0x18
+ 1689 0159 00       		.byte	0
+ 1690 015a 00       		.byte	0
+ 1691 015b 1A       		.uleb128 0x1a
+ 1692 015c 898201   		.uleb128 0x4109
+ 1693 015f 01       		.byte	0x1
+ 1694 0160 11       		.uleb128 0x11
+ 1695 0161 01       		.uleb128 0x1
+ 1696 0162 31       		.uleb128 0x31
+ 1697 0163 13       		.uleb128 0x13
+ 1698 0164 00       		.byte	0
+ 1699 0165 00       		.byte	0
+ 1700 0166 1B       		.uleb128 0x1b
+ 1701 0167 1D       		.uleb128 0x1d
+ 1702 0168 01       		.byte	0x1
+ 1703 0169 31       		.uleb128 0x31
+ 1704 016a 13       		.uleb128 0x13
+ 1705 016b 11       		.uleb128 0x11
+ 1706 016c 01       		.uleb128 0x1
+ 1707 016d 12       		.uleb128 0x12
+ 1708 016e 06       		.uleb128 0x6
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 42
+
+
+ 1709 016f 58       		.uleb128 0x58
+ 1710 0170 0B       		.uleb128 0xb
+ 1711 0171 59       		.uleb128 0x59
+ 1712 0172 0B       		.uleb128 0xb
+ 1713 0173 01       		.uleb128 0x1
+ 1714 0174 13       		.uleb128 0x13
+ 1715 0175 00       		.byte	0
+ 1716 0176 00       		.byte	0
+ 1717 0177 1C       		.uleb128 0x1c
+ 1718 0178 05       		.uleb128 0x5
+ 1719 0179 00       		.byte	0
+ 1720 017a 31       		.uleb128 0x31
+ 1721 017b 13       		.uleb128 0x13
+ 1722 017c 02       		.uleb128 0x2
+ 1723 017d 17       		.uleb128 0x17
+ 1724 017e 00       		.byte	0
+ 1725 017f 00       		.byte	0
+ 1726 0180 1D       		.uleb128 0x1d
+ 1727 0181 34       		.uleb128 0x34
+ 1728 0182 00       		.byte	0
+ 1729 0183 03       		.uleb128 0x3
+ 1730 0184 0E       		.uleb128 0xe
+ 1731 0185 3A       		.uleb128 0x3a
+ 1732 0186 0B       		.uleb128 0xb
+ 1733 0187 3B       		.uleb128 0x3b
+ 1734 0188 0B       		.uleb128 0xb
+ 1735 0189 49       		.uleb128 0x49
+ 1736 018a 13       		.uleb128 0x13
+ 1737 018b 3F       		.uleb128 0x3f
+ 1738 018c 19       		.uleb128 0x19
+ 1739 018d 3C       		.uleb128 0x3c
+ 1740 018e 19       		.uleb128 0x19
+ 1741 018f 00       		.byte	0
+ 1742 0190 00       		.byte	0
+ 1743 0191 1E       		.uleb128 0x1e
+ 1744 0192 0D       		.uleb128 0xd
+ 1745 0193 00       		.byte	0
+ 1746 0194 03       		.uleb128 0x3
+ 1747 0195 08       		.uleb128 0x8
+ 1748 0196 3A       		.uleb128 0x3a
+ 1749 0197 0B       		.uleb128 0xb
+ 1750 0198 3B       		.uleb128 0x3b
+ 1751 0199 0B       		.uleb128 0xb
+ 1752 019a 49       		.uleb128 0x49
+ 1753 019b 13       		.uleb128 0x13
+ 1754 019c 38       		.uleb128 0x38
+ 1755 019d 0B       		.uleb128 0xb
+ 1756 019e 00       		.byte	0
+ 1757 019f 00       		.byte	0
+ 1758 01a0 1F       		.uleb128 0x1f
+ 1759 01a1 2E       		.uleb128 0x2e
+ 1760 01a2 01       		.byte	0x1
+ 1761 01a3 3F       		.uleb128 0x3f
+ 1762 01a4 19       		.uleb128 0x19
+ 1763 01a5 03       		.uleb128 0x3
+ 1764 01a6 0E       		.uleb128 0xe
+ 1765 01a7 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 43
+
+
+ 1766 01a8 0B       		.uleb128 0xb
+ 1767 01a9 3B       		.uleb128 0x3b
+ 1768 01aa 05       		.uleb128 0x5
+ 1769 01ab 27       		.uleb128 0x27
+ 1770 01ac 19       		.uleb128 0x19
+ 1771 01ad 49       		.uleb128 0x49
+ 1772 01ae 13       		.uleb128 0x13
+ 1773 01af 3C       		.uleb128 0x3c
+ 1774 01b0 19       		.uleb128 0x19
+ 1775 01b1 01       		.uleb128 0x1
+ 1776 01b2 13       		.uleb128 0x13
+ 1777 01b3 00       		.byte	0
+ 1778 01b4 00       		.byte	0
+ 1779 01b5 20       		.uleb128 0x20
+ 1780 01b6 05       		.uleb128 0x5
+ 1781 01b7 00       		.byte	0
+ 1782 01b8 49       		.uleb128 0x49
+ 1783 01b9 13       		.uleb128 0x13
+ 1784 01ba 00       		.byte	0
+ 1785 01bb 00       		.byte	0
+ 1786 01bc 21       		.uleb128 0x21
+ 1787 01bd 2E       		.uleb128 0x2e
+ 1788 01be 01       		.byte	0x1
+ 1789 01bf 3F       		.uleb128 0x3f
+ 1790 01c0 19       		.uleb128 0x19
+ 1791 01c1 03       		.uleb128 0x3
+ 1792 01c2 0E       		.uleb128 0xe
+ 1793 01c3 3A       		.uleb128 0x3a
+ 1794 01c4 0B       		.uleb128 0xb
+ 1795 01c5 3B       		.uleb128 0x3b
+ 1796 01c6 05       		.uleb128 0x5
+ 1797 01c7 27       		.uleb128 0x27
+ 1798 01c8 19       		.uleb128 0x19
+ 1799 01c9 3C       		.uleb128 0x3c
+ 1800 01ca 19       		.uleb128 0x19
+ 1801 01cb 01       		.uleb128 0x1
+ 1802 01cc 13       		.uleb128 0x13
+ 1803 01cd 00       		.byte	0
+ 1804 01ce 00       		.byte	0
+ 1805 01cf 22       		.uleb128 0x22
+ 1806 01d0 2E       		.uleb128 0x2e
+ 1807 01d1 01       		.byte	0x1
+ 1808 01d2 3F       		.uleb128 0x3f
+ 1809 01d3 19       		.uleb128 0x19
+ 1810 01d4 03       		.uleb128 0x3
+ 1811 01d5 0E       		.uleb128 0xe
+ 1812 01d6 3A       		.uleb128 0x3a
+ 1813 01d7 0B       		.uleb128 0xb
+ 1814 01d8 3B       		.uleb128 0x3b
+ 1815 01d9 0B       		.uleb128 0xb
+ 1816 01da 27       		.uleb128 0x27
+ 1817 01db 19       		.uleb128 0x19
+ 1818 01dc 3C       		.uleb128 0x3c
+ 1819 01dd 19       		.uleb128 0x19
+ 1820 01de 01       		.uleb128 0x1
+ 1821 01df 13       		.uleb128 0x13
+ 1822 01e0 00       		.byte	0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 44
+
+
+ 1823 01e1 00       		.byte	0
+ 1824 01e2 00       		.byte	0
+ 1825              		.section	.debug_loc,"",%progbits
+ 1826              	.Ldebug_loc0:
+ 1827              	.LLST0:
+ 1828 0000 00000000 		.4byte	.LVL0
+ 1829 0004 10000000 		.4byte	.LVL2
+ 1830 0008 0100     		.2byte	0x1
+ 1831 000a 50       		.byte	0x50
+ 1832 000b 10000000 		.4byte	.LVL2
+ 1833 000f 42010000 		.4byte	.LVL38
+ 1834 0013 0100     		.2byte	0x1
+ 1835 0015 54       		.byte	0x54
+ 1836 0016 42010000 		.4byte	.LVL38
+ 1837 001a 48010000 		.4byte	.LFE84
+ 1838 001e 0400     		.2byte	0x4
+ 1839 0020 F3       		.byte	0xf3
+ 1840 0021 01       		.uleb128 0x1
+ 1841 0022 50       		.byte	0x50
+ 1842 0023 9F       		.byte	0x9f
+ 1843 0024 00000000 		.4byte	0
+ 1844 0028 00000000 		.4byte	0
+ 1845              	.LLST1:
+ 1846 002c 00000000 		.4byte	.LVL0
+ 1847 0030 12000000 		.4byte	.LVL3
+ 1848 0034 0100     		.2byte	0x1
+ 1849 0036 51       		.byte	0x51
+ 1850 0037 12000000 		.4byte	.LVL3
+ 1851 003b 1B000000 		.4byte	.LVL6-1
+ 1852 003f 0100     		.2byte	0x1
+ 1853 0041 50       		.byte	0x50
+ 1854 0042 1B000000 		.4byte	.LVL6-1
+ 1855 0046 42010000 		.4byte	.LVL38
+ 1856 004a 0100     		.2byte	0x1
+ 1857 004c 58       		.byte	0x58
+ 1858 004d 42010000 		.4byte	.LVL38
+ 1859 0051 48010000 		.4byte	.LFE84
+ 1860 0055 0400     		.2byte	0x4
+ 1861 0057 F3       		.byte	0xf3
+ 1862 0058 01       		.uleb128 0x1
+ 1863 0059 51       		.byte	0x51
+ 1864 005a 9F       		.byte	0x9f
+ 1865 005b 00000000 		.4byte	0
+ 1866 005f 00000000 		.4byte	0
+ 1867              	.LLST2:
+ 1868 0063 00000000 		.4byte	.LVL0
+ 1869 0067 16000000 		.4byte	.LVL4
+ 1870 006b 0100     		.2byte	0x1
+ 1871 006d 52       		.byte	0x52
+ 1872 006e 16000000 		.4byte	.LVL4
+ 1873 0072 42010000 		.4byte	.LVL38
+ 1874 0076 0100     		.2byte	0x1
+ 1875 0078 5B       		.byte	0x5b
+ 1876 0079 42010000 		.4byte	.LVL38
+ 1877 007d 48010000 		.4byte	.LFE84
+ 1878 0081 0400     		.2byte	0x4
+ 1879 0083 F3       		.byte	0xf3
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 45
+
+
+ 1880 0084 01       		.uleb128 0x1
+ 1881 0085 52       		.byte	0x52
+ 1882 0086 9F       		.byte	0x9f
+ 1883 0087 00000000 		.4byte	0
+ 1884 008b 00000000 		.4byte	0
+ 1885              	.LLST3:
+ 1886 008f 00000000 		.4byte	.LVL0
+ 1887 0093 18000000 		.4byte	.LVL5
+ 1888 0097 0100     		.2byte	0x1
+ 1889 0099 53       		.byte	0x53
+ 1890 009a 18000000 		.4byte	.LVL5
+ 1891 009e 42010000 		.4byte	.LVL38
+ 1892 00a2 0100     		.2byte	0x1
+ 1893 00a4 57       		.byte	0x57
+ 1894 00a5 42010000 		.4byte	.LVL38
+ 1895 00a9 48010000 		.4byte	.LFE84
+ 1896 00ad 0400     		.2byte	0x4
+ 1897 00af F3       		.byte	0xf3
+ 1898 00b0 01       		.uleb128 0x1
+ 1899 00b1 53       		.byte	0x53
+ 1900 00b2 9F       		.byte	0x9f
+ 1901 00b3 00000000 		.4byte	0
+ 1902 00b7 00000000 		.4byte	0
+ 1903              	.LLST4:
+ 1904 00bb 0E000000 		.4byte	.LVL1
+ 1905 00bf 70000000 		.4byte	.LVL14
+ 1906 00c3 0200     		.2byte	0x2
+ 1907 00c5 30       		.byte	0x30
+ 1908 00c6 9F       		.byte	0x9f
+ 1909 00c7 70000000 		.4byte	.LVL14
+ 1910 00cb EA000000 		.4byte	.LVL27
+ 1911 00cf 0100     		.2byte	0x1
+ 1912 00d1 59       		.byte	0x59
+ 1913 00d2 EA000000 		.4byte	.LVL27
+ 1914 00d6 38010000 		.4byte	.LVL37
+ 1915 00da 0300     		.2byte	0x3
+ 1916 00dc 79       		.byte	0x79
+ 1917 00dd 74       		.sleb128 -12
+ 1918 00de 9F       		.byte	0x9f
+ 1919 00df 00000000 		.4byte	0
+ 1920 00e3 00000000 		.4byte	0
+ 1921              	.LLST5:
+ 1922 00e7 EA000000 		.4byte	.LVL27
+ 1923 00eb F2000000 		.4byte	.LVL28
+ 1924 00ef 0900     		.2byte	0x9
+ 1925 00f1 79       		.byte	0x79
+ 1926 00f2 00       		.sleb128 0
+ 1927 00f3 0C       		.byte	0xc
+ 1928 00f4 60C8C502 		.4byte	0x2c5c860
+ 1929 00f8 1E       		.byte	0x1e
+ 1930 00f9 9F       		.byte	0x9f
+ 1931 00fa F2000000 		.4byte	.LVL28
+ 1932 00fe F9000000 		.4byte	.LVL29-1
+ 1933 0102 0100     		.2byte	0x1
+ 1934 0104 51       		.byte	0x51
+ 1935 0105 F9000000 		.4byte	.LVL29-1
+ 1936 0109 38010000 		.4byte	.LVL37
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 46
+
+
+ 1937 010d 0900     		.2byte	0x9
+ 1938 010f 79       		.byte	0x79
+ 1939 0110 00       		.sleb128 0
+ 1940 0111 0C       		.byte	0xc
+ 1941 0112 60C8C502 		.4byte	0x2c5c860
+ 1942 0116 1E       		.byte	0x1e
+ 1943 0117 9F       		.byte	0x9f
+ 1944 0118 00000000 		.4byte	0
+ 1945 011c 00000000 		.4byte	0
+ 1946              	.LLST6:
+ 1947 0120 8A000000 		.4byte	.LVL18
+ 1948 0124 90000000 		.4byte	.LVL19
+ 1949 0128 0200     		.2byte	0x2
+ 1950 012a 30       		.byte	0x30
+ 1951 012b 9F       		.byte	0x9f
+ 1952 012c 90000000 		.4byte	.LVL19
+ 1953 0130 08010000 		.4byte	.LVL30
+ 1954 0134 0100     		.2byte	0x1
+ 1955 0136 55       		.byte	0x55
+ 1956 0137 08010000 		.4byte	.LVL30
+ 1957 013b 0C010000 		.4byte	.LVL31
+ 1958 013f 0200     		.2byte	0x2
+ 1959 0141 30       		.byte	0x30
+ 1960 0142 9F       		.byte	0x9f
+ 1961 0143 0C010000 		.4byte	.LVL31
+ 1962 0147 22010000 		.4byte	.LVL36
+ 1963 014b 0100     		.2byte	0x1
+ 1964 014d 53       		.byte	0x53
+ 1965 014e 00000000 		.4byte	0
+ 1966 0152 00000000 		.4byte	0
+ 1967              	.LLST7:
+ 1968 0156 8A000000 		.4byte	.LVL18
+ 1969 015a 90000000 		.4byte	.LVL19
+ 1970 015e 0200     		.2byte	0x2
+ 1971 0160 30       		.byte	0x30
+ 1972 0161 9F       		.byte	0x9f
+ 1973 0162 90000000 		.4byte	.LVL19
+ 1974 0166 38010000 		.4byte	.LVL37
+ 1975 016a 0100     		.2byte	0x1
+ 1976 016c 56       		.byte	0x56
+ 1977 016d 00000000 		.4byte	0
+ 1978 0171 00000000 		.4byte	0
+ 1979              	.LLST8:
+ 1980 0175 80000000 		.4byte	.LVL16
+ 1981 0179 86000000 		.4byte	.LVL17
+ 1982 017d 0300     		.2byte	0x3
+ 1983 017f 72       		.byte	0x72
+ 1984 0180 01       		.sleb128 1
+ 1985 0181 9F       		.byte	0x9f
+ 1986 0182 86000000 		.4byte	.LVL17
+ 1987 0186 89000000 		.4byte	.LVL18-1
+ 1988 018a 0100     		.2byte	0x1
+ 1989 018c 52       		.byte	0x52
+ 1990 018d 00000000 		.4byte	0
+ 1991 0191 00000000 		.4byte	0
+ 1992              	.LLST9:
+ 1993 0195 0E000000 		.4byte	.LVL1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 47
+
+
+ 1994 0199 18000000 		.4byte	.LVL5
+ 1995 019d 0100     		.2byte	0x1
+ 1996 019f 53       		.byte	0x53
+ 1997 01a0 18000000 		.4byte	.LVL5
+ 1998 01a4 42010000 		.4byte	.LVL38
+ 1999 01a8 0100     		.2byte	0x1
+ 2000 01aa 57       		.byte	0x57
+ 2001 01ab 42010000 		.4byte	.LVL38
+ 2002 01af 48010000 		.4byte	.LFE84
+ 2003 01b3 0400     		.2byte	0x4
+ 2004 01b5 F3       		.byte	0xf3
+ 2005 01b6 01       		.uleb128 0x1
+ 2006 01b7 53       		.byte	0x53
+ 2007 01b8 9F       		.byte	0x9f
+ 2008 01b9 00000000 		.4byte	0
+ 2009 01bd 00000000 		.4byte	0
+ 2010              	.LLST10:
+ 2011 01c1 0E000000 		.4byte	.LVL1
+ 2012 01c5 32000000 		.4byte	.LVL7
+ 2013 01c9 0200     		.2byte	0x2
+ 2014 01cb 30       		.byte	0x30
+ 2015 01cc 9F       		.byte	0x9f
+ 2016 01cd 32000000 		.4byte	.LVL7
+ 2017 01d1 46000000 		.4byte	.LVL8
+ 2018 01d5 0100     		.2byte	0x1
+ 2019 01d7 50       		.byte	0x50
+ 2020 01d8 4E000000 		.4byte	.LVL10
+ 2021 01dc 52000000 		.4byte	.LVL11
+ 2022 01e0 0200     		.2byte	0x2
+ 2023 01e2 30       		.byte	0x30
+ 2024 01e3 9F       		.byte	0x9f
+ 2025 01e4 52000000 		.4byte	.LVL11
+ 2026 01e8 38010000 		.4byte	.LVL37
+ 2027 01ec 0100     		.2byte	0x1
+ 2028 01ee 5A       		.byte	0x5a
+ 2029 01ef 00000000 		.4byte	0
+ 2030 01f3 00000000 		.4byte	0
+ 2031              	.LLST11:
+ 2032 01f7 60000000 		.4byte	.LVL13
+ 2033 01fb 7B000000 		.4byte	.LVL15-1
+ 2034 01ff 0100     		.2byte	0x1
+ 2035 0201 53       		.byte	0x53
+ 2036 0202 00000000 		.4byte	0
+ 2037 0206 00000000 		.4byte	0
+ 2038              	.LLST12:
+ 2039 020a D2000000 		.4byte	.LVL23
+ 2040 020e D8000000 		.4byte	.LVL25
+ 2041 0212 0100     		.2byte	0x1
+ 2042 0214 53       		.byte	0x53
+ 2043 0215 00000000 		.4byte	0
+ 2044 0219 00000000 		.4byte	0
+ 2045              	.LLST13:
+ 2046 021d CE000000 		.4byte	.LVL22
+ 2047 0221 D2000000 		.4byte	.LVL23
+ 2048 0225 0100     		.2byte	0x1
+ 2049 0227 53       		.byte	0x53
+ 2050 0228 D2000000 		.4byte	.LVL23
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 48
+
+
+ 2051 022c D6000000 		.4byte	.LVL24
+ 2052 0230 0200     		.2byte	0x2
+ 2053 0232 91       		.byte	0x91
+ 2054 0233 48       		.sleb128 -56
+ 2055 0234 D6000000 		.4byte	.LVL24
+ 2056 0238 D8000000 		.4byte	.LVL25
+ 2057 023c 0A00     		.2byte	0xa
+ 2058 023e 71       		.byte	0x71
+ 2059 023f 00       		.sleb128 0
+ 2060 0240 46       		.byte	0x46
+ 2061 0241 24       		.byte	0x24
+ 2062 0242 70       		.byte	0x70
+ 2063 0243 00       		.sleb128 0
+ 2064 0244 3A       		.byte	0x3a
+ 2065 0245 25       		.byte	0x25
+ 2066 0246 21       		.byte	0x21
+ 2067 0247 9F       		.byte	0x9f
+ 2068 0248 00000000 		.4byte	0
+ 2069 024c 00000000 		.4byte	0
+ 2070              	.LLST14:
+ 2071 0250 14010000 		.4byte	.LVL33
+ 2072 0254 1A010000 		.4byte	.LVL35
+ 2073 0258 0100     		.2byte	0x1
+ 2074 025a 52       		.byte	0x52
+ 2075 025b 00000000 		.4byte	0
+ 2076 025f 00000000 		.4byte	0
+ 2077              	.LLST15:
+ 2078 0263 10010000 		.4byte	.LVL32
+ 2079 0267 14010000 		.4byte	.LVL33
+ 2080 026b 0100     		.2byte	0x1
+ 2081 026d 52       		.byte	0x52
+ 2082 026e 14010000 		.4byte	.LVL33
+ 2083 0272 18010000 		.4byte	.LVL34
+ 2084 0276 0E00     		.2byte	0xe
+ 2085 0278 73       		.byte	0x73
+ 2086 0279 00       		.sleb128 0
+ 2087 027a 32       		.byte	0x32
+ 2088 027b 24       		.byte	0x24
+ 2089 027c 77       		.byte	0x77
+ 2090 027d 00       		.sleb128 0
+ 2091 027e 22       		.byte	0x22
+ 2092 027f 94       		.byte	0x94
+ 2093 0280 02       		.byte	0x2
+ 2094 0281 40       		.byte	0x40
+ 2095 0282 24       		.byte	0x24
+ 2096 0283 40       		.byte	0x40
+ 2097 0284 26       		.byte	0x26
+ 2098 0285 9F       		.byte	0x9f
+ 2099 0286 00000000 		.4byte	0
+ 2100 028a 00000000 		.4byte	0
+ 2101              		.section	.debug_aranges,"",%progbits
+ 2102 0000 1C000000 		.4byte	0x1c
+ 2103 0004 0200     		.2byte	0x2
+ 2104 0006 00000000 		.4byte	.Ldebug_info0
+ 2105 000a 04       		.byte	0x4
+ 2106 000b 00       		.byte	0
+ 2107 000c 0000     		.2byte	0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 49
+
+
+ 2108 000e 0000     		.2byte	0
+ 2109 0010 00000000 		.4byte	.LFB84
+ 2110 0014 48010000 		.4byte	.LFE84-.LFB84
+ 2111 0018 00000000 		.4byte	0
+ 2112 001c 00000000 		.4byte	0
+ 2113              		.section	.debug_ranges,"",%progbits
+ 2114              	.Ldebug_ranges0:
+ 2115 0000 00000000 		.4byte	.LFB84
+ 2116 0004 48010000 		.4byte	.LFE84
+ 2117 0008 00000000 		.4byte	0
+ 2118 000c 00000000 		.4byte	0
+ 2119              		.section	.debug_line,"",%progbits
+ 2120              	.Ldebug_line0:
+ 2121 0000 B3020000 		.section	.debug_str,"MS",%progbits,1
+ 2121      02002702 
+ 2121      00000201 
+ 2121      FB0E0D00 
+ 2121      01010101 
+ 2122              	.LASF82:
+ 2123 0000 5F5F636F 		.ascii	"__copy_table_t\000"
+ 2123      70795F74 
+ 2123      61626C65 
+ 2123      5F7400
+ 2124              	.LASF30:
+ 2125 000f 7136335F 		.ascii	"q63_t\000"
+ 2125      7400
+ 2126              	.LASF103:
+ 2127 0015 5F5F434C 		.ascii	"__CLZ\000"
+ 2127      5A00
+ 2128              	.LASF94:
+ 2129 001b 61726D5F 		.ascii	"arm_cmplx_mag_q15\000"
+ 2129      636D706C 
+ 2129      785F6D61 
+ 2129      675F7131 
+ 2129      3500
+ 2130              	.LASF85:
+ 2131 002d 5F5F7A65 		.ascii	"__zero_table_t\000"
+ 2131      726F5F74 
+ 2131      61626C65 
+ 2131      5F7400
+ 2132              	.LASF1:
+ 2133 003c 5F5F7569 		.ascii	"__uint8_t\000"
+ 2133      6E74385F 
+ 2133      7400
+ 2134              	.LASF78:
+ 2135 0046 71756F74 		.ascii	"quotient\000"
+ 2135      69656E74 
+ 2135      00
+ 2136              	.LASF31:
+ 2137 004f 41524D5F 		.ascii	"ARM_MATH_SUCCESS\000"
+ 2137      4D415448 
+ 2137      5F535543 
+ 2137      43455353 
+ 2137      00
+ 2138              	.LASF14:
+ 2139 0060 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2139      206C6F6E 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 50
+
+
+ 2139      6720756E 
+ 2139      7369676E 
+ 2139      65642069 
+ 2140              	.LASF44:
+ 2141 0077 61726D5F 		.ascii	"arm_cfft_instance_q15\000"
+ 2141      63666674 
+ 2141      5F696E73 
+ 2141      74616E63 
+ 2141      655F7131 
+ 2142              	.LASF90:
+ 2143 008d 61726D5F 		.ascii	"arm_scale_q15\000"
+ 2143      7363616C 
+ 2143      655F7131 
+ 2143      3500
+ 2144              	.LASF12:
+ 2145 009b 5F5F696E 		.ascii	"__int64_t\000"
+ 2145      7436345F 
+ 2145      7400
+ 2146              	.LASF0:
+ 2147 00a5 5F5F696E 		.ascii	"__int8_t\000"
+ 2147      74385F74 
+ 2147      00
+ 2148              	.LASF84:
+ 2149 00ae 5F5F636F 		.ascii	"__copy_table_end__\000"
+ 2149      70795F74 
+ 2149      61626C65 
+ 2149      5F656E64 
+ 2149      5F5F00
+ 2150              	.LASF18:
+ 2151 00c1 696E7431 		.ascii	"int16_t\000"
+ 2151      365F7400 
+ 2152              	.LASF13:
+ 2153 00c9 6C6F6E67 		.ascii	"long long int\000"
+ 2153      206C6F6E 
+ 2153      6720696E 
+ 2153      7400
+ 2154              	.LASF2:
+ 2155 00d7 7369676E 		.ascii	"signed char\000"
+ 2155      65642063 
+ 2155      68617200 
+ 2156              	.LASF54:
+ 2157 00e3 66696C74 		.ascii	"filterCoefs\000"
+ 2157      6572436F 
+ 2157      65667300 
+ 2158              	.LASF106:
+ 2159 00ef 61726D5F 		.ascii	"arm_divide_q15\000"
+ 2159      64697669 
+ 2159      64655F71 
+ 2159      313500
+ 2160              	.LASF86:
+ 2161 00fe 5F5F7A65 		.ascii	"__zero_table_start__\000"
+ 2161      726F5F74 
+ 2161      61626C65 
+ 2161      5F737461 
+ 2161      72745F5F 
+ 2162              	.LASF97:
+ 2163 0113 61726D5F 		.ascii	"arm_offset_q31\000"
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 51
+
+
+ 2163      6F666673 
+ 2163      65745F71 
+ 2163      333100
+ 2164              	.LASF9:
+ 2165 0122 6C6F6E67 		.ascii	"long int\000"
+ 2165      20696E74 
+ 2165      00
+ 2166              	.LASF67:
+ 2167 012b 70447374 		.ascii	"pDst\000"
+ 2167      00
+ 2168              	.LASF28:
+ 2169 0130 7131355F 		.ascii	"q15_t\000"
+ 2169      7400
+ 2170              	.LASF42:
+ 2171 0136 70426974 		.ascii	"pBitRevTable\000"
+ 2171      52657654 
+ 2171      61626C65 
+ 2171      00
+ 2172              	.LASF19:
+ 2173 0143 75696E74 		.ascii	"uint16_t\000"
+ 2173      31365F74 
+ 2173      00
+ 2174              	.LASF25:
+ 2175 014c 646F7562 		.ascii	"double\000"
+ 2175      6C6500
+ 2176              	.LASF79:
+ 2177 0153 73686966 		.ascii	"shift\000"
+ 2177      7400
+ 2178              	.LASF46:
+ 2179 0159 69666674 		.ascii	"ifftFlagR\000"
+ 2179      466C6167 
+ 2179      5200
+ 2180              	.LASF80:
+ 2181 0163 5F5F5245 		.ascii	"__RES\000"
+ 2181      5300
+ 2182              	.LASF61:
+ 2183 0169 61726D5F 		.ascii	"arm_mfcc_instance_q15\000"
+ 2183      6D666363 
+ 2183      5F696E73 
+ 2183      74616E63 
+ 2183      655F7131 
+ 2184              	.LASF64:
+ 2185 017f 70446174 		.ascii	"pData\000"
+ 2185      6100
+ 2186              	.LASF10:
+ 2187 0185 5F5F7569 		.ascii	"__uint32_t\000"
+ 2187      6E743332 
+ 2187      5F7400
+ 2188              	.LASF50:
+ 2189 0190 70547769 		.ascii	"pTwiddleBReal\000"
+ 2189      64646C65 
+ 2189      42526561 
+ 2189      6C00
+ 2190              	.LASF4:
+ 2191 019e 5F5F696E 		.ascii	"__int16_t\000"
+ 2191      7431365F 
+ 2191      7400
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 52
+
+
+ 2192              	.LASF62:
+ 2193 01a8 6E756D52 		.ascii	"numRows\000"
+ 2193      6F777300 
+ 2194              	.LASF40:
+ 2195 01b0 6666744C 		.ascii	"fftLen\000"
+ 2195      656E00
+ 2196              	.LASF83:
+ 2197 01b7 5F5F636F 		.ascii	"__copy_table_start__\000"
+ 2197      70795F74 
+ 2197      61626C65 
+ 2197      5F737461 
+ 2197      72745F5F 
+ 2198              	.LASF104:
+ 2199 01cc 76616C75 		.ascii	"value\000"
+ 2199      6500
+ 2200              	.LASF56:
+ 2201 01d2 66696C74 		.ascii	"filterPos\000"
+ 2201      6572506F 
+ 2201      7300
+ 2202              	.LASF15:
+ 2203 01dc 756E7369 		.ascii	"unsigned int\000"
+ 2203      676E6564 
+ 2203      20696E74 
+ 2203      00
+ 2204              	.LASF66:
+ 2205 01e9 70537263 		.ascii	"pSrc\000"
+ 2205      00
+ 2206              	.LASF11:
+ 2207 01ee 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2207      20756E73 
+ 2207      69676E65 
+ 2207      6420696E 
+ 2207      7400
+ 2208              	.LASF98:
+ 2209 0200 61726D5F 		.ascii	"arm_shift_q31\000"
+ 2209      73686966 
+ 2209      745F7133 
+ 2209      3100
+ 2210              	.LASF59:
+ 2211 020e 6E624463 		.ascii	"nbDctOutputs\000"
+ 2211      744F7574 
+ 2211      70757473 
+ 2211      00
+ 2212              	.LASF58:
+ 2213 021b 6E624D65 		.ascii	"nbMelFilters\000"
+ 2213      6C46696C 
+ 2213      74657273 
+ 2213      00
+ 2214              	.LASF7:
+ 2215 0228 73686F72 		.ascii	"short unsigned int\000"
+ 2215      7420756E 
+ 2215      7369676E 
+ 2215      65642069 
+ 2215      6E7400
+ 2216              	.LASF38:
+ 2217 023b 41524D5F 		.ascii	"ARM_MATH_DECOMPOSITION_FAILURE\000"
+ 2217      4D415448 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 53
+
+
+ 2217      5F444543 
+ 2217      4F4D504F 
+ 2217      53495449 
+ 2218              	.LASF53:
+ 2219 025a 64637443 		.ascii	"dctCoefs\000"
+ 2219      6F656673 
+ 2219      00
+ 2220              	.LASF37:
+ 2221 0263 41524D5F 		.ascii	"ARM_MATH_TEST_FAILURE\000"
+ 2221      4D415448 
+ 2221      5F544553 
+ 2221      545F4641 
+ 2221      494C5552 
+ 2222              	.LASF60:
+ 2223 0279 72666674 		.ascii	"rfft\000"
+ 2223      00
+ 2224              	.LASF55:
+ 2225 027e 77696E64 		.ascii	"windowCoefs\000"
+ 2225      6F77436F 
+ 2225      65667300 
+ 2226              	.LASF92:
+ 2227 028a 61726D5F 		.ascii	"arm_mult_q15\000"
+ 2227      6D756C74 
+ 2227      5F713135 
+ 2227      00
+ 2228              	.LASF63:
+ 2229 0297 6E756D43 		.ascii	"numCols\000"
+ 2229      6F6C7300 
+ 2230              	.LASF23:
+ 2231 029f 73697A65 		.ascii	"sizetype\000"
+ 2231      74797065 
+ 2231      00
+ 2232              	.LASF27:
+ 2233 02a8 6C6F6E67 		.ascii	"long double\000"
+ 2233      20646F75 
+ 2233      626C6500 
+ 2234              	.LASF47:
+ 2235 02b4 62697452 		.ascii	"bitReverseFlagR\000"
+ 2235      65766572 
+ 2235      7365466C 
+ 2235      61675200 
+ 2236              	.LASF68:
+ 2237 02c4 70546D70 		.ascii	"pTmp\000"
+ 2237      00
+ 2238              	.LASF74:
+ 2239 02c9 636F6566 		.ascii	"coefsPos\000"
+ 2239      73506F73 
+ 2239      00
+ 2240              	.LASF70:
+ 2241 02d2 66667453 		.ascii	"fftShift\000"
+ 2241      68696674 
+ 2241      00
+ 2242              	.LASF88:
+ 2243 02db 64657374 		.ascii	"dest\000"
+ 2243      00
+ 2244              	.LASF75:
+ 2245 02e0 66696C74 		.ascii	"filterLimit\000"
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 54
+
+
+ 2245      65724C69 
+ 2245      6D697400 
+ 2246              	.LASF33:
+ 2247 02ec 41524D5F 		.ascii	"ARM_MATH_LENGTH_ERROR\000"
+ 2247      4D415448 
+ 2247      5F4C454E 
+ 2247      4754485F 
+ 2247      4552524F 
+ 2248              	.LASF91:
+ 2249 0302 61726D5F 		.ascii	"arm_absmax_q15\000"
+ 2249      6162736D 
+ 2249      61785F71 
+ 2249      313500
+ 2250              	.LASF71:
+ 2251 0311 6C6F6745 		.ascii	"logExponent\000"
+ 2251      78706F6E 
+ 2251      656E7400 
+ 2252              	.LASF26:
+ 2253 031d 666C6F61 		.ascii	"float\000"
+ 2253      7400
+ 2254              	.LASF36:
+ 2255 0323 41524D5F 		.ascii	"ARM_MATH_SINGULAR\000"
+ 2255      4D415448 
+ 2255      5F53494E 
+ 2255      47554C41 
+ 2255      5200
+ 2256              	.LASF93:
+ 2257 0335 61726D5F 		.ascii	"arm_rfft_q15\000"
+ 2257      72666674 
+ 2257      5F713135 
+ 2257      00
+ 2258              	.LASF35:
+ 2259 0342 41524D5F 		.ascii	"ARM_MATH_NANINF\000"
+ 2259      4D415448 
+ 2259      5F4E414E 
+ 2259      494E4600 
+ 2260              	.LASF43:
+ 2261 0352 62697452 		.ascii	"bitRevLength\000"
+ 2261      65764C65 
+ 2261      6E677468 
+ 2261      00
+ 2262              	.LASF20:
+ 2263 035f 696E7433 		.ascii	"int32_t\000"
+ 2263      325F7400 
+ 2264              	.LASF3:
+ 2265 0367 756E7369 		.ascii	"unsigned char\000"
+ 2265      676E6564 
+ 2265      20636861 
+ 2265      7200
+ 2266              	.LASF99:
+ 2267 0375 61726D5F 		.ascii	"arm_mat_vec_mult_q15\000"
+ 2267      6D61745F 
+ 2267      7665635F 
+ 2267      6D756C74 
+ 2267      5F713135 
+ 2268              	.LASF89:
+ 2269 038a 776C656E 		.ascii	"wlen\000"
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 55
+
+
+ 2269      00
+ 2270              	.LASF49:
+ 2271 038f 70547769 		.ascii	"pTwiddleAReal\000"
+ 2271      64646C65 
+ 2271      41526561 
+ 2271      6C00
+ 2272              	.LASF5:
+ 2273 039d 73686F72 		.ascii	"short int\000"
+ 2273      7420696E 
+ 2273      7400
+ 2274              	.LASF32:
+ 2275 03a7 41524D5F 		.ascii	"ARM_MATH_ARGUMENT_ERROR\000"
+ 2275      4D415448 
+ 2275      5F415247 
+ 2275      554D454E 
+ 2275      545F4552 
+ 2276              	.LASF51:
+ 2277 03bf 70436666 		.ascii	"pCfft\000"
+ 2277      7400
+ 2278              	.LASF57:
+ 2279 03c5 66696C74 		.ascii	"filterLengths\000"
+ 2279      65724C65 
+ 2279      6E677468 
+ 2279      7300
+ 2280              	.LASF101:
+ 2281 03d3 2E5C4453 		.ascii	".\\DSP\\Source\\TransformFunctions\\arm_mfcc_q15.c\000"
+ 2281      505C536F 
+ 2281      75726365 
+ 2281      5C547261 
+ 2281      6E73666F 
+ 2282              	.LASF29:
+ 2283 0402 7133315F 		.ascii	"q31_t\000"
+ 2283      7400
+ 2284              	.LASF76:
+ 2285 0408 70546D70 		.ascii	"pTmp2\000"
+ 2285      3200
+ 2286              	.LASF21:
+ 2287 040e 75696E74 		.ascii	"uint32_t\000"
+ 2287      33325F74 
+ 2287      00
+ 2288              	.LASF73:
+ 2289 0417 70446374 		.ascii	"pDctMat\000"
+ 2289      4D617400 
+ 2290              	.LASF102:
+ 2291 041f 5C5C766D 		.ascii	"\\\\vmware-host\\Shared Folders\\Documents\\PSoC Cr"
+ 2291      77617265 
+ 2291      2D686F73 
+ 2291      745C5368 
+ 2291      61726564 
+ 2292 044d 6561746F 		.ascii	"eator\\FinalProject\\SoundDetection.cydsn\000"
+ 2292      725C4669 
+ 2292      6E616C50 
+ 2292      726F6A65 
+ 2292      63745C53 
+ 2293              	.LASF48:
+ 2294 0475 74776964 		.ascii	"twidCoefRModifier\000"
+ 2294      436F6566 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 56
+
+
+ 2294      524D6F64 
+ 2294      69666965 
+ 2294      7200
+ 2295              	.LASF24:
+ 2296 0487 63686172 		.ascii	"char\000"
+ 2296      00
+ 2297              	.LASF105:
+ 2298 048c 61726D5F 		.ascii	"arm_mfcc_q15\000"
+ 2298      6D666363 
+ 2298      5F713135 
+ 2298      00
+ 2299              	.LASF6:
+ 2300 0499 5F5F7569 		.ascii	"__uint16_t\000"
+ 2300      6E743136 
+ 2300      5F7400
+ 2301              	.LASF69:
+ 2302 04a4 696E6465 		.ascii	"index\000"
+ 2302      7800
+ 2303              	.LASF34:
+ 2304 04aa 41524D5F 		.ascii	"ARM_MATH_SIZE_MISMATCH\000"
+ 2304      4D415448 
+ 2304      5F53495A 
+ 2304      455F4D49 
+ 2304      534D4154 
+ 2305              	.LASF8:
+ 2306 04c1 5F5F696E 		.ascii	"__int32_t\000"
+ 2306      7433325F 
+ 2306      7400
+ 2307              	.LASF52:
+ 2308 04cb 61726D5F 		.ascii	"arm_rfft_instance_q15\000"
+ 2308      72666674 
+ 2308      5F696E73 
+ 2308      74616E63 
+ 2308      655F7131 
+ 2309              	.LASF87:
+ 2310 04e1 5F5F7A65 		.ascii	"__zero_table_end__\000"
+ 2310      726F5F74 
+ 2310      61626C65 
+ 2310      5F656E64 
+ 2310      5F5F00
+ 2311              	.LASF16:
+ 2312 04f4 696E7438 		.ascii	"int8_t\000"
+ 2312      5F7400
+ 2313              	.LASF65:
+ 2314 04fb 61726D5F 		.ascii	"arm_matrix_instance_q15\000"
+ 2314      6D617472 
+ 2314      69785F69 
+ 2314      6E737461 
+ 2314      6E63655F 
+ 2315              	.LASF41:
+ 2316 0513 70547769 		.ascii	"pTwiddle\000"
+ 2316      64646C65 
+ 2316      00
+ 2317              	.LASF77:
+ 2318 051c 73746174 		.ascii	"status\000"
+ 2318      757300
+ 2319              	.LASF96:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccLOQKMN.s 			page 57
+
+
+ 2320 0523 61726D5F 		.ascii	"arm_vlog_q31\000"
+ 2320      766C6F67 
+ 2320      5F713331 
+ 2320      00
+ 2321              	.LASF17:
+ 2322 0530 75696E74 		.ascii	"uint8_t\000"
+ 2322      385F7400 
+ 2323              	.LASF81:
+ 2324 0538 5F5F4152 		.ascii	"__ARG1\000"
+ 2324      473100
+ 2325              	.LASF39:
+ 2326 053f 61726D5F 		.ascii	"arm_status\000"
+ 2326      73746174 
+ 2326      757300
+ 2327              	.LASF22:
+ 2328 054a 696E7436 		.ascii	"int64_t\000"
+ 2328      345F7400 
+ 2329              	.LASF45:
+ 2330 0552 6666744C 		.ascii	"fftLenReal\000"
+ 2330      656E5265 
+ 2330      616C00
+ 2331              	.LASF100:
+ 2332 055d 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 2332      4320342E 
+ 2332      392E3320 
+ 2332      32303135 
+ 2332      30333033 
+ 2333 0590 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 2333      20726576 
+ 2333      6973696F 
+ 2333      6E203232 
+ 2333      31323230 
+ 2334 05c3 67202D73 		.ascii	"g -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 2334      74643D67 
+ 2334      6E753939 
+ 2334      202D6666 
+ 2334      756E6374 
+ 2335              	.LASF72:
+ 2336 05f6 72657375 		.ascii	"result\000"
+ 2336      6C7400
+ 2337              	.LASF95:
+ 2338 05fd 61726D5F 		.ascii	"arm_dot_prod_q15\000"
+ 2338      646F745F 
+ 2338      70726F64 
+ 2338      5F713135 
+ 2338      00
+ 2339              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

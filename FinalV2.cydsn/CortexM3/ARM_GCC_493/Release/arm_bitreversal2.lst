@@ -1,0 +1,1564 @@
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"arm_bitreversal2.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.text.arm_bitreversal_64,"ax",%progbits
+  19              		.align	1
+  20              		.global	arm_bitreversal_64
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	arm_bitreversal_64, %function
+  24              	arm_bitreversal_64:
+  25              	.LFB84:
+  26              		.file 1 ".\\DSP\\Source\\TransformFunctions\\arm_bitreversal2.c"
+   1:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** /* ----------------------------------------------------------------------
+   2:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * Project:      CMSIS DSP Library
+   3:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * Title:        arm_bitreversal2.c
+   4:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * Description:  Bitreversal functions
+   5:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  *
+   6:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * $Date:        23 April 2021
+   7:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * $Revision:    V1.9.0
+   8:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  *
+   9:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * Target Processor: Cortex-M and Cortex-A cores
+  10:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * -------------------------------------------------------------------- */
+  11:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** /*
+  12:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * Copyright (C) 2019 ARM Limited or its affiliates. All rights reserved.
+  13:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  *
+  14:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * SPDX-License-Identifier: Apache-2.0
+  15:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  *
+  16:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * Licensed under the Apache License, Version 2.0 (the License); you may
+  17:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * not use this file except in compliance with the License.
+  18:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * You may obtain a copy of the License at
+  19:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  *
+  20:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * www.apache.org/licenses/LICENSE-2.0
+  21:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  *
+  22:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * Unless required by applicable law or agreed to in writing, software
+  23:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+  24:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  25:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * See the License for the specific language governing permissions and
+  26:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  * limitations under the License.
+  27:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****  */
+  28:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+  29:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** #include "dsp/transform_functions.h"
+  30:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** #include "arm_common_tables.h"
+  31:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 2
+
+
+  32:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+  33:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** /**
+  34:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @brief         In-place 64 bit reversal function.
+  35:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @param[in,out] pSrc        points to in-place buffer of unknown 64-bit data type
+  36:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @param[in]     bitRevLen   bit reversal table length
+  37:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @param[in]     pBitRevTab  points to bit reversal table
+  38:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @return        none
+  39:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** */
+  40:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+  41:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** void arm_bitreversal_64(
+  42:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****         uint64_t *pSrc,
+  43:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   const uint16_t bitRevLen,
+  44:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   const uint16_t *pBitRevTab)
+  45:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** {
+  27              		.loc 1 45 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              	.LVL0:
+  32 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+  33              		.cfi_def_cfa_offset 32
+  34              		.cfi_offset 4, -32
+  35              		.cfi_offset 5, -28
+  36              		.cfi_offset 6, -24
+  37              		.cfi_offset 7, -20
+  38              		.cfi_offset 8, -16
+  39              		.cfi_offset 9, -12
+  40              		.cfi_offset 10, -8
+  41              		.cfi_offset 14, -4
+  46:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   uint64_t a, b, i, tmp;
+  47:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+  48:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   for (i = 0; i < bitRevLen; )
+  42              		.loc 1 48 0
+  43 0004 0024     		movs	r4, #0
+  44 0006 0025     		movs	r5, #0
+  45              	.LVL1:
+  46              	.L2:
+  47              		.loc 1 48 0 is_stmt 0 discriminator 1
+  48 0008 0027     		movs	r7, #0
+  49 000a BD42     		cmp	r5, r7
+  50 000c 08BF     		it	eq
+  51 000e 8C42     		cmpeq	r4, r1
+  52 0010 27D2     		bcs	.L5
+  53              	.LVL2:
+  54 0012 02EB4403 		add	r3, r2, r4, lsl #1
+  49:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   {
+  50:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      a = pBitRevTab[i    ] >> 2;
+  55              		.loc 1 50 0 is_stmt 1
+  56 0016 32F814E0 		ldrh	lr, [r2, r4, lsl #1]
+  51:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      b = pBitRevTab[i + 1] >> 2;
+  57              		.loc 1 51 0
+  58 001a 5B88     		ldrh	r3, [r3, #2]
+  52:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+  53:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      //real
+  54:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      tmp = pSrc[a];
+  59              		.loc 1 54 0
+  60 001c 4FEA9E0E 		lsr	lr, lr, #2
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 3
+
+
+  55:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a] = pSrc[b];
+  61              		.loc 1 55 0
+  62 0020 9B08     		lsrs	r3, r3, #2
+  54:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a] = pSrc[b];
+  63              		.loc 1 54 0
+  64 0022 4FEACE0E 		lsl	lr, lr, #3
+  65              		.loc 1 55 0
+  66 0026 DB00     		lsls	r3, r3, #3
+  54:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a] = pSrc[b];
+  67              		.loc 1 54 0
+  68 0028 00EB0E0C 		add	ip, r0, lr
+  69              		.loc 1 55 0
+  70 002c 00EB030A 		add	r10, r0, r3
+  54:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a] = pSrc[b];
+  71              		.loc 1 54 0
+  72 0030 DCE90089 		ldrd	r8, [ip]
+  73              	.LVL3:
+  74              		.loc 1 55 0
+  75 0034 DAE90067 		ldrd	r6, [r10]
+  76 0038 CCE90067 		strd	r6, [ip]
+  77              	.LVL4:
+  56:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[b] = tmp;
+  78              		.loc 1 56 0
+  79 003c CAE90089 		strd	r8, [r10]
+  57:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+  58:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      //complex
+  59:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      tmp = pSrc[a+1];
+  80              		.loc 1 59 0
+  81 0040 0EF1080E 		add	lr, lr, #8
+  60:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a+1] = pSrc[b+1];
+  82              		.loc 1 60 0
+  83 0044 0833     		adds	r3, r3, #8
+  59:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a+1] = pSrc[b+1];
+  84              		.loc 1 59 0
+  85 0046 8644     		add	lr, lr, r0
+  86              		.loc 1 60 0
+  87 0048 0344     		add	r3, r3, r0
+  61:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[b+1] = tmp;
+  62:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+  63:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****     i += 2;
+  88              		.loc 1 63 0
+  89 004a 0234     		adds	r4, r4, #2
+  90              	.LVL5:
+  59:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a+1] = pSrc[b+1];
+  91              		.loc 1 59 0
+  92 004c DEE90089 		ldrd	r8, [lr]
+  93              	.LVL6:
+  60:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[b+1] = tmp;
+  94              		.loc 1 60 0
+  95 0050 D3E90067 		ldrd	r6, [r3]
+  96              		.loc 1 63 0
+  97 0054 45F10005 		adc	r5, r5, #0
+  98              	.LVL7:
+  60:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[b+1] = tmp;
+  99              		.loc 1 60 0
+ 100 0058 CEE90067 		strd	r6, [lr]
+  61:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[b+1] = tmp;
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 4
+
+
+ 101              		.loc 1 61 0
+ 102 005c C3E90089 		strd	r8, [r3]
+ 103 0060 D2E7     		b	.L2
+ 104              	.LVL8:
+ 105              	.L5:
+  64:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   }
+  65:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** }
+ 106              		.loc 1 65 0
+ 107 0062 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 108              		.cfi_endproc
+ 109              	.LFE84:
+ 110              		.size	arm_bitreversal_64, .-arm_bitreversal_64
+ 111              		.section	.text.arm_bitreversal_32,"ax",%progbits
+ 112              		.align	1
+ 113              		.global	arm_bitreversal_32
+ 114              		.thumb
+ 115              		.thumb_func
+ 116              		.type	arm_bitreversal_32, %function
+ 117              	arm_bitreversal_32:
+ 118              	.LFB85:
+  66:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+  67:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** /**
+  68:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @brief         In-place 32 bit reversal function.
+  69:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @param[in,out] pSrc        points to in-place buffer of unknown 32-bit data type
+  70:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @param[in]     bitRevLen   bit reversal table length
+  71:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @param[in]     pBitRevTab  points to bit reversal table
+  72:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @return        none
+  73:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** */
+  74:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+  75:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** void arm_bitreversal_32(
+  76:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****         uint32_t *pSrc,
+  77:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   const uint16_t bitRevLen,
+  78:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   const uint16_t *pBitRevTab)
+  79:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** {
+ 119              		.loc 1 79 0
+ 120              		.cfi_startproc
+ 121              		@ args = 0, pretend = 0, frame = 0
+ 122              		@ frame_needed = 0, uses_anonymous_args = 0
+ 123              	.LVL9:
+ 124 0000 8C46     		mov	ip, r1
+ 125 0002 F0B5     		push	{r4, r5, r6, r7, lr}
+ 126              		.cfi_def_cfa_offset 20
+ 127              		.cfi_offset 4, -20
+ 128              		.cfi_offset 5, -16
+ 129              		.cfi_offset 6, -12
+ 130              		.cfi_offset 7, -8
+ 131              		.cfi_offset 14, -4
+  80:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   uint32_t a, b, i, tmp;
+  81:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+  82:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   for (i = 0; i < bitRevLen; )
+ 132              		.loc 1 82 0
+ 133 0004 0027     		movs	r7, #0
+ 134              	.LVL10:
+ 135              	.L7:
+ 136              		.loc 1 82 0 is_stmt 0 discriminator 1
+ 137 0006 6745     		cmp	r7, ip
+ 138 0008 02F10402 		add	r2, r2, #4
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 5
+
+
+ 139 000c 17D2     		bcs	.L9
+ 140              	.LVL11:
+  83:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   {
+  84:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      a = pBitRevTab[i    ] >> 2;
+ 141              		.loc 1 84 0 is_stmt 1
+ 142 000e 32F8044C 		ldrh	r4, [r2, #-4]
+  85:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      b = pBitRevTab[i + 1] >> 2;
+ 143              		.loc 1 85 0
+ 144 0012 32F8023C 		ldrh	r3, [r2, #-2]
+  84:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      b = pBitRevTab[i + 1] >> 2;
+ 145              		.loc 1 84 0
+ 146 0016 A408     		lsrs	r4, r4, #2
+ 147              		.loc 1 85 0
+ 148 0018 9B08     		lsrs	r3, r3, #2
+  86:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+  87:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      //real
+  88:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      tmp = pSrc[a];
+ 149              		.loc 1 88 0
+ 150 001a 50F824E0 		ldr	lr, [r0, r4, lsl #2]
+ 151              	.LVL12:
+  89:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a] = pSrc[b];
+ 152              		.loc 1 89 0
+ 153 001e 50F82310 		ldr	r1, [r0, r3, lsl #2]
+  88:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a] = pSrc[b];
+ 154              		.loc 1 88 0
+ 155 0022 A600     		lsls	r6, r4, #2
+ 156              		.loc 1 89 0
+ 157 0024 9D00     		lsls	r5, r3, #2
+ 158 0026 40F82410 		str	r1, [r0, r4, lsl #2]
+ 159              	.LVL13:
+  90:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[b] = tmp;
+ 160              		.loc 1 90 0
+ 161 002a 40F823E0 		str	lr, [r0, r3, lsl #2]
+  91:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+  92:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      //complex
+  93:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      tmp = pSrc[a+1];
+ 162              		.loc 1 93 0
+ 163 002e 341D     		adds	r4, r6, #4
+  94:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a+1] = pSrc[b+1];
+ 164              		.loc 1 94 0
+ 165 0030 2B1D     		adds	r3, r5, #4
+  93:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a+1] = pSrc[b+1];
+ 166              		.loc 1 93 0
+ 167 0032 0659     		ldr	r6, [r0, r4]
+ 168              	.LVL14:
+ 169              		.loc 1 94 0
+ 170 0034 C558     		ldr	r5, [r0, r3]
+  95:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[b+1] = tmp;
+  96:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+  97:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****     i += 2;
+ 171              		.loc 1 97 0
+ 172 0036 0237     		adds	r7, r7, #2
+ 173              	.LVL15:
+  94:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[b+1] = tmp;
+ 174              		.loc 1 94 0
+ 175 0038 0551     		str	r5, [r0, r4]
+  95:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[b+1] = tmp;
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 6
+
+
+ 176              		.loc 1 95 0
+ 177 003a C650     		str	r6, [r0, r3]
+ 178 003c E3E7     		b	.L7
+ 179              	.LVL16:
+ 180              	.L9:
+  98:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   }
+  99:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** }
+ 181              		.loc 1 99 0
+ 182 003e F0BD     		pop	{r4, r5, r6, r7, pc}
+ 183              		.cfi_endproc
+ 184              	.LFE85:
+ 185              		.size	arm_bitreversal_32, .-arm_bitreversal_32
+ 186              		.section	.text.arm_bitreversal_16,"ax",%progbits
+ 187              		.align	1
+ 188              		.global	arm_bitreversal_16
+ 189              		.thumb
+ 190              		.thumb_func
+ 191              		.type	arm_bitreversal_16, %function
+ 192              	arm_bitreversal_16:
+ 193              	.LFB86:
+ 100:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+ 101:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+ 102:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** /**
+ 103:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @brief         In-place 16 bit reversal function.
+ 104:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @param[in,out] pSrc        points to in-place buffer of unknown 16-bit data type
+ 105:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @param[in]     bitRevLen   bit reversal table length
+ 106:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @param[in]     pBitRevTab  points to bit reversal table
+ 107:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   @return        none
+ 108:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** */
+ 109:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+ 110:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** void arm_bitreversal_16(
+ 111:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****         uint16_t *pSrc,
+ 112:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   const uint16_t bitRevLen,
+ 113:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   const uint16_t *pBitRevTab)
+ 114:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** {
+ 194              		.loc 1 114 0
+ 195              		.cfi_startproc
+ 196              		@ args = 0, pretend = 0, frame = 0
+ 197              		@ frame_needed = 0, uses_anonymous_args = 0
+ 198              	.LVL17:
+ 199 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 200              		.cfi_def_cfa_offset 20
+ 201              		.cfi_offset 4, -20
+ 202              		.cfi_offset 5, -16
+ 203              		.cfi_offset 6, -12
+ 204              		.cfi_offset 7, -8
+ 205              		.cfi_offset 14, -4
+ 115:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   uint16_t a, b, i, tmp;
+ 116:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+ 117:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   for (i = 0; i < bitRevLen; )
+ 206              		.loc 1 117 0
+ 207 0002 0023     		movs	r3, #0
+ 208              	.LVL18:
+ 209              	.L11:
+ 210              		.loc 1 117 0 is_stmt 0 discriminator 1
+ 211 0004 8B42     		cmp	r3, r1
+ 212 0006 19D2     		bcs	.L13
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 7
+
+
+ 213              	.LVL19:
+ 118:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   {
+ 119:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      a = pBitRevTab[i    ] >> 2;
+ 120:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      b = pBitRevTab[i + 1] >> 2;
+ 214              		.loc 1 120 0 is_stmt 1
+ 215 0008 02EB4304 		add	r4, r2, r3, lsl #1
+ 216              	.LVL20:
+ 119:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      b = pBitRevTab[i + 1] >> 2;
+ 217              		.loc 1 119 0
+ 218 000c 32F81350 		ldrh	r5, [r2, r3, lsl #1]
+ 219              		.loc 1 120 0
+ 220 0010 6488     		ldrh	r4, [r4, #2]
+ 221              	.LVL21:
+ 121:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+ 122:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      //real
+ 123:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      tmp = pSrc[a];
+ 222              		.loc 1 123 0
+ 223 0012 AD08     		lsrs	r5, r5, #2
+ 124:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a] = pSrc[b];
+ 224              		.loc 1 124 0
+ 225 0014 A408     		lsrs	r4, r4, #2
+ 123:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a] = pSrc[b];
+ 226              		.loc 1 123 0
+ 227 0016 30F815E0 		ldrh	lr, [r0, r5, lsl #1]
+ 228              	.LVL22:
+ 229              		.loc 1 124 0
+ 230 001a 30F814C0 		ldrh	ip, [r0, r4, lsl #1]
+ 123:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a] = pSrc[b];
+ 231              		.loc 1 123 0
+ 232 001e 6F00     		lsls	r7, r5, #1
+ 233              		.loc 1 124 0
+ 234 0020 6600     		lsls	r6, r4, #1
+ 235 0022 20F815C0 		strh	ip, [r0, r5, lsl #1]	@ movhi
+ 236              	.LVL23:
+ 125:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[b] = tmp;
+ 237              		.loc 1 125 0
+ 238 0026 20F814E0 		strh	lr, [r0, r4, lsl #1]	@ movhi
+ 126:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+ 127:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      //complex
+ 128:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      tmp = pSrc[a+1];
+ 239              		.loc 1 128 0
+ 240 002a BD1C     		adds	r5, r7, #2
+ 129:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a+1] = pSrc[b+1];
+ 241              		.loc 1 129 0
+ 242 002c B41C     		adds	r4, r6, #2
+ 128:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[a+1] = pSrc[b+1];
+ 243              		.loc 1 128 0
+ 244 002e 475B     		ldrh	r7, [r0, r5]
+ 245              	.LVL24:
+ 246              		.loc 1 129 0
+ 247 0030 065B     		ldrh	r6, [r0, r4]
+ 130:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[b+1] = tmp;
+ 131:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** 
+ 132:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****     i += 2;
+ 248              		.loc 1 132 0
+ 249 0032 0233     		adds	r3, r3, #2
+ 250              	.LVL25:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 8
+
+
+ 129:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[b+1] = tmp;
+ 251              		.loc 1 129 0
+ 252 0034 4653     		strh	r6, [r0, r5]	@ movhi
+ 253              		.loc 1 132 0
+ 254 0036 9BB2     		uxth	r3, r3
+ 255              	.LVL26:
+ 130:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****      pSrc[b+1] = tmp;
+ 256              		.loc 1 130 0
+ 257 0038 0753     		strh	r7, [r0, r4]	@ movhi
+ 258 003a E3E7     		b	.L11
+ 259              	.LVL27:
+ 260              	.L13:
+ 133:.\DSP\Source\TransformFunctions/arm_bitreversal2.c ****   }
+ 134:.\DSP\Source\TransformFunctions/arm_bitreversal2.c **** }
+ 261              		.loc 1 134 0
+ 262 003c F0BD     		pop	{r4, r5, r6, r7, pc}
+ 263              		.cfi_endproc
+ 264              	.LFE86:
+ 265              		.size	arm_bitreversal_16, .-arm_bitreversal_16
+ 266              		.text
+ 267              	.Letext0:
+ 268              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+ 269              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+ 270              		.file 4 ".\\Core\\Include/cmsis_gcc.h"
+ 271              		.section	.debug_info,"",%progbits
+ 272              	.Ldebug_info0:
+ 273 0000 E8020000 		.4byte	0x2e8
+ 274 0004 0400     		.2byte	0x4
+ 275 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 276 000a 04       		.byte	0x4
+ 277 000b 01       		.uleb128 0x1
+ 278 000c DB000000 		.4byte	.LASF34
+ 279 0010 01       		.byte	0x1
+ 280 0011 22000000 		.4byte	.LASF35
+ 281 0015 9E010000 		.4byte	.LASF36
+ 282 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 283 001d 00000000 		.4byte	0
+ 284 0021 00000000 		.4byte	.Ldebug_line0
+ 285 0025 02       		.uleb128 0x2
+ 286 0026 08       		.byte	0x8
+ 287 0027 07       		.byte	0x7
+ 288 0028 ED010000 		.4byte	.LASF0
+ 289 002c 02       		.uleb128 0x2
+ 290 002d 02       		.byte	0x2
+ 291 002e 07       		.byte	0x7
+ 292 002f C8000000 		.4byte	.LASF1
+ 293 0033 02       		.uleb128 0x2
+ 294 0034 01       		.byte	0x1
+ 295 0035 06       		.byte	0x6
+ 296 0036 A7020000 		.4byte	.LASF2
+ 297 003a 02       		.uleb128 0x2
+ 298 003b 01       		.byte	0x1
+ 299 003c 08       		.byte	0x8
+ 300 003d 95000000 		.4byte	.LASF3
+ 301 0041 02       		.uleb128 0x2
+ 302 0042 02       		.byte	0x2
+ 303 0043 05       		.byte	0x5
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 9
+
+
+ 304 0044 56020000 		.4byte	.LASF4
+ 305 0048 03       		.uleb128 0x3
+ 306 0049 74010000 		.4byte	.LASF6
+ 307 004d 02       		.byte	0x2
+ 308 004e 2B       		.byte	0x2b
+ 309 004f 2C000000 		.4byte	0x2c
+ 310 0053 02       		.uleb128 0x2
+ 311 0054 04       		.byte	0x4
+ 312 0055 05       		.byte	0x5
+ 313 0056 7D020000 		.4byte	.LASF5
+ 314 005a 03       		.uleb128 0x3
+ 315 005b 86010000 		.4byte	.LASF7
+ 316 005f 02       		.byte	0x2
+ 317 0060 41       		.byte	0x41
+ 318 0061 65000000 		.4byte	0x65
+ 319 0065 02       		.uleb128 0x2
+ 320 0066 04       		.byte	0x4
+ 321 0067 07       		.byte	0x7
+ 322 0068 B6000000 		.4byte	.LASF8
+ 323 006c 02       		.uleb128 0x2
+ 324 006d 08       		.byte	0x8
+ 325 006e 05       		.byte	0x5
+ 326 006f 3E020000 		.4byte	.LASF9
+ 327 0073 03       		.uleb128 0x3
+ 328 0074 60020000 		.4byte	.LASF10
+ 329 0078 02       		.byte	0x2
+ 330 0079 5B       		.byte	0x5b
+ 331 007a 25000000 		.4byte	0x25
+ 332 007e 04       		.uleb128 0x4
+ 333 007f 04       		.byte	0x4
+ 334 0080 05       		.byte	0x5
+ 335 0081 696E7400 		.ascii	"int\000"
+ 336 0085 02       		.uleb128 0x2
+ 337 0086 04       		.byte	0x4
+ 338 0087 07       		.byte	0x7
+ 339 0088 91010000 		.4byte	.LASF11
+ 340 008c 03       		.uleb128 0x3
+ 341 008d 6B020000 		.4byte	.LASF12
+ 342 0091 03       		.byte	0x3
+ 343 0092 21       		.byte	0x21
+ 344 0093 48000000 		.4byte	0x48
+ 345 0097 03       		.uleb128 0x3
+ 346 0098 74020000 		.4byte	.LASF13
+ 347 009c 03       		.byte	0x3
+ 348 009d 2D       		.byte	0x2d
+ 349 009e 5A000000 		.4byte	0x5a
+ 350 00a2 03       		.uleb128 0x3
+ 351 00a3 64000000 		.4byte	.LASF14
+ 352 00a7 03       		.byte	0x3
+ 353 00a8 39       		.byte	0x39
+ 354 00a9 73000000 		.4byte	0x73
+ 355 00ad 02       		.uleb128 0x2
+ 356 00ae 04       		.byte	0x4
+ 357 00af 07       		.byte	0x7
+ 358 00b0 35020000 		.4byte	.LASF15
+ 359 00b4 02       		.uleb128 0x2
+ 360 00b5 01       		.byte	0x1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 10
+
+
+ 361 00b6 08       		.byte	0x8
+ 362 00b7 4C020000 		.4byte	.LASF16
+ 363 00bb 02       		.uleb128 0x2
+ 364 00bc 08       		.byte	0x8
+ 365 00bd 04       		.byte	0x4
+ 366 00be 7F010000 		.4byte	.LASF17
+ 367 00c2 02       		.uleb128 0x2
+ 368 00c3 04       		.byte	0x4
+ 369 00c4 04       		.byte	0x4
+ 370 00c5 8A000000 		.4byte	.LASF18
+ 371 00c9 02       		.uleb128 0x2
+ 372 00ca 08       		.byte	0x8
+ 373 00cb 04       		.byte	0x4
+ 374 00cc 86020000 		.4byte	.LASF19
+ 375 00d0 05       		.uleb128 0x5
+ 376 00d1 04       		.byte	0x4
+ 377 00d2 D6000000 		.4byte	0xd6
+ 378 00d6 06       		.uleb128 0x6
+ 379 00d7 8C000000 		.4byte	0x8c
+ 380 00db 05       		.uleb128 0x5
+ 381 00dc 04       		.byte	0x4
+ 382 00dd E1000000 		.4byte	0xe1
+ 383 00e1 06       		.uleb128 0x6
+ 384 00e2 97000000 		.4byte	0x97
+ 385 00e6 07       		.uleb128 0x7
+ 386 00e7 6D000000 		.4byte	.LASF23
+ 387 00eb 01       		.byte	0x1
+ 388 00ec 29       		.byte	0x29
+ 389 00ed 00000000 		.4byte	.LFB84
+ 390 00f1 66000000 		.4byte	.LFE84-.LFB84
+ 391 00f5 01       		.uleb128 0x1
+ 392 00f6 9C       		.byte	0x9c
+ 393 00f7 59010000 		.4byte	0x159
+ 394 00fb 08       		.uleb128 0x8
+ 395 00fc B3020000 		.4byte	.LASF20
+ 396 0100 01       		.byte	0x1
+ 397 0101 2A       		.byte	0x2a
+ 398 0102 59010000 		.4byte	0x159
+ 399 0106 01       		.uleb128 0x1
+ 400 0107 50       		.byte	0x50
+ 401 0108 08       		.uleb128 0x8
+ 402 0109 80000000 		.4byte	.LASF21
+ 403 010d 01       		.byte	0x1
+ 404 010e 2B       		.byte	0x2b
+ 405 010f D6000000 		.4byte	0xd6
+ 406 0113 01       		.uleb128 0x1
+ 407 0114 51       		.byte	0x51
+ 408 0115 08       		.uleb128 0x8
+ 409 0116 17020000 		.4byte	.LASF22
+ 410 011a 01       		.byte	0x1
+ 411 011b 2C       		.byte	0x2c
+ 412 011c D0000000 		.4byte	0xd0
+ 413 0120 01       		.uleb128 0x1
+ 414 0121 52       		.byte	0x52
+ 415 0122 09       		.uleb128 0x9
+ 416 0123 6100     		.ascii	"a\000"
+ 417 0125 01       		.byte	0x1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 11
+
+
+ 418 0126 2E       		.byte	0x2e
+ 419 0127 A2000000 		.4byte	0xa2
+ 420 012b 00000000 		.4byte	.LLST0
+ 421 012f 09       		.uleb128 0x9
+ 422 0130 6200     		.ascii	"b\000"
+ 423 0132 01       		.byte	0x1
+ 424 0133 2E       		.byte	0x2e
+ 425 0134 A2000000 		.4byte	0xa2
+ 426 0138 22000000 		.4byte	.LLST1
+ 427 013c 09       		.uleb128 0x9
+ 428 013d 6900     		.ascii	"i\000"
+ 429 013f 01       		.byte	0x1
+ 430 0140 2E       		.byte	0x2e
+ 431 0141 A2000000 		.4byte	0xa2
+ 432 0145 46000000 		.4byte	.LLST2
+ 433 0149 09       		.uleb128 0x9
+ 434 014a 746D7000 		.ascii	"tmp\000"
+ 435 014e 01       		.byte	0x1
+ 436 014f 2E       		.byte	0x2e
+ 437 0150 A2000000 		.4byte	0xa2
+ 438 0154 82000000 		.4byte	.LLST3
+ 439 0158 00       		.byte	0
+ 440 0159 05       		.uleb128 0x5
+ 441 015a 04       		.byte	0x4
+ 442 015b A2000000 		.4byte	0xa2
+ 443 015f 07       		.uleb128 0x7
+ 444 0160 22020000 		.4byte	.LASF24
+ 445 0164 01       		.byte	0x1
+ 446 0165 4B       		.byte	0x4b
+ 447 0166 00000000 		.4byte	.LFB85
+ 448 016a 40000000 		.4byte	.LFE85-.LFB85
+ 449 016e 01       		.uleb128 0x1
+ 450 016f 9C       		.byte	0x9c
+ 451 0170 D6010000 		.4byte	0x1d6
+ 452 0174 08       		.uleb128 0x8
+ 453 0175 B3020000 		.4byte	.LASF20
+ 454 0179 01       		.byte	0x1
+ 455 017a 4C       		.byte	0x4c
+ 456 017b D6010000 		.4byte	0x1d6
+ 457 017f 01       		.uleb128 0x1
+ 458 0180 50       		.byte	0x50
+ 459 0181 0A       		.uleb128 0xa
+ 460 0182 80000000 		.4byte	.LASF21
+ 461 0186 01       		.byte	0x1
+ 462 0187 4D       		.byte	0x4d
+ 463 0188 D6000000 		.4byte	0xd6
+ 464 018c 9A000000 		.4byte	.LLST4
+ 465 0190 0A       		.uleb128 0xa
+ 466 0191 17020000 		.4byte	.LASF22
+ 467 0195 01       		.byte	0x1
+ 468 0196 4E       		.byte	0x4e
+ 469 0197 D0000000 		.4byte	0xd0
+ 470 019b BB000000 		.4byte	.LLST5
+ 471 019f 09       		.uleb128 0x9
+ 472 01a0 6100     		.ascii	"a\000"
+ 473 01a2 01       		.byte	0x1
+ 474 01a3 50       		.byte	0x50
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 12
+
+
+ 475 01a4 97000000 		.4byte	0x97
+ 476 01a8 DC000000 		.4byte	.LLST6
+ 477 01ac 09       		.uleb128 0x9
+ 478 01ad 6200     		.ascii	"b\000"
+ 479 01af 01       		.byte	0x1
+ 480 01b0 50       		.byte	0x50
+ 481 01b1 97000000 		.4byte	0x97
+ 482 01b5 F9000000 		.4byte	.LLST7
+ 483 01b9 09       		.uleb128 0x9
+ 484 01ba 6900     		.ascii	"i\000"
+ 485 01bc 01       		.byte	0x1
+ 486 01bd 50       		.byte	0x50
+ 487 01be 97000000 		.4byte	0x97
+ 488 01c2 16010000 		.4byte	.LLST8
+ 489 01c6 09       		.uleb128 0x9
+ 490 01c7 746D7000 		.ascii	"tmp\000"
+ 491 01cb 01       		.byte	0x1
+ 492 01cc 50       		.byte	0x50
+ 493 01cd 97000000 		.4byte	0x97
+ 494 01d1 35010000 		.4byte	.LLST9
+ 495 01d5 00       		.byte	0
+ 496 01d6 05       		.uleb128 0x5
+ 497 01d7 04       		.byte	0x4
+ 498 01d8 97000000 		.4byte	0x97
+ 499 01dc 07       		.uleb128 0x7
+ 500 01dd 04020000 		.4byte	.LASF25
+ 501 01e1 01       		.byte	0x1
+ 502 01e2 6E       		.byte	0x6e
+ 503 01e3 00000000 		.4byte	.LFB86
+ 504 01e7 3E000000 		.4byte	.LFE86-.LFB86
+ 505 01eb 01       		.uleb128 0x1
+ 506 01ec 9C       		.byte	0x9c
+ 507 01ed 4F020000 		.4byte	0x24f
+ 508 01f1 08       		.uleb128 0x8
+ 509 01f2 B3020000 		.4byte	.LASF20
+ 510 01f6 01       		.byte	0x1
+ 511 01f7 6F       		.byte	0x6f
+ 512 01f8 4F020000 		.4byte	0x24f
+ 513 01fc 01       		.uleb128 0x1
+ 514 01fd 50       		.byte	0x50
+ 515 01fe 08       		.uleb128 0x8
+ 516 01ff 80000000 		.4byte	.LASF21
+ 517 0203 01       		.byte	0x1
+ 518 0204 70       		.byte	0x70
+ 519 0205 D6000000 		.4byte	0xd6
+ 520 0209 01       		.uleb128 0x1
+ 521 020a 51       		.byte	0x51
+ 522 020b 08       		.uleb128 0x8
+ 523 020c 17020000 		.4byte	.LASF22
+ 524 0210 01       		.byte	0x1
+ 525 0211 71       		.byte	0x71
+ 526 0212 D0000000 		.4byte	0xd0
+ 527 0216 01       		.uleb128 0x1
+ 528 0217 52       		.byte	0x52
+ 529 0218 09       		.uleb128 0x9
+ 530 0219 6100     		.ascii	"a\000"
+ 531 021b 01       		.byte	0x1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 13
+
+
+ 532 021c 73       		.byte	0x73
+ 533 021d 8C000000 		.4byte	0x8c
+ 534 0221 53010000 		.4byte	.LLST10
+ 535 0225 09       		.uleb128 0x9
+ 536 0226 6200     		.ascii	"b\000"
+ 537 0228 01       		.byte	0x1
+ 538 0229 73       		.byte	0x73
+ 539 022a 8C000000 		.4byte	0x8c
+ 540 022e 98010000 		.4byte	.LLST11
+ 541 0232 09       		.uleb128 0x9
+ 542 0233 6900     		.ascii	"i\000"
+ 543 0235 01       		.byte	0x1
+ 544 0236 73       		.byte	0x73
+ 545 0237 8C000000 		.4byte	0x8c
+ 546 023b B8010000 		.4byte	.LLST12
+ 547 023f 09       		.uleb128 0x9
+ 548 0240 746D7000 		.ascii	"tmp\000"
+ 549 0244 01       		.byte	0x1
+ 550 0245 73       		.byte	0x73
+ 551 0246 8C000000 		.4byte	0x8c
+ 552 024a E2010000 		.4byte	.LLST13
+ 553 024e 00       		.byte	0
+ 554 024f 05       		.uleb128 0x5
+ 555 0250 04       		.byte	0x4
+ 556 0251 8C000000 		.4byte	0x8c
+ 557 0255 03       		.uleb128 0x3
+ 558 0256 00000000 		.4byte	.LASF26
+ 559 025a 04       		.byte	0x4
+ 560 025b 8B       		.byte	0x8b
+ 561 025c C2020000 		.4byte	0x2c2
+ 562 0260 0B       		.uleb128 0xb
+ 563 0261 B8020000 		.4byte	.LASF27
+ 564 0265 04       		.byte	0x4
+ 565 0266 92       		.byte	0x92
+ 566 0267 6B020000 		.4byte	0x26b
+ 567 026b 06       		.uleb128 0x6
+ 568 026c 55020000 		.4byte	0x255
+ 569 0270 0B       		.uleb128 0xb
+ 570 0271 A3000000 		.4byte	.LASF28
+ 571 0275 04       		.byte	0x4
+ 572 0276 93       		.byte	0x93
+ 573 0277 6B020000 		.4byte	0x26b
+ 574 027b 03       		.uleb128 0x3
+ 575 027c 55000000 		.4byte	.LASF29
+ 576 0280 04       		.byte	0x4
+ 577 0281 90       		.byte	0x90
+ 578 0282 A1020000 		.4byte	0x2a1
+ 579 0286 0B       		.uleb128 0xb
+ 580 0287 92020000 		.4byte	.LASF30
+ 581 028b 04       		.byte	0x4
+ 582 028c 94       		.byte	0x94
+ 583 028d 91020000 		.4byte	0x291
+ 584 0291 06       		.uleb128 0x6
+ 585 0292 7B020000 		.4byte	0x27b
+ 586 0296 0B       		.uleb128 0xb
+ 587 0297 0F000000 		.4byte	.LASF31
+ 588 029b 04       		.byte	0x4
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 14
+
+
+ 589 029c 95       		.byte	0x95
+ 590 029d 91020000 		.4byte	0x291
+ 591 02a1 0C       		.uleb128 0xc
+ 592 02a2 08       		.byte	0x8
+ 593 02a3 04       		.byte	0x4
+ 594 02a4 8D       		.byte	0x8d
+ 595 02a5 C2020000 		.4byte	0x2c2
+ 596 02a9 0D       		.uleb128 0xd
+ 597 02aa 90000000 		.4byte	.LASF32
+ 598 02ae 04       		.byte	0x4
+ 599 02af 8E       		.byte	0x8e
+ 600 02b0 D6010000 		.4byte	0x1d6
+ 601 02b4 00       		.byte	0
+ 602 02b5 0D       		.uleb128 0xd
+ 603 02b6 51020000 		.4byte	.LASF33
+ 604 02ba 04       		.byte	0x4
+ 605 02bb 8F       		.byte	0x8f
+ 606 02bc 97000000 		.4byte	0x97
+ 607 02c0 04       		.byte	0x4
+ 608 02c1 00       		.byte	0
+ 609 02c2 0E       		.uleb128 0xe
+ 610 02c3 0C       		.byte	0xc
+ 611 02c4 04       		.byte	0x4
+ 612 02c5 87       		.byte	0x87
+ 613 02c6 0F       		.uleb128 0xf
+ 614 02c7 73726300 		.ascii	"src\000"
+ 615 02cb 04       		.byte	0x4
+ 616 02cc 88       		.byte	0x88
+ 617 02cd DB000000 		.4byte	0xdb
+ 618 02d1 00       		.byte	0
+ 619 02d2 0D       		.uleb128 0xd
+ 620 02d3 90000000 		.4byte	.LASF32
+ 621 02d7 04       		.byte	0x4
+ 622 02d8 89       		.byte	0x89
+ 623 02d9 D6010000 		.4byte	0x1d6
+ 624 02dd 04       		.byte	0x4
+ 625 02de 0D       		.uleb128 0xd
+ 626 02df 51020000 		.4byte	.LASF33
+ 627 02e3 04       		.byte	0x4
+ 628 02e4 8A       		.byte	0x8a
+ 629 02e5 97000000 		.4byte	0x97
+ 630 02e9 08       		.byte	0x8
+ 631 02ea 00       		.byte	0
+ 632 02eb 00       		.byte	0
+ 633              		.section	.debug_abbrev,"",%progbits
+ 634              	.Ldebug_abbrev0:
+ 635 0000 01       		.uleb128 0x1
+ 636 0001 11       		.uleb128 0x11
+ 637 0002 01       		.byte	0x1
+ 638 0003 25       		.uleb128 0x25
+ 639 0004 0E       		.uleb128 0xe
+ 640 0005 13       		.uleb128 0x13
+ 641 0006 0B       		.uleb128 0xb
+ 642 0007 03       		.uleb128 0x3
+ 643 0008 0E       		.uleb128 0xe
+ 644 0009 1B       		.uleb128 0x1b
+ 645 000a 0E       		.uleb128 0xe
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 15
+
+
+ 646 000b 55       		.uleb128 0x55
+ 647 000c 17       		.uleb128 0x17
+ 648 000d 11       		.uleb128 0x11
+ 649 000e 01       		.uleb128 0x1
+ 650 000f 10       		.uleb128 0x10
+ 651 0010 17       		.uleb128 0x17
+ 652 0011 00       		.byte	0
+ 653 0012 00       		.byte	0
+ 654 0013 02       		.uleb128 0x2
+ 655 0014 24       		.uleb128 0x24
+ 656 0015 00       		.byte	0
+ 657 0016 0B       		.uleb128 0xb
+ 658 0017 0B       		.uleb128 0xb
+ 659 0018 3E       		.uleb128 0x3e
+ 660 0019 0B       		.uleb128 0xb
+ 661 001a 03       		.uleb128 0x3
+ 662 001b 0E       		.uleb128 0xe
+ 663 001c 00       		.byte	0
+ 664 001d 00       		.byte	0
+ 665 001e 03       		.uleb128 0x3
+ 666 001f 16       		.uleb128 0x16
+ 667 0020 00       		.byte	0
+ 668 0021 03       		.uleb128 0x3
+ 669 0022 0E       		.uleb128 0xe
+ 670 0023 3A       		.uleb128 0x3a
+ 671 0024 0B       		.uleb128 0xb
+ 672 0025 3B       		.uleb128 0x3b
+ 673 0026 0B       		.uleb128 0xb
+ 674 0027 49       		.uleb128 0x49
+ 675 0028 13       		.uleb128 0x13
+ 676 0029 00       		.byte	0
+ 677 002a 00       		.byte	0
+ 678 002b 04       		.uleb128 0x4
+ 679 002c 24       		.uleb128 0x24
+ 680 002d 00       		.byte	0
+ 681 002e 0B       		.uleb128 0xb
+ 682 002f 0B       		.uleb128 0xb
+ 683 0030 3E       		.uleb128 0x3e
+ 684 0031 0B       		.uleb128 0xb
+ 685 0032 03       		.uleb128 0x3
+ 686 0033 08       		.uleb128 0x8
+ 687 0034 00       		.byte	0
+ 688 0035 00       		.byte	0
+ 689 0036 05       		.uleb128 0x5
+ 690 0037 0F       		.uleb128 0xf
+ 691 0038 00       		.byte	0
+ 692 0039 0B       		.uleb128 0xb
+ 693 003a 0B       		.uleb128 0xb
+ 694 003b 49       		.uleb128 0x49
+ 695 003c 13       		.uleb128 0x13
+ 696 003d 00       		.byte	0
+ 697 003e 00       		.byte	0
+ 698 003f 06       		.uleb128 0x6
+ 699 0040 26       		.uleb128 0x26
+ 700 0041 00       		.byte	0
+ 701 0042 49       		.uleb128 0x49
+ 702 0043 13       		.uleb128 0x13
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 16
+
+
+ 703 0044 00       		.byte	0
+ 704 0045 00       		.byte	0
+ 705 0046 07       		.uleb128 0x7
+ 706 0047 2E       		.uleb128 0x2e
+ 707 0048 01       		.byte	0x1
+ 708 0049 3F       		.uleb128 0x3f
+ 709 004a 19       		.uleb128 0x19
+ 710 004b 03       		.uleb128 0x3
+ 711 004c 0E       		.uleb128 0xe
+ 712 004d 3A       		.uleb128 0x3a
+ 713 004e 0B       		.uleb128 0xb
+ 714 004f 3B       		.uleb128 0x3b
+ 715 0050 0B       		.uleb128 0xb
+ 716 0051 27       		.uleb128 0x27
+ 717 0052 19       		.uleb128 0x19
+ 718 0053 11       		.uleb128 0x11
+ 719 0054 01       		.uleb128 0x1
+ 720 0055 12       		.uleb128 0x12
+ 721 0056 06       		.uleb128 0x6
+ 722 0057 40       		.uleb128 0x40
+ 723 0058 18       		.uleb128 0x18
+ 724 0059 9742     		.uleb128 0x2117
+ 725 005b 19       		.uleb128 0x19
+ 726 005c 01       		.uleb128 0x1
+ 727 005d 13       		.uleb128 0x13
+ 728 005e 00       		.byte	0
+ 729 005f 00       		.byte	0
+ 730 0060 08       		.uleb128 0x8
+ 731 0061 05       		.uleb128 0x5
+ 732 0062 00       		.byte	0
+ 733 0063 03       		.uleb128 0x3
+ 734 0064 0E       		.uleb128 0xe
+ 735 0065 3A       		.uleb128 0x3a
+ 736 0066 0B       		.uleb128 0xb
+ 737 0067 3B       		.uleb128 0x3b
+ 738 0068 0B       		.uleb128 0xb
+ 739 0069 49       		.uleb128 0x49
+ 740 006a 13       		.uleb128 0x13
+ 741 006b 02       		.uleb128 0x2
+ 742 006c 18       		.uleb128 0x18
+ 743 006d 00       		.byte	0
+ 744 006e 00       		.byte	0
+ 745 006f 09       		.uleb128 0x9
+ 746 0070 34       		.uleb128 0x34
+ 747 0071 00       		.byte	0
+ 748 0072 03       		.uleb128 0x3
+ 749 0073 08       		.uleb128 0x8
+ 750 0074 3A       		.uleb128 0x3a
+ 751 0075 0B       		.uleb128 0xb
+ 752 0076 3B       		.uleb128 0x3b
+ 753 0077 0B       		.uleb128 0xb
+ 754 0078 49       		.uleb128 0x49
+ 755 0079 13       		.uleb128 0x13
+ 756 007a 02       		.uleb128 0x2
+ 757 007b 17       		.uleb128 0x17
+ 758 007c 00       		.byte	0
+ 759 007d 00       		.byte	0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 17
+
+
+ 760 007e 0A       		.uleb128 0xa
+ 761 007f 05       		.uleb128 0x5
+ 762 0080 00       		.byte	0
+ 763 0081 03       		.uleb128 0x3
+ 764 0082 0E       		.uleb128 0xe
+ 765 0083 3A       		.uleb128 0x3a
+ 766 0084 0B       		.uleb128 0xb
+ 767 0085 3B       		.uleb128 0x3b
+ 768 0086 0B       		.uleb128 0xb
+ 769 0087 49       		.uleb128 0x49
+ 770 0088 13       		.uleb128 0x13
+ 771 0089 02       		.uleb128 0x2
+ 772 008a 17       		.uleb128 0x17
+ 773 008b 00       		.byte	0
+ 774 008c 00       		.byte	0
+ 775 008d 0B       		.uleb128 0xb
+ 776 008e 34       		.uleb128 0x34
+ 777 008f 00       		.byte	0
+ 778 0090 03       		.uleb128 0x3
+ 779 0091 0E       		.uleb128 0xe
+ 780 0092 3A       		.uleb128 0x3a
+ 781 0093 0B       		.uleb128 0xb
+ 782 0094 3B       		.uleb128 0x3b
+ 783 0095 0B       		.uleb128 0xb
+ 784 0096 49       		.uleb128 0x49
+ 785 0097 13       		.uleb128 0x13
+ 786 0098 3F       		.uleb128 0x3f
+ 787 0099 19       		.uleb128 0x19
+ 788 009a 3C       		.uleb128 0x3c
+ 789 009b 19       		.uleb128 0x19
+ 790 009c 00       		.byte	0
+ 791 009d 00       		.byte	0
+ 792 009e 0C       		.uleb128 0xc
+ 793 009f 13       		.uleb128 0x13
+ 794 00a0 01       		.byte	0x1
+ 795 00a1 0B       		.uleb128 0xb
+ 796 00a2 0B       		.uleb128 0xb
+ 797 00a3 3A       		.uleb128 0x3a
+ 798 00a4 0B       		.uleb128 0xb
+ 799 00a5 3B       		.uleb128 0x3b
+ 800 00a6 0B       		.uleb128 0xb
+ 801 00a7 01       		.uleb128 0x1
+ 802 00a8 13       		.uleb128 0x13
+ 803 00a9 00       		.byte	0
+ 804 00aa 00       		.byte	0
+ 805 00ab 0D       		.uleb128 0xd
+ 806 00ac 0D       		.uleb128 0xd
+ 807 00ad 00       		.byte	0
+ 808 00ae 03       		.uleb128 0x3
+ 809 00af 0E       		.uleb128 0xe
+ 810 00b0 3A       		.uleb128 0x3a
+ 811 00b1 0B       		.uleb128 0xb
+ 812 00b2 3B       		.uleb128 0x3b
+ 813 00b3 0B       		.uleb128 0xb
+ 814 00b4 49       		.uleb128 0x49
+ 815 00b5 13       		.uleb128 0x13
+ 816 00b6 38       		.uleb128 0x38
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 18
+
+
+ 817 00b7 0B       		.uleb128 0xb
+ 818 00b8 00       		.byte	0
+ 819 00b9 00       		.byte	0
+ 820 00ba 0E       		.uleb128 0xe
+ 821 00bb 13       		.uleb128 0x13
+ 822 00bc 01       		.byte	0x1
+ 823 00bd 0B       		.uleb128 0xb
+ 824 00be 0B       		.uleb128 0xb
+ 825 00bf 3A       		.uleb128 0x3a
+ 826 00c0 0B       		.uleb128 0xb
+ 827 00c1 3B       		.uleb128 0x3b
+ 828 00c2 0B       		.uleb128 0xb
+ 829 00c3 00       		.byte	0
+ 830 00c4 00       		.byte	0
+ 831 00c5 0F       		.uleb128 0xf
+ 832 00c6 0D       		.uleb128 0xd
+ 833 00c7 00       		.byte	0
+ 834 00c8 03       		.uleb128 0x3
+ 835 00c9 08       		.uleb128 0x8
+ 836 00ca 3A       		.uleb128 0x3a
+ 837 00cb 0B       		.uleb128 0xb
+ 838 00cc 3B       		.uleb128 0x3b
+ 839 00cd 0B       		.uleb128 0xb
+ 840 00ce 49       		.uleb128 0x49
+ 841 00cf 13       		.uleb128 0x13
+ 842 00d0 38       		.uleb128 0x38
+ 843 00d1 0B       		.uleb128 0xb
+ 844 00d2 00       		.byte	0
+ 845 00d3 00       		.byte	0
+ 846 00d4 00       		.byte	0
+ 847              		.section	.debug_loc,"",%progbits
+ 848              	.Ldebug_loc0:
+ 849              	.LLST0:
+ 850 0000 12000000 		.4byte	.LVL2
+ 851 0004 3C000000 		.4byte	.LVL4
+ 852 0008 1000     		.2byte	0x10
+ 853 000a 74       		.byte	0x74
+ 854 000b 00       		.sleb128 0
+ 855 000c 31       		.byte	0x31
+ 856 000d 24       		.byte	0x24
+ 857 000e 72       		.byte	0x72
+ 858 000f 00       		.sleb128 0
+ 859 0010 22       		.byte	0x22
+ 860 0011 94       		.byte	0x94
+ 861 0012 02       		.byte	0x2
+ 862 0013 32       		.byte	0x32
+ 863 0014 25       		.byte	0x25
+ 864 0015 F7       		.byte	0xf7
+ 865 0016 2C       		.uleb128 0x2c
+ 866 0017 F7       		.byte	0xf7
+ 867 0018 25       		.uleb128 0x25
+ 868 0019 9F       		.byte	0x9f
+ 869 001a 00000000 		.4byte	0
+ 870 001e 00000000 		.4byte	0
+ 871              	.LLST1:
+ 872 0022 12000000 		.4byte	.LVL2
+ 873 0026 3C000000 		.4byte	.LVL4
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 19
+
+
+ 874 002a 1200     		.2byte	0x12
+ 875 002c 74       		.byte	0x74
+ 876 002d 00       		.sleb128 0
+ 877 002e 31       		.byte	0x31
+ 878 002f 24       		.byte	0x24
+ 879 0030 72       		.byte	0x72
+ 880 0031 00       		.sleb128 0
+ 881 0032 22       		.byte	0x22
+ 882 0033 23       		.byte	0x23
+ 883 0034 02       		.uleb128 0x2
+ 884 0035 94       		.byte	0x94
+ 885 0036 02       		.byte	0x2
+ 886 0037 32       		.byte	0x32
+ 887 0038 25       		.byte	0x25
+ 888 0039 F7       		.byte	0xf7
+ 889 003a 2C       		.uleb128 0x2c
+ 890 003b F7       		.byte	0xf7
+ 891 003c 25       		.uleb128 0x25
+ 892 003d 9F       		.byte	0x9f
+ 893 003e 00000000 		.4byte	0
+ 894 0042 00000000 		.4byte	0
+ 895              	.LLST2:
+ 896 0046 00000000 		.4byte	.LVL0
+ 897 004a 08000000 		.4byte	.LVL1
+ 898 004e 0A00     		.2byte	0xa
+ 899 0050 9E       		.byte	0x9e
+ 900 0051 08       		.uleb128 0x8
+ 901 0052 00000000 		.8byte	0
+ 901      00000000 
+ 902 005a 08000000 		.4byte	.LVL1
+ 903 005e 4C000000 		.4byte	.LVL5
+ 904 0062 0600     		.2byte	0x6
+ 905 0064 54       		.byte	0x54
+ 906 0065 93       		.byte	0x93
+ 907 0066 04       		.uleb128 0x4
+ 908 0067 55       		.byte	0x55
+ 909 0068 93       		.byte	0x93
+ 910 0069 04       		.uleb128 0x4
+ 911 006a 58000000 		.4byte	.LVL7
+ 912 006e 66000000 		.4byte	.LFE84
+ 913 0072 0600     		.2byte	0x6
+ 914 0074 54       		.byte	0x54
+ 915 0075 93       		.byte	0x93
+ 916 0076 04       		.uleb128 0x4
+ 917 0077 55       		.byte	0x55
+ 918 0078 93       		.byte	0x93
+ 919 0079 04       		.uleb128 0x4
+ 920 007a 00000000 		.4byte	0
+ 921 007e 00000000 		.4byte	0
+ 922              	.LLST3:
+ 923 0082 34000000 		.4byte	.LVL3
+ 924 0086 62000000 		.4byte	.LVL8
+ 925 008a 0600     		.2byte	0x6
+ 926 008c 58       		.byte	0x58
+ 927 008d 93       		.byte	0x93
+ 928 008e 04       		.uleb128 0x4
+ 929 008f 59       		.byte	0x59
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 20
+
+
+ 930 0090 93       		.byte	0x93
+ 931 0091 04       		.uleb128 0x4
+ 932 0092 00000000 		.4byte	0
+ 933 0096 00000000 		.4byte	0
+ 934              	.LLST4:
+ 935 009a 00000000 		.4byte	.LVL9
+ 936 009e 06000000 		.4byte	.LVL10
+ 937 00a2 0100     		.2byte	0x1
+ 938 00a4 51       		.byte	0x51
+ 939 00a5 06000000 		.4byte	.LVL10
+ 940 00a9 40000000 		.4byte	.LFE85
+ 941 00ad 0400     		.2byte	0x4
+ 942 00af F3       		.byte	0xf3
+ 943 00b0 01       		.uleb128 0x1
+ 944 00b1 51       		.byte	0x51
+ 945 00b2 9F       		.byte	0x9f
+ 946 00b3 00000000 		.4byte	0
+ 947 00b7 00000000 		.4byte	0
+ 948              	.LLST5:
+ 949 00bb 00000000 		.4byte	.LVL9
+ 950 00bf 06000000 		.4byte	.LVL10
+ 951 00c3 0100     		.2byte	0x1
+ 952 00c5 52       		.byte	0x52
+ 953 00c6 06000000 		.4byte	.LVL10
+ 954 00ca 40000000 		.4byte	.LFE85
+ 955 00ce 0400     		.2byte	0x4
+ 956 00d0 F3       		.byte	0xf3
+ 957 00d1 01       		.uleb128 0x1
+ 958 00d2 52       		.byte	0x52
+ 959 00d3 9F       		.byte	0x9f
+ 960 00d4 00000000 		.4byte	0
+ 961 00d8 00000000 		.4byte	0
+ 962              	.LLST6:
+ 963 00dc 0E000000 		.4byte	.LVL11
+ 964 00e0 2A000000 		.4byte	.LVL13
+ 965 00e4 0B00     		.2byte	0xb
+ 966 00e6 72       		.byte	0x72
+ 967 00e7 7C       		.sleb128 -4
+ 968 00e8 94       		.byte	0x94
+ 969 00e9 02       		.byte	0x2
+ 970 00ea 32       		.byte	0x32
+ 971 00eb 25       		.byte	0x25
+ 972 00ec 0A       		.byte	0xa
+ 973 00ed FFFF     		.2byte	0xffff
+ 974 00ef 1A       		.byte	0x1a
+ 975 00f0 9F       		.byte	0x9f
+ 976 00f1 00000000 		.4byte	0
+ 977 00f5 00000000 		.4byte	0
+ 978              	.LLST7:
+ 979 00f9 0E000000 		.4byte	.LVL11
+ 980 00fd 2A000000 		.4byte	.LVL13
+ 981 0101 0B00     		.2byte	0xb
+ 982 0103 72       		.byte	0x72
+ 983 0104 7E       		.sleb128 -2
+ 984 0105 94       		.byte	0x94
+ 985 0106 02       		.byte	0x2
+ 986 0107 32       		.byte	0x32
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 21
+
+
+ 987 0108 25       		.byte	0x25
+ 988 0109 0A       		.byte	0xa
+ 989 010a FFFF     		.2byte	0xffff
+ 990 010c 1A       		.byte	0x1a
+ 991 010d 9F       		.byte	0x9f
+ 992 010e 00000000 		.4byte	0
+ 993 0112 00000000 		.4byte	0
+ 994              	.LLST8:
+ 995 0116 00000000 		.4byte	.LVL9
+ 996 011a 06000000 		.4byte	.LVL10
+ 997 011e 0200     		.2byte	0x2
+ 998 0120 30       		.byte	0x30
+ 999 0121 9F       		.byte	0x9f
+ 1000 0122 06000000 		.4byte	.LVL10
+ 1001 0126 40000000 		.4byte	.LFE85
+ 1002 012a 0100     		.2byte	0x1
+ 1003 012c 57       		.byte	0x57
+ 1004 012d 00000000 		.4byte	0
+ 1005 0131 00000000 		.4byte	0
+ 1006              	.LLST9:
+ 1007 0135 1E000000 		.4byte	.LVL12
+ 1008 0139 34000000 		.4byte	.LVL14
+ 1009 013d 0100     		.2byte	0x1
+ 1010 013f 5E       		.byte	0x5e
+ 1011 0140 34000000 		.4byte	.LVL14
+ 1012 0144 3E000000 		.4byte	.LVL16
+ 1013 0148 0100     		.2byte	0x1
+ 1014 014a 56       		.byte	0x56
+ 1015 014b 00000000 		.4byte	0
+ 1016 014f 00000000 		.4byte	0
+ 1017              	.LLST10:
+ 1018 0153 08000000 		.4byte	.LVL19
+ 1019 0157 0C000000 		.4byte	.LVL20
+ 1020 015b 0C00     		.2byte	0xc
+ 1021 015d 73       		.byte	0x73
+ 1022 015e 00       		.sleb128 0
+ 1023 015f 31       		.byte	0x31
+ 1024 0160 24       		.byte	0x24
+ 1025 0161 72       		.byte	0x72
+ 1026 0162 00       		.sleb128 0
+ 1027 0163 22       		.byte	0x22
+ 1028 0164 94       		.byte	0x94
+ 1029 0165 02       		.byte	0x2
+ 1030 0166 32       		.byte	0x32
+ 1031 0167 25       		.byte	0x25
+ 1032 0168 9F       		.byte	0x9f
+ 1033 0169 0C000000 		.4byte	.LVL20
+ 1034 016d 12000000 		.4byte	.LVL21
+ 1035 0171 0700     		.2byte	0x7
+ 1036 0173 74       		.byte	0x74
+ 1037 0174 00       		.sleb128 0
+ 1038 0175 94       		.byte	0x94
+ 1039 0176 02       		.byte	0x2
+ 1040 0177 32       		.byte	0x32
+ 1041 0178 25       		.byte	0x25
+ 1042 0179 9F       		.byte	0x9f
+ 1043 017a 12000000 		.4byte	.LVL21
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 22
+
+
+ 1044 017e 26000000 		.4byte	.LVL23
+ 1045 0182 0C00     		.2byte	0xc
+ 1046 0184 73       		.byte	0x73
+ 1047 0185 00       		.sleb128 0
+ 1048 0186 31       		.byte	0x31
+ 1049 0187 24       		.byte	0x24
+ 1050 0188 72       		.byte	0x72
+ 1051 0189 00       		.sleb128 0
+ 1052 018a 22       		.byte	0x22
+ 1053 018b 94       		.byte	0x94
+ 1054 018c 02       		.byte	0x2
+ 1055 018d 32       		.byte	0x32
+ 1056 018e 25       		.byte	0x25
+ 1057 018f 9F       		.byte	0x9f
+ 1058 0190 00000000 		.4byte	0
+ 1059 0194 00000000 		.4byte	0
+ 1060              	.LLST11:
+ 1061 0198 08000000 		.4byte	.LVL19
+ 1062 019c 26000000 		.4byte	.LVL23
+ 1063 01a0 0E00     		.2byte	0xe
+ 1064 01a2 73       		.byte	0x73
+ 1065 01a3 00       		.sleb128 0
+ 1066 01a4 31       		.byte	0x31
+ 1067 01a5 24       		.byte	0x24
+ 1068 01a6 72       		.byte	0x72
+ 1069 01a7 00       		.sleb128 0
+ 1070 01a8 22       		.byte	0x22
+ 1071 01a9 23       		.byte	0x23
+ 1072 01aa 02       		.uleb128 0x2
+ 1073 01ab 94       		.byte	0x94
+ 1074 01ac 02       		.byte	0x2
+ 1075 01ad 32       		.byte	0x32
+ 1076 01ae 25       		.byte	0x25
+ 1077 01af 9F       		.byte	0x9f
+ 1078 01b0 00000000 		.4byte	0
+ 1079 01b4 00000000 		.4byte	0
+ 1080              	.LLST12:
+ 1081 01b8 00000000 		.4byte	.LVL17
+ 1082 01bc 04000000 		.4byte	.LVL18
+ 1083 01c0 0200     		.2byte	0x2
+ 1084 01c2 30       		.byte	0x30
+ 1085 01c3 9F       		.byte	0x9f
+ 1086 01c4 04000000 		.4byte	.LVL18
+ 1087 01c8 34000000 		.4byte	.LVL25
+ 1088 01cc 0100     		.2byte	0x1
+ 1089 01ce 53       		.byte	0x53
+ 1090 01cf 38000000 		.4byte	.LVL26
+ 1091 01d3 3E000000 		.4byte	.LFE86
+ 1092 01d7 0100     		.2byte	0x1
+ 1093 01d9 53       		.byte	0x53
+ 1094 01da 00000000 		.4byte	0
+ 1095 01de 00000000 		.4byte	0
+ 1096              	.LLST13:
+ 1097 01e2 1A000000 		.4byte	.LVL22
+ 1098 01e6 30000000 		.4byte	.LVL24
+ 1099 01ea 0100     		.2byte	0x1
+ 1100 01ec 5E       		.byte	0x5e
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 23
+
+
+ 1101 01ed 30000000 		.4byte	.LVL24
+ 1102 01f1 3C000000 		.4byte	.LVL27
+ 1103 01f5 0100     		.2byte	0x1
+ 1104 01f7 57       		.byte	0x57
+ 1105 01f8 00000000 		.4byte	0
+ 1106 01fc 00000000 		.4byte	0
+ 1107              		.section	.debug_aranges,"",%progbits
+ 1108 0000 2C000000 		.4byte	0x2c
+ 1109 0004 0200     		.2byte	0x2
+ 1110 0006 00000000 		.4byte	.Ldebug_info0
+ 1111 000a 04       		.byte	0x4
+ 1112 000b 00       		.byte	0
+ 1113 000c 0000     		.2byte	0
+ 1114 000e 0000     		.2byte	0
+ 1115 0010 00000000 		.4byte	.LFB84
+ 1116 0014 66000000 		.4byte	.LFE84-.LFB84
+ 1117 0018 00000000 		.4byte	.LFB85
+ 1118 001c 40000000 		.4byte	.LFE85-.LFB85
+ 1119 0020 00000000 		.4byte	.LFB86
+ 1120 0024 3E000000 		.4byte	.LFE86-.LFB86
+ 1121 0028 00000000 		.4byte	0
+ 1122 002c 00000000 		.4byte	0
+ 1123              		.section	.debug_ranges,"",%progbits
+ 1124              	.Ldebug_ranges0:
+ 1125 0000 00000000 		.4byte	.LFB84
+ 1126 0004 66000000 		.4byte	.LFE84
+ 1127 0008 00000000 		.4byte	.LFB85
+ 1128 000c 40000000 		.4byte	.LFE85
+ 1129 0010 00000000 		.4byte	.LFB86
+ 1130 0014 3E000000 		.4byte	.LFE86
+ 1131 0018 00000000 		.4byte	0
+ 1132 001c 00000000 		.4byte	0
+ 1133              		.section	.debug_line,"",%progbits
+ 1134              	.Ldebug_line0:
+ 1135 0000 E6010000 		.section	.debug_str,"MS",%progbits,1
+ 1135      02005F01 
+ 1135      00000201 
+ 1135      FB0E0D00 
+ 1135      01010101 
+ 1136              	.LASF26:
+ 1137 0000 5F5F636F 		.ascii	"__copy_table_t\000"
+ 1137      70795F74 
+ 1137      61626C65 
+ 1137      5F7400
+ 1138              	.LASF31:
+ 1139 000f 5F5F7A65 		.ascii	"__zero_table_end__\000"
+ 1139      726F5F74 
+ 1139      61626C65 
+ 1139      5F656E64 
+ 1139      5F5F00
+ 1140              	.LASF35:
+ 1141 0022 2E5C4453 		.ascii	".\\DSP\\Source\\TransformFunctions\\arm_bitreversal"
+ 1141      505C536F 
+ 1141      75726365 
+ 1141      5C547261 
+ 1141      6E73666F 
+ 1142 0051 322E6300 		.ascii	"2.c\000"
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 24
+
+
+ 1143              	.LASF29:
+ 1144 0055 5F5F7A65 		.ascii	"__zero_table_t\000"
+ 1144      726F5F74 
+ 1144      61626C65 
+ 1144      5F7400
+ 1145              	.LASF14:
+ 1146 0064 75696E74 		.ascii	"uint64_t\000"
+ 1146      36345F74 
+ 1146      00
+ 1147              	.LASF23:
+ 1148 006d 61726D5F 		.ascii	"arm_bitreversal_64\000"
+ 1148      62697472 
+ 1148      65766572 
+ 1148      73616C5F 
+ 1148      363400
+ 1149              	.LASF21:
+ 1150 0080 62697452 		.ascii	"bitRevLen\000"
+ 1150      65764C65 
+ 1150      6E00
+ 1151              	.LASF18:
+ 1152 008a 666C6F61 		.ascii	"float\000"
+ 1152      7400
+ 1153              	.LASF32:
+ 1154 0090 64657374 		.ascii	"dest\000"
+ 1154      00
+ 1155              	.LASF3:
+ 1156 0095 756E7369 		.ascii	"unsigned char\000"
+ 1156      676E6564 
+ 1156      20636861 
+ 1156      7200
+ 1157              	.LASF28:
+ 1158 00a3 5F5F636F 		.ascii	"__copy_table_end__\000"
+ 1158      70795F74 
+ 1158      61626C65 
+ 1158      5F656E64 
+ 1158      5F5F00
+ 1159              	.LASF8:
+ 1160 00b6 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1160      20756E73 
+ 1160      69676E65 
+ 1160      6420696E 
+ 1160      7400
+ 1161              	.LASF1:
+ 1162 00c8 73686F72 		.ascii	"short unsigned int\000"
+ 1162      7420756E 
+ 1162      7369676E 
+ 1162      65642069 
+ 1162      6E7400
+ 1163              	.LASF34:
+ 1164 00db 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 1164      4320342E 
+ 1164      392E3320 
+ 1164      32303135 
+ 1164      30333033 
+ 1165 010e 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 1165      20726576 
+ 1165      6973696F 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 25
+
+
+ 1165      6E203232 
+ 1165      31323230 
+ 1166 0141 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 1166      74643D67 
+ 1166      6E753939 
+ 1166      202D6666 
+ 1166      756E6374 
+ 1167              	.LASF6:
+ 1168 0174 5F5F7569 		.ascii	"__uint16_t\000"
+ 1168      6E743136 
+ 1168      5F7400
+ 1169              	.LASF17:
+ 1170 017f 646F7562 		.ascii	"double\000"
+ 1170      6C6500
+ 1171              	.LASF7:
+ 1172 0186 5F5F7569 		.ascii	"__uint32_t\000"
+ 1172      6E743332 
+ 1172      5F7400
+ 1173              	.LASF11:
+ 1174 0191 756E7369 		.ascii	"unsigned int\000"
+ 1174      676E6564 
+ 1174      20696E74 
+ 1174      00
+ 1175              	.LASF36:
+ 1176 019e 5C5C766D 		.ascii	"\\\\vmware-host\\Shared Folders\\Documents\\PSoC Cr"
+ 1176      77617265 
+ 1176      2D686F73 
+ 1176      745C5368 
+ 1176      61726564 
+ 1177 01cc 6561746F 		.ascii	"eator\\FinalProject\\FinalV2.cydsn\000"
+ 1177      725C4669 
+ 1177      6E616C50 
+ 1177      726F6A65 
+ 1177      63745C46 
+ 1178              	.LASF0:
+ 1179 01ed 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1179      206C6F6E 
+ 1179      6720756E 
+ 1179      7369676E 
+ 1179      65642069 
+ 1180              	.LASF25:
+ 1181 0204 61726D5F 		.ascii	"arm_bitreversal_16\000"
+ 1181      62697472 
+ 1181      65766572 
+ 1181      73616C5F 
+ 1181      313600
+ 1182              	.LASF22:
+ 1183 0217 70426974 		.ascii	"pBitRevTab\000"
+ 1183      52657654 
+ 1183      616200
+ 1184              	.LASF24:
+ 1185 0222 61726D5F 		.ascii	"arm_bitreversal_32\000"
+ 1185      62697472 
+ 1185      65766572 
+ 1185      73616C5F 
+ 1185      333200
+ 1186              	.LASF15:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 26
+
+
+ 1187 0235 73697A65 		.ascii	"sizetype\000"
+ 1187      74797065 
+ 1187      00
+ 1188              	.LASF9:
+ 1189 023e 6C6F6E67 		.ascii	"long long int\000"
+ 1189      206C6F6E 
+ 1189      6720696E 
+ 1189      7400
+ 1190              	.LASF16:
+ 1191 024c 63686172 		.ascii	"char\000"
+ 1191      00
+ 1192              	.LASF33:
+ 1193 0251 776C656E 		.ascii	"wlen\000"
+ 1193      00
+ 1194              	.LASF4:
+ 1195 0256 73686F72 		.ascii	"short int\000"
+ 1195      7420696E 
+ 1195      7400
+ 1196              	.LASF10:
+ 1197 0260 5F5F7569 		.ascii	"__uint64_t\000"
+ 1197      6E743634 
+ 1197      5F7400
+ 1198              	.LASF12:
+ 1199 026b 75696E74 		.ascii	"uint16_t\000"
+ 1199      31365F74 
+ 1199      00
+ 1200              	.LASF13:
+ 1201 0274 75696E74 		.ascii	"uint32_t\000"
+ 1201      33325F74 
+ 1201      00
+ 1202              	.LASF5:
+ 1203 027d 6C6F6E67 		.ascii	"long int\000"
+ 1203      20696E74 
+ 1203      00
+ 1204              	.LASF19:
+ 1205 0286 6C6F6E67 		.ascii	"long double\000"
+ 1205      20646F75 
+ 1205      626C6500 
+ 1206              	.LASF30:
+ 1207 0292 5F5F7A65 		.ascii	"__zero_table_start__\000"
+ 1207      726F5F74 
+ 1207      61626C65 
+ 1207      5F737461 
+ 1207      72745F5F 
+ 1208              	.LASF2:
+ 1209 02a7 7369676E 		.ascii	"signed char\000"
+ 1209      65642063 
+ 1209      68617200 
+ 1210              	.LASF20:
+ 1211 02b3 70537263 		.ascii	"pSrc\000"
+ 1211      00
+ 1212              	.LASF27:
+ 1213 02b8 5F5F636F 		.ascii	"__copy_table_start__\000"
+ 1213      70795F74 
+ 1213      61626C65 
+ 1213      5F737461 
+ 1213      72745F5F 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccrTdl4b.s 			page 27
+
+
+ 1214              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

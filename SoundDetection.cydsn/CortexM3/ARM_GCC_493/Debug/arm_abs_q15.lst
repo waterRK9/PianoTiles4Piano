@@ -1,0 +1,1045 @@
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"arm_abs_q15.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.text.arm_abs_q15,"ax",%progbits
+  19              		.align	2
+  20              		.global	arm_abs_q15
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	arm_abs_q15, %function
+  24              	arm_abs_q15:
+  25              	.LFB83:
+  26              		.file 1 ".\\DSP\\Source\\BasicMathFunctions\\arm_abs_q15.c"
+   1:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** /* ----------------------------------------------------------------------
+   2:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * Project:      CMSIS DSP Library
+   3:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * Title:        arm_abs_q15.c
+   4:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * Description:  Q15 vector absolute value
+   5:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  *
+   6:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * $Date:        23 April 2021
+   7:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * $Revision:    V1.9.0
+   8:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  *
+   9:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * Target Processor: Cortex-M and Cortex-A cores
+  10:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * -------------------------------------------------------------------- */
+  11:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** /*
+  12:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * Copyright (C) 2010-2021 ARM Limited or its affiliates. All rights reserved.
+  13:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  *
+  14:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * SPDX-License-Identifier: Apache-2.0
+  15:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  *
+  16:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * Licensed under the Apache License, Version 2.0 (the License); you may
+  17:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * not use this file except in compliance with the License.
+  18:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * You may obtain a copy of the License at
+  19:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  *
+  20:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * www.apache.org/licenses/LICENSE-2.0
+  21:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  *
+  22:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * Unless required by applicable law or agreed to in writing, software
+  23:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+  24:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  25:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * See the License for the specific language governing permissions and
+  26:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  * limitations under the License.
+  27:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  */
+  28:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+  29:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #include "dsp/basic_math_functions.h"
+  30:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+  31:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** /**
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 2
+
+
+  32:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   @ingroup groupMath
+  33:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  */
+  34:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+  35:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** /**
+  36:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   @addtogroup BasicAbs
+  37:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   @{
+  38:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  */
+  39:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+  40:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** /**
+  41:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   @brief         Q15 vector absolute value.
+  42:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   @param[in]     pSrc       points to the input vector
+  43:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   @param[out]    pDst       points to the output vector
+  44:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   @param[in]     blockSize  number of samples in each vector
+  45:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   @return        none
+  46:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+  47:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   @par           Scaling and Overflow Behavior
+  48:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****                    The function uses saturating arithmetic.
+  49:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****                    The Q15 value -1 (0x8000) will be saturated to the maximum allowable positive va
+  50:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****  */
+  51:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+  52:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #if defined(ARM_MATH_MVEI) && !defined(ARM_MATH_AUTOVECTORIZE)
+  53:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+  54:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #include "arm_helium_utils.h"
+  55:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+  56:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** void arm_abs_q15(
+  57:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     const q15_t * pSrc,
+  58:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     q15_t * pDst,
+  59:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     uint32_t blockSize)
+  60:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** {
+  61:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     uint32_t  blkCnt;           /* loop counters */
+  62:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     q15x8_t vecSrc;
+  63:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+  64:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     /* Compute 8 outputs at a time */
+  65:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     blkCnt = blockSize >> 3;
+  66:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     while (blkCnt > 0U)
+  67:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     {
+  68:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         /*
+  69:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****          * C = |A|
+  70:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****          * Calculate absolute and then store the results in the destination buffer.
+  71:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****          */
+  72:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         vecSrc = vld1q(pSrc);
+  73:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         vst1q(pDst, vqabsq(vecSrc));
+  74:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         /*
+  75:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****          * Decrement the blockSize loop counter
+  76:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****          */
+  77:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         blkCnt--;
+  78:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         /*
+  79:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****          * advance vector source and destination pointers
+  80:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****          */
+  81:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         pSrc += 8;
+  82:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         pDst += 8;
+  83:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     }
+  84:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     /*
+  85:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****      * tail
+  86:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****      */
+  87:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     blkCnt = blockSize & 7;
+  88:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     if (blkCnt > 0U)
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 3
+
+
+  89:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     {
+  90:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         mve_pred16_t p0 = vctp16q(blkCnt);
+  91:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         vecSrc = vld1q(pSrc);
+  92:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         vstrhq_p(pDst, vqabsq(vecSrc), p0);
+  93:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     }
+  94:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** }
+  95:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+  96:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #else
+  97:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** void arm_abs_q15(
+  98:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   const q15_t * pSrc,
+  99:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         q15_t * pDst,
+ 100:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         uint32_t blockSize)
+ 101:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** {
+  27              		.loc 1 101 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  32              	.LVL0:
+  33 0000 30B4     		push	{r4, r5}
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 4, -8
+  36              		.cfi_offset 5, -4
+  37              	.LVL1:
+ 102:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         uint32_t blkCnt;                               /* Loop counter */
+ 103:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****         q15_t in;                                      /* Temporary input variable */
+ 104:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 105:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #if defined (ARM_MATH_LOOPUNROLL)
+ 106:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 107:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   /* Loop unrolling: Compute 4 outputs at a time */
+ 108:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   blkCnt = blockSize >> 2U;
+ 109:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 110:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   while (blkCnt > 0U)
+ 111:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   {
+ 112:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     /* C = |A| */
+ 113:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 114:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     /* Calculate absolute of input (if -1 then saturated to 0x7fff) and store result in destination
+ 115:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     in = *pSrc++;
+ 116:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #if defined (ARM_MATH_DSP)
+ 117:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     *pDst++ = (in > 0) ? in : (q15_t)__QSUB16(0, in);
+ 118:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #else
+ 119:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     *pDst++ = (in > 0) ? in : ((in == (q15_t) 0x8000) ? 0x7fff : -in);
+ 120:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #endif
+ 121:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 122:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     in = *pSrc++;
+ 123:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #if defined (ARM_MATH_DSP)
+ 124:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     *pDst++ = (in > 0) ? in : (q15_t)__QSUB16(0, in);
+ 125:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #else
+ 126:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     *pDst++ = (in > 0) ? in : ((in == (q15_t) 0x8000) ? 0x7fff : -in);
+ 127:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #endif
+ 128:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 129:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     in = *pSrc++;
+ 130:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #if defined (ARM_MATH_DSP)
+ 131:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     *pDst++ = (in > 0) ? in : (q15_t)__QSUB16(0, in);
+ 132:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #else
+ 133:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     *pDst++ = (in > 0) ? in : ((in == (q15_t) 0x8000) ? 0x7fff : -in);
+ 134:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #endif
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 4
+
+
+ 135:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 136:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     in = *pSrc++;
+ 137:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #if defined (ARM_MATH_DSP)
+ 138:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     *pDst++ = (in > 0) ? in : (q15_t)__QSUB16(0, in);
+ 139:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #else
+ 140:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     *pDst++ = (in > 0) ? in : ((in == (q15_t) 0x8000) ? 0x7fff : -in);
+ 141:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #endif
+ 142:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 143:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     /* Decrement loop counter */
+ 144:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     blkCnt--;
+ 145:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   }
+ 146:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 147:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   /* Loop unrolling: Compute remaining outputs */
+ 148:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   blkCnt = blockSize % 0x4U;
+ 149:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 150:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #else
+ 151:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 152:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   /* Initialize blkCnt with number of samples */
+ 153:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   blkCnt = blockSize;
+ 154:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 155:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #endif /* #if defined (ARM_MATH_LOOPUNROLL) */
+ 156:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 157:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   while (blkCnt > 0U)
+  38              		.loc 1 157 0
+  39 0002 11E0     		b	.L2
+  40              	.LVL2:
+  41              	.L5:
+ 158:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   {
+ 159:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     /* C = |A| */
+ 160:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 161:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     /* Calculate absolute of input (if -1 then saturated to 0x7fff) and store result in destination
+ 162:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     in = *pSrc++;
+  42              		.loc 1 162 0
+  43 0004 841C     		adds	r4, r0, #2
+  44              	.LVL3:
+  45 0006 0388     		ldrh	r3, [r0]
+  46              	.LVL4:
+ 163:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #if defined (ARM_MATH_DSP)
+ 164:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     *pDst++ = (in > 0) ? in : (q15_t)__QSUB16(0, in);
+ 165:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #else
+ 166:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     *pDst++ = (in > 0) ? in : ((in == (q15_t) 0x8000) ? 0x7fff : -in);
+  47              		.loc 1 166 0
+  48 0008 881C     		adds	r0, r1, #2
+  49              	.LVL5:
+  50 000a 1DB2     		sxth	r5, r3
+  51 000c 002D     		cmp	r5, #0
+  52 000e 07DC     		bgt	.L3
+  53              		.loc 1 166 0 is_stmt 0 discriminator 1
+  54 0010 15F5004F 		cmn	r5, #32768
+  55 0014 02D0     		beq	.L7
+  56              		.loc 1 166 0 discriminator 3
+  57 0016 5B42     		negs	r3, r3
+  58              	.LVL6:
+  59 0018 9BB2     		uxth	r3, r3
+  60 001a 01E0     		b	.L3
+  61              	.LVL7:
+  62              	.L7:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 5
+
+
+  63              		.loc 1 166 0
+  64 001c 47F6FF73 		movw	r3, #32767
+  65              	.LVL8:
+  66              	.L3:
+  67              		.loc 1 166 0 discriminator 8
+  68 0020 0B80     		strh	r3, [r1]	@ movhi
+ 167:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #endif
+ 168:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 169:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     /* Decrement loop counter */
+ 170:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****     blkCnt--;
+  69              		.loc 1 170 0 is_stmt 1 discriminator 8
+  70 0022 013A     		subs	r2, r2, #1
+  71              	.LVL9:
+ 166:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #endif
+  72              		.loc 1 166 0 discriminator 8
+  73 0024 0146     		mov	r1, r0
+ 162:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** #if defined (ARM_MATH_DSP)
+  74              		.loc 1 162 0 discriminator 8
+  75 0026 2046     		mov	r0, r4
+  76              	.LVL10:
+  77              	.L2:
+ 157:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   {
+  78              		.loc 1 157 0
+  79 0028 002A     		cmp	r2, #0
+  80 002a EBD1     		bne	.L5
+ 171:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c ****   }
+ 172:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** 
+ 173:.\DSP\Source\BasicMathFunctions/arm_abs_q15.c **** }
+  81              		.loc 1 173 0
+  82 002c 30BC     		pop	{r4, r5}
+  83              		.cfi_restore 5
+  84              		.cfi_restore 4
+  85              		.cfi_def_cfa_offset 0
+  86 002e 7047     		bx	lr
+  87              		.cfi_endproc
+  88              	.LFE83:
+  89              		.size	arm_abs_q15, .-arm_abs_q15
+  90              		.text
+  91              	.Letext0:
+  92              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+  93              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+  94              		.file 4 ".\\DSP\\Include/arm_math_types.h"
+  95              		.file 5 ".\\Core\\Include/cmsis_gcc.h"
+  96              		.section	.debug_info,"",%progbits
+  97              	.Ldebug_info0:
+  98 0000 D9010000 		.4byte	0x1d9
+  99 0004 0400     		.2byte	0x4
+ 100 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 101 000a 04       		.byte	0x4
+ 102 000b 01       		.uleb128 0x1
+ 103 000c 95010000 		.4byte	.LASF31
+ 104 0010 01       		.byte	0x1
+ 105 0011 2C000000 		.4byte	.LASF32
+ 106 0015 30010000 		.4byte	.LASF33
+ 107 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 108 001d 00000000 		.4byte	0
+ 109 0021 00000000 		.4byte	.Ldebug_line0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 6
+
+
+ 110 0025 02       		.uleb128 0x2
+ 111 0026 01       		.byte	0x1
+ 112 0027 06       		.byte	0x6
+ 113 0028 61020000 		.4byte	.LASF0
+ 114 002c 02       		.uleb128 0x2
+ 115 002d 01       		.byte	0x1
+ 116 002e 08       		.byte	0x8
+ 117 002f 7A000000 		.4byte	.LASF1
+ 118 0033 03       		.uleb128 0x3
+ 119 0034 22000000 		.4byte	.LASF5
+ 120 0038 02       		.byte	0x2
+ 121 0039 29       		.byte	0x29
+ 122 003a 3E000000 		.4byte	0x3e
+ 123 003e 02       		.uleb128 0x2
+ 124 003f 02       		.byte	0x2
+ 125 0040 05       		.byte	0x5
+ 126 0041 8B010000 		.4byte	.LASF2
+ 127 0045 02       		.uleb128 0x2
+ 128 0046 02       		.byte	0x2
+ 129 0047 07       		.byte	0x7
+ 130 0048 B4000000 		.4byte	.LASF3
+ 131 004c 02       		.uleb128 0x2
+ 132 004d 04       		.byte	0x4
+ 133 004e 05       		.byte	0x5
+ 134 004f 37020000 		.4byte	.LASF4
+ 135 0053 03       		.uleb128 0x3
+ 136 0054 D3000000 		.4byte	.LASF6
+ 137 0058 02       		.byte	0x2
+ 138 0059 41       		.byte	0x41
+ 139 005a 5E000000 		.4byte	0x5e
+ 140 005e 02       		.uleb128 0x2
+ 141 005f 04       		.byte	0x4
+ 142 0060 07       		.byte	0x7
+ 143 0061 A2000000 		.4byte	.LASF7
+ 144 0065 02       		.uleb128 0x2
+ 145 0066 08       		.byte	0x8
+ 146 0067 05       		.byte	0x5
+ 147 0068 13010000 		.4byte	.LASF8
+ 148 006c 02       		.uleb128 0x2
+ 149 006d 08       		.byte	0x8
+ 150 006e 07       		.byte	0x7
+ 151 006f EB000000 		.4byte	.LASF9
+ 152 0073 04       		.uleb128 0x4
+ 153 0074 04       		.byte	0x4
+ 154 0075 05       		.byte	0x5
+ 155 0076 696E7400 		.ascii	"int\000"
+ 156 007a 02       		.uleb128 0x2
+ 157 007b 04       		.byte	0x4
+ 158 007c 07       		.byte	0x7
+ 159 007d DE000000 		.4byte	.LASF10
+ 160 0081 03       		.uleb128 0x3
+ 161 0082 02010000 		.4byte	.LASF11
+ 162 0086 03       		.byte	0x3
+ 163 0087 20       		.byte	0x20
+ 164 0088 33000000 		.4byte	0x33
+ 165 008c 03       		.uleb128 0x3
+ 166 008d 2E020000 		.4byte	.LASF12
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 7
+
+
+ 167 0091 03       		.byte	0x3
+ 168 0092 2D       		.byte	0x2d
+ 169 0093 53000000 		.4byte	0x53
+ 170 0097 02       		.uleb128 0x2
+ 171 0098 04       		.byte	0x4
+ 172 0099 07       		.byte	0x7
+ 173 009a 0A010000 		.4byte	.LASF13
+ 174 009e 02       		.uleb128 0x2
+ 175 009f 01       		.byte	0x1
+ 176 00a0 08       		.byte	0x8
+ 177 00a1 2B010000 		.4byte	.LASF14
+ 178 00a5 02       		.uleb128 0x2
+ 179 00a6 08       		.byte	0x8
+ 180 00a7 04       		.byte	0x4
+ 181 00a8 CC000000 		.4byte	.LASF15
+ 182 00ac 02       		.uleb128 0x2
+ 183 00ad 04       		.byte	0x4
+ 184 00ae 04       		.byte	0x4
+ 185 00af 6F000000 		.4byte	.LASF16
+ 186 00b3 02       		.uleb128 0x2
+ 187 00b4 08       		.byte	0x8
+ 188 00b5 04       		.byte	0x4
+ 189 00b6 40020000 		.4byte	.LASF17
+ 190 00ba 05       		.uleb128 0x5
+ 191 00bb 69000000 		.4byte	.LASF18
+ 192 00bf 04       		.byte	0x4
+ 193 00c0 1F01     		.2byte	0x11f
+ 194 00c2 81000000 		.4byte	0x81
+ 195 00c6 06       		.uleb128 0x6
+ 196 00c7 72020000 		.4byte	.LASF34
+ 197 00cb 01       		.byte	0x1
+ 198 00cc 61       		.byte	0x61
+ 199 00cd 00000000 		.4byte	.LFB83
+ 200 00d1 30000000 		.4byte	.LFE83-.LFB83
+ 201 00d5 01       		.uleb128 0x1
+ 202 00d6 9C       		.byte	0x9c
+ 203 00d7 24010000 		.4byte	0x124
+ 204 00db 07       		.uleb128 0x7
+ 205 00dc 6D020000 		.4byte	.LASF19
+ 206 00e0 01       		.byte	0x1
+ 207 00e1 62       		.byte	0x62
+ 208 00e2 24010000 		.4byte	0x124
+ 209 00e6 00000000 		.4byte	.LLST0
+ 210 00ea 07       		.uleb128 0x7
+ 211 00eb C7000000 		.4byte	.LASF20
+ 212 00ef 01       		.byte	0x1
+ 213 00f0 63       		.byte	0x63
+ 214 00f1 2F010000 		.4byte	0x12f
+ 215 00f5 29000000 		.4byte	.LLST1
+ 216 00f9 07       		.uleb128 0x7
+ 217 00fa 21010000 		.4byte	.LASF21
+ 218 00fe 01       		.byte	0x1
+ 219 00ff 64       		.byte	0x64
+ 220 0100 8C000000 		.4byte	0x8c
+ 221 0104 52000000 		.4byte	.LLST2
+ 222 0108 08       		.uleb128 0x8
+ 223 0109 88000000 		.4byte	.LASF22
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 8
+
+
+ 224 010d 01       		.byte	0x1
+ 225 010e 66       		.byte	0x66
+ 226 010f 8C000000 		.4byte	0x8c
+ 227 0113 01       		.uleb128 0x1
+ 228 0114 52       		.byte	0x52
+ 229 0115 09       		.uleb128 0x9
+ 230 0116 696E00   		.ascii	"in\000"
+ 231 0119 01       		.byte	0x1
+ 232 011a 67       		.byte	0x67
+ 233 011b BA000000 		.4byte	0xba
+ 234 011f 73000000 		.4byte	.LLST3
+ 235 0123 00       		.byte	0
+ 236 0124 0A       		.uleb128 0xa
+ 237 0125 04       		.byte	0x4
+ 238 0126 2A010000 		.4byte	0x12a
+ 239 012a 0B       		.uleb128 0xb
+ 240 012b BA000000 		.4byte	0xba
+ 241 012f 0A       		.uleb128 0xa
+ 242 0130 04       		.byte	0x4
+ 243 0131 BA000000 		.4byte	0xba
+ 244 0135 03       		.uleb128 0x3
+ 245 0136 13000000 		.4byte	.LASF23
+ 246 013a 05       		.byte	0x5
+ 247 013b 8B       		.byte	0x8b
+ 248 013c B3010000 		.4byte	0x1b3
+ 249 0140 0A       		.uleb128 0xa
+ 250 0141 04       		.byte	0x4
+ 251 0142 46010000 		.4byte	0x146
+ 252 0146 0B       		.uleb128 0xb
+ 253 0147 8C000000 		.4byte	0x8c
+ 254 014b 0A       		.uleb128 0xa
+ 255 014c 04       		.byte	0x4
+ 256 014d 8C000000 		.4byte	0x8c
+ 257 0151 0C       		.uleb128 0xc
+ 258 0152 7E020000 		.4byte	.LASF24
+ 259 0156 05       		.byte	0x5
+ 260 0157 92       		.byte	0x92
+ 261 0158 5C010000 		.4byte	0x15c
+ 262 015c 0B       		.uleb128 0xb
+ 263 015d 35010000 		.4byte	0x135
+ 264 0161 0C       		.uleb128 0xc
+ 265 0162 8F000000 		.4byte	.LASF25
+ 266 0166 05       		.byte	0x5
+ 267 0167 93       		.byte	0x93
+ 268 0168 5C010000 		.4byte	0x15c
+ 269 016c 03       		.uleb128 0x3
+ 270 016d 5A000000 		.4byte	.LASF26
+ 271 0171 05       		.byte	0x5
+ 272 0172 90       		.byte	0x90
+ 273 0173 92010000 		.4byte	0x192
+ 274 0177 0C       		.uleb128 0xc
+ 275 0178 4C020000 		.4byte	.LASF27
+ 276 017c 05       		.byte	0x5
+ 277 017d 94       		.byte	0x94
+ 278 017e 82010000 		.4byte	0x182
+ 279 0182 0B       		.uleb128 0xb
+ 280 0183 6C010000 		.4byte	0x16c
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 9
+
+
+ 281 0187 0C       		.uleb128 0xc
+ 282 0188 00000000 		.4byte	.LASF28
+ 283 018c 05       		.byte	0x5
+ 284 018d 95       		.byte	0x95
+ 285 018e 82010000 		.4byte	0x182
+ 286 0192 0D       		.uleb128 0xd
+ 287 0193 08       		.byte	0x8
+ 288 0194 05       		.byte	0x5
+ 289 0195 8D       		.byte	0x8d
+ 290 0196 B3010000 		.4byte	0x1b3
+ 291 019a 0E       		.uleb128 0xe
+ 292 019b 75000000 		.4byte	.LASF29
+ 293 019f 05       		.byte	0x5
+ 294 01a0 8E       		.byte	0x8e
+ 295 01a1 4B010000 		.4byte	0x14b
+ 296 01a5 00       		.byte	0
+ 297 01a6 0E       		.uleb128 0xe
+ 298 01a7 86010000 		.4byte	.LASF30
+ 299 01ab 05       		.byte	0x5
+ 300 01ac 8F       		.byte	0x8f
+ 301 01ad 8C000000 		.4byte	0x8c
+ 302 01b1 04       		.byte	0x4
+ 303 01b2 00       		.byte	0
+ 304 01b3 0F       		.uleb128 0xf
+ 305 01b4 0C       		.byte	0xc
+ 306 01b5 05       		.byte	0x5
+ 307 01b6 87       		.byte	0x87
+ 308 01b7 10       		.uleb128 0x10
+ 309 01b8 73726300 		.ascii	"src\000"
+ 310 01bc 05       		.byte	0x5
+ 311 01bd 88       		.byte	0x88
+ 312 01be 40010000 		.4byte	0x140
+ 313 01c2 00       		.byte	0
+ 314 01c3 0E       		.uleb128 0xe
+ 315 01c4 75000000 		.4byte	.LASF29
+ 316 01c8 05       		.byte	0x5
+ 317 01c9 89       		.byte	0x89
+ 318 01ca 4B010000 		.4byte	0x14b
+ 319 01ce 04       		.byte	0x4
+ 320 01cf 0E       		.uleb128 0xe
+ 321 01d0 86010000 		.4byte	.LASF30
+ 322 01d4 05       		.byte	0x5
+ 323 01d5 8A       		.byte	0x8a
+ 324 01d6 8C000000 		.4byte	0x8c
+ 325 01da 08       		.byte	0x8
+ 326 01db 00       		.byte	0
+ 327 01dc 00       		.byte	0
+ 328              		.section	.debug_abbrev,"",%progbits
+ 329              	.Ldebug_abbrev0:
+ 330 0000 01       		.uleb128 0x1
+ 331 0001 11       		.uleb128 0x11
+ 332 0002 01       		.byte	0x1
+ 333 0003 25       		.uleb128 0x25
+ 334 0004 0E       		.uleb128 0xe
+ 335 0005 13       		.uleb128 0x13
+ 336 0006 0B       		.uleb128 0xb
+ 337 0007 03       		.uleb128 0x3
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 10
+
+
+ 338 0008 0E       		.uleb128 0xe
+ 339 0009 1B       		.uleb128 0x1b
+ 340 000a 0E       		.uleb128 0xe
+ 341 000b 55       		.uleb128 0x55
+ 342 000c 17       		.uleb128 0x17
+ 343 000d 11       		.uleb128 0x11
+ 344 000e 01       		.uleb128 0x1
+ 345 000f 10       		.uleb128 0x10
+ 346 0010 17       		.uleb128 0x17
+ 347 0011 00       		.byte	0
+ 348 0012 00       		.byte	0
+ 349 0013 02       		.uleb128 0x2
+ 350 0014 24       		.uleb128 0x24
+ 351 0015 00       		.byte	0
+ 352 0016 0B       		.uleb128 0xb
+ 353 0017 0B       		.uleb128 0xb
+ 354 0018 3E       		.uleb128 0x3e
+ 355 0019 0B       		.uleb128 0xb
+ 356 001a 03       		.uleb128 0x3
+ 357 001b 0E       		.uleb128 0xe
+ 358 001c 00       		.byte	0
+ 359 001d 00       		.byte	0
+ 360 001e 03       		.uleb128 0x3
+ 361 001f 16       		.uleb128 0x16
+ 362 0020 00       		.byte	0
+ 363 0021 03       		.uleb128 0x3
+ 364 0022 0E       		.uleb128 0xe
+ 365 0023 3A       		.uleb128 0x3a
+ 366 0024 0B       		.uleb128 0xb
+ 367 0025 3B       		.uleb128 0x3b
+ 368 0026 0B       		.uleb128 0xb
+ 369 0027 49       		.uleb128 0x49
+ 370 0028 13       		.uleb128 0x13
+ 371 0029 00       		.byte	0
+ 372 002a 00       		.byte	0
+ 373 002b 04       		.uleb128 0x4
+ 374 002c 24       		.uleb128 0x24
+ 375 002d 00       		.byte	0
+ 376 002e 0B       		.uleb128 0xb
+ 377 002f 0B       		.uleb128 0xb
+ 378 0030 3E       		.uleb128 0x3e
+ 379 0031 0B       		.uleb128 0xb
+ 380 0032 03       		.uleb128 0x3
+ 381 0033 08       		.uleb128 0x8
+ 382 0034 00       		.byte	0
+ 383 0035 00       		.byte	0
+ 384 0036 05       		.uleb128 0x5
+ 385 0037 16       		.uleb128 0x16
+ 386 0038 00       		.byte	0
+ 387 0039 03       		.uleb128 0x3
+ 388 003a 0E       		.uleb128 0xe
+ 389 003b 3A       		.uleb128 0x3a
+ 390 003c 0B       		.uleb128 0xb
+ 391 003d 3B       		.uleb128 0x3b
+ 392 003e 05       		.uleb128 0x5
+ 393 003f 49       		.uleb128 0x49
+ 394 0040 13       		.uleb128 0x13
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 11
+
+
+ 395 0041 00       		.byte	0
+ 396 0042 00       		.byte	0
+ 397 0043 06       		.uleb128 0x6
+ 398 0044 2E       		.uleb128 0x2e
+ 399 0045 01       		.byte	0x1
+ 400 0046 3F       		.uleb128 0x3f
+ 401 0047 19       		.uleb128 0x19
+ 402 0048 03       		.uleb128 0x3
+ 403 0049 0E       		.uleb128 0xe
+ 404 004a 3A       		.uleb128 0x3a
+ 405 004b 0B       		.uleb128 0xb
+ 406 004c 3B       		.uleb128 0x3b
+ 407 004d 0B       		.uleb128 0xb
+ 408 004e 27       		.uleb128 0x27
+ 409 004f 19       		.uleb128 0x19
+ 410 0050 11       		.uleb128 0x11
+ 411 0051 01       		.uleb128 0x1
+ 412 0052 12       		.uleb128 0x12
+ 413 0053 06       		.uleb128 0x6
+ 414 0054 40       		.uleb128 0x40
+ 415 0055 18       		.uleb128 0x18
+ 416 0056 9742     		.uleb128 0x2117
+ 417 0058 19       		.uleb128 0x19
+ 418 0059 01       		.uleb128 0x1
+ 419 005a 13       		.uleb128 0x13
+ 420 005b 00       		.byte	0
+ 421 005c 00       		.byte	0
+ 422 005d 07       		.uleb128 0x7
+ 423 005e 05       		.uleb128 0x5
+ 424 005f 00       		.byte	0
+ 425 0060 03       		.uleb128 0x3
+ 426 0061 0E       		.uleb128 0xe
+ 427 0062 3A       		.uleb128 0x3a
+ 428 0063 0B       		.uleb128 0xb
+ 429 0064 3B       		.uleb128 0x3b
+ 430 0065 0B       		.uleb128 0xb
+ 431 0066 49       		.uleb128 0x49
+ 432 0067 13       		.uleb128 0x13
+ 433 0068 02       		.uleb128 0x2
+ 434 0069 17       		.uleb128 0x17
+ 435 006a 00       		.byte	0
+ 436 006b 00       		.byte	0
+ 437 006c 08       		.uleb128 0x8
+ 438 006d 34       		.uleb128 0x34
+ 439 006e 00       		.byte	0
+ 440 006f 03       		.uleb128 0x3
+ 441 0070 0E       		.uleb128 0xe
+ 442 0071 3A       		.uleb128 0x3a
+ 443 0072 0B       		.uleb128 0xb
+ 444 0073 3B       		.uleb128 0x3b
+ 445 0074 0B       		.uleb128 0xb
+ 446 0075 49       		.uleb128 0x49
+ 447 0076 13       		.uleb128 0x13
+ 448 0077 02       		.uleb128 0x2
+ 449 0078 18       		.uleb128 0x18
+ 450 0079 00       		.byte	0
+ 451 007a 00       		.byte	0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 12
+
+
+ 452 007b 09       		.uleb128 0x9
+ 453 007c 34       		.uleb128 0x34
+ 454 007d 00       		.byte	0
+ 455 007e 03       		.uleb128 0x3
+ 456 007f 08       		.uleb128 0x8
+ 457 0080 3A       		.uleb128 0x3a
+ 458 0081 0B       		.uleb128 0xb
+ 459 0082 3B       		.uleb128 0x3b
+ 460 0083 0B       		.uleb128 0xb
+ 461 0084 49       		.uleb128 0x49
+ 462 0085 13       		.uleb128 0x13
+ 463 0086 02       		.uleb128 0x2
+ 464 0087 17       		.uleb128 0x17
+ 465 0088 00       		.byte	0
+ 466 0089 00       		.byte	0
+ 467 008a 0A       		.uleb128 0xa
+ 468 008b 0F       		.uleb128 0xf
+ 469 008c 00       		.byte	0
+ 470 008d 0B       		.uleb128 0xb
+ 471 008e 0B       		.uleb128 0xb
+ 472 008f 49       		.uleb128 0x49
+ 473 0090 13       		.uleb128 0x13
+ 474 0091 00       		.byte	0
+ 475 0092 00       		.byte	0
+ 476 0093 0B       		.uleb128 0xb
+ 477 0094 26       		.uleb128 0x26
+ 478 0095 00       		.byte	0
+ 479 0096 49       		.uleb128 0x49
+ 480 0097 13       		.uleb128 0x13
+ 481 0098 00       		.byte	0
+ 482 0099 00       		.byte	0
+ 483 009a 0C       		.uleb128 0xc
+ 484 009b 34       		.uleb128 0x34
+ 485 009c 00       		.byte	0
+ 486 009d 03       		.uleb128 0x3
+ 487 009e 0E       		.uleb128 0xe
+ 488 009f 3A       		.uleb128 0x3a
+ 489 00a0 0B       		.uleb128 0xb
+ 490 00a1 3B       		.uleb128 0x3b
+ 491 00a2 0B       		.uleb128 0xb
+ 492 00a3 49       		.uleb128 0x49
+ 493 00a4 13       		.uleb128 0x13
+ 494 00a5 3F       		.uleb128 0x3f
+ 495 00a6 19       		.uleb128 0x19
+ 496 00a7 3C       		.uleb128 0x3c
+ 497 00a8 19       		.uleb128 0x19
+ 498 00a9 00       		.byte	0
+ 499 00aa 00       		.byte	0
+ 500 00ab 0D       		.uleb128 0xd
+ 501 00ac 13       		.uleb128 0x13
+ 502 00ad 01       		.byte	0x1
+ 503 00ae 0B       		.uleb128 0xb
+ 504 00af 0B       		.uleb128 0xb
+ 505 00b0 3A       		.uleb128 0x3a
+ 506 00b1 0B       		.uleb128 0xb
+ 507 00b2 3B       		.uleb128 0x3b
+ 508 00b3 0B       		.uleb128 0xb
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 13
+
+
+ 509 00b4 01       		.uleb128 0x1
+ 510 00b5 13       		.uleb128 0x13
+ 511 00b6 00       		.byte	0
+ 512 00b7 00       		.byte	0
+ 513 00b8 0E       		.uleb128 0xe
+ 514 00b9 0D       		.uleb128 0xd
+ 515 00ba 00       		.byte	0
+ 516 00bb 03       		.uleb128 0x3
+ 517 00bc 0E       		.uleb128 0xe
+ 518 00bd 3A       		.uleb128 0x3a
+ 519 00be 0B       		.uleb128 0xb
+ 520 00bf 3B       		.uleb128 0x3b
+ 521 00c0 0B       		.uleb128 0xb
+ 522 00c1 49       		.uleb128 0x49
+ 523 00c2 13       		.uleb128 0x13
+ 524 00c3 38       		.uleb128 0x38
+ 525 00c4 0B       		.uleb128 0xb
+ 526 00c5 00       		.byte	0
+ 527 00c6 00       		.byte	0
+ 528 00c7 0F       		.uleb128 0xf
+ 529 00c8 13       		.uleb128 0x13
+ 530 00c9 01       		.byte	0x1
+ 531 00ca 0B       		.uleb128 0xb
+ 532 00cb 0B       		.uleb128 0xb
+ 533 00cc 3A       		.uleb128 0x3a
+ 534 00cd 0B       		.uleb128 0xb
+ 535 00ce 3B       		.uleb128 0x3b
+ 536 00cf 0B       		.uleb128 0xb
+ 537 00d0 00       		.byte	0
+ 538 00d1 00       		.byte	0
+ 539 00d2 10       		.uleb128 0x10
+ 540 00d3 0D       		.uleb128 0xd
+ 541 00d4 00       		.byte	0
+ 542 00d5 03       		.uleb128 0x3
+ 543 00d6 08       		.uleb128 0x8
+ 544 00d7 3A       		.uleb128 0x3a
+ 545 00d8 0B       		.uleb128 0xb
+ 546 00d9 3B       		.uleb128 0x3b
+ 547 00da 0B       		.uleb128 0xb
+ 548 00db 49       		.uleb128 0x49
+ 549 00dc 13       		.uleb128 0x13
+ 550 00dd 38       		.uleb128 0x38
+ 551 00de 0B       		.uleb128 0xb
+ 552 00df 00       		.byte	0
+ 553 00e0 00       		.byte	0
+ 554 00e1 00       		.byte	0
+ 555              		.section	.debug_loc,"",%progbits
+ 556              	.Ldebug_loc0:
+ 557              	.LLST0:
+ 558 0000 00000000 		.4byte	.LVL0
+ 559 0004 06000000 		.4byte	.LVL3
+ 560 0008 0100     		.2byte	0x1
+ 561 000a 50       		.byte	0x50
+ 562 000b 06000000 		.4byte	.LVL3
+ 563 000f 28000000 		.4byte	.LVL10
+ 564 0013 0100     		.2byte	0x1
+ 565 0015 54       		.byte	0x54
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 14
+
+
+ 566 0016 28000000 		.4byte	.LVL10
+ 567 001a 30000000 		.4byte	.LFE83
+ 568 001e 0100     		.2byte	0x1
+ 569 0020 50       		.byte	0x50
+ 570 0021 00000000 		.4byte	0
+ 571 0025 00000000 		.4byte	0
+ 572              	.LLST1:
+ 573 0029 00000000 		.4byte	.LVL0
+ 574 002d 0A000000 		.4byte	.LVL5
+ 575 0031 0100     		.2byte	0x1
+ 576 0033 51       		.byte	0x51
+ 577 0034 0A000000 		.4byte	.LVL5
+ 578 0038 28000000 		.4byte	.LVL10
+ 579 003c 0100     		.2byte	0x1
+ 580 003e 50       		.byte	0x50
+ 581 003f 28000000 		.4byte	.LVL10
+ 582 0043 30000000 		.4byte	.LFE83
+ 583 0047 0100     		.2byte	0x1
+ 584 0049 51       		.byte	0x51
+ 585 004a 00000000 		.4byte	0
+ 586 004e 00000000 		.4byte	0
+ 587              	.LLST2:
+ 588 0052 00000000 		.4byte	.LVL0
+ 589 0056 04000000 		.4byte	.LVL2
+ 590 005a 0100     		.2byte	0x1
+ 591 005c 52       		.byte	0x52
+ 592 005d 04000000 		.4byte	.LVL2
+ 593 0061 30000000 		.4byte	.LFE83
+ 594 0065 0400     		.2byte	0x4
+ 595 0067 F3       		.byte	0xf3
+ 596 0068 01       		.uleb128 0x1
+ 597 0069 52       		.byte	0x52
+ 598 006a 9F       		.byte	0x9f
+ 599 006b 00000000 		.4byte	0
+ 600 006f 00000000 		.4byte	0
+ 601              	.LLST3:
+ 602 0073 08000000 		.4byte	.LVL4
+ 603 0077 18000000 		.4byte	.LVL6
+ 604 007b 0100     		.2byte	0x1
+ 605 007d 53       		.byte	0x53
+ 606 007e 18000000 		.4byte	.LVL6
+ 607 0082 1C000000 		.4byte	.LVL7
+ 608 0086 0100     		.2byte	0x1
+ 609 0088 55       		.byte	0x55
+ 610 0089 1C000000 		.4byte	.LVL7
+ 611 008d 20000000 		.4byte	.LVL8
+ 612 0091 0100     		.2byte	0x1
+ 613 0093 53       		.byte	0x53
+ 614 0094 20000000 		.4byte	.LVL8
+ 615 0098 28000000 		.4byte	.LVL10
+ 616 009c 0100     		.2byte	0x1
+ 617 009e 55       		.byte	0x55
+ 618 009f 00000000 		.4byte	0
+ 619 00a3 00000000 		.4byte	0
+ 620              		.section	.debug_aranges,"",%progbits
+ 621 0000 1C000000 		.4byte	0x1c
+ 622 0004 0200     		.2byte	0x2
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 15
+
+
+ 623 0006 00000000 		.4byte	.Ldebug_info0
+ 624 000a 04       		.byte	0x4
+ 625 000b 00       		.byte	0
+ 626 000c 0000     		.2byte	0
+ 627 000e 0000     		.2byte	0
+ 628 0010 00000000 		.4byte	.LFB83
+ 629 0014 30000000 		.4byte	.LFE83-.LFB83
+ 630 0018 00000000 		.4byte	0
+ 631 001c 00000000 		.4byte	0
+ 632              		.section	.debug_ranges,"",%progbits
+ 633              	.Ldebug_ranges0:
+ 634 0000 00000000 		.4byte	.LFB83
+ 635 0004 30000000 		.4byte	.LFE83
+ 636 0008 00000000 		.4byte	0
+ 637 000c 00000000 		.4byte	0
+ 638              		.section	.debug_line,"",%progbits
+ 639              	.Ldebug_line0:
+ 640 0000 BC010000 		.section	.debug_str,"MS",%progbits,1
+ 640      02007C01 
+ 640      00000201 
+ 640      FB0E0D00 
+ 640      01010101 
+ 641              	.LASF28:
+ 642 0000 5F5F7A65 		.ascii	"__zero_table_end__\000"
+ 642      726F5F74 
+ 642      61626C65 
+ 642      5F656E64 
+ 642      5F5F00
+ 643              	.LASF23:
+ 644 0013 5F5F636F 		.ascii	"__copy_table_t\000"
+ 644      70795F74 
+ 644      61626C65 
+ 644      5F7400
+ 645              	.LASF5:
+ 646 0022 5F5F696E 		.ascii	"__int16_t\000"
+ 646      7431365F 
+ 646      7400
+ 647              	.LASF32:
+ 648 002c 2E5C4453 		.ascii	".\\DSP\\Source\\BasicMathFunctions\\arm_abs_q15.c\000"
+ 648      505C536F 
+ 648      75726365 
+ 648      5C426173 
+ 648      69634D61 
+ 649              	.LASF26:
+ 650 005a 5F5F7A65 		.ascii	"__zero_table_t\000"
+ 650      726F5F74 
+ 650      61626C65 
+ 650      5F7400
+ 651              	.LASF18:
+ 652 0069 7131355F 		.ascii	"q15_t\000"
+ 652      7400
+ 653              	.LASF16:
+ 654 006f 666C6F61 		.ascii	"float\000"
+ 654      7400
+ 655              	.LASF29:
+ 656 0075 64657374 		.ascii	"dest\000"
+ 656      00
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 16
+
+
+ 657              	.LASF1:
+ 658 007a 756E7369 		.ascii	"unsigned char\000"
+ 658      676E6564 
+ 658      20636861 
+ 658      7200
+ 659              	.LASF22:
+ 660 0088 626C6B43 		.ascii	"blkCnt\000"
+ 660      6E7400
+ 661              	.LASF25:
+ 662 008f 5F5F636F 		.ascii	"__copy_table_end__\000"
+ 662      70795F74 
+ 662      61626C65 
+ 662      5F656E64 
+ 662      5F5F00
+ 663              	.LASF7:
+ 664 00a2 6C6F6E67 		.ascii	"long unsigned int\000"
+ 664      20756E73 
+ 664      69676E65 
+ 664      6420696E 
+ 664      7400
+ 665              	.LASF3:
+ 666 00b4 73686F72 		.ascii	"short unsigned int\000"
+ 666      7420756E 
+ 666      7369676E 
+ 666      65642069 
+ 666      6E7400
+ 667              	.LASF20:
+ 668 00c7 70447374 		.ascii	"pDst\000"
+ 668      00
+ 669              	.LASF15:
+ 670 00cc 646F7562 		.ascii	"double\000"
+ 670      6C6500
+ 671              	.LASF6:
+ 672 00d3 5F5F7569 		.ascii	"__uint32_t\000"
+ 672      6E743332 
+ 672      5F7400
+ 673              	.LASF10:
+ 674 00de 756E7369 		.ascii	"unsigned int\000"
+ 674      676E6564 
+ 674      20696E74 
+ 674      00
+ 675              	.LASF9:
+ 676 00eb 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 676      206C6F6E 
+ 676      6720756E 
+ 676      7369676E 
+ 676      65642069 
+ 677              	.LASF11:
+ 678 0102 696E7431 		.ascii	"int16_t\000"
+ 678      365F7400 
+ 679              	.LASF13:
+ 680 010a 73697A65 		.ascii	"sizetype\000"
+ 680      74797065 
+ 680      00
+ 681              	.LASF8:
+ 682 0113 6C6F6E67 		.ascii	"long long int\000"
+ 682      206C6F6E 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 17
+
+
+ 682      6720696E 
+ 682      7400
+ 683              	.LASF21:
+ 684 0121 626C6F63 		.ascii	"blockSize\000"
+ 684      6B53697A 
+ 684      6500
+ 685              	.LASF14:
+ 686 012b 63686172 		.ascii	"char\000"
+ 686      00
+ 687              	.LASF33:
+ 688 0130 5C5C766D 		.ascii	"\\\\vmware-host\\Shared Folders\\Documents\\PSoC Cr"
+ 688      77617265 
+ 688      2D686F73 
+ 688      745C5368 
+ 688      61726564 
+ 689 015e 6561746F 		.ascii	"eator\\FinalProject\\SoundDetection.cydsn\000"
+ 689      725C4669 
+ 689      6E616C50 
+ 689      726F6A65 
+ 689      63745C53 
+ 690              	.LASF30:
+ 691 0186 776C656E 		.ascii	"wlen\000"
+ 691      00
+ 692              	.LASF2:
+ 693 018b 73686F72 		.ascii	"short int\000"
+ 693      7420696E 
+ 693      7400
+ 694              	.LASF31:
+ 695 0195 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 695      4320342E 
+ 695      392E3320 
+ 695      32303135 
+ 695      30333033 
+ 696 01c8 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 696      20726576 
+ 696      6973696F 
+ 696      6E203232 
+ 696      31323230 
+ 697 01fb 67202D73 		.ascii	"g -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 697      74643D67 
+ 697      6E753939 
+ 697      202D6666 
+ 697      756E6374 
+ 698              	.LASF12:
+ 699 022e 75696E74 		.ascii	"uint32_t\000"
+ 699      33325F74 
+ 699      00
+ 700              	.LASF4:
+ 701 0237 6C6F6E67 		.ascii	"long int\000"
+ 701      20696E74 
+ 701      00
+ 702              	.LASF17:
+ 703 0240 6C6F6E67 		.ascii	"long double\000"
+ 703      20646F75 
+ 703      626C6500 
+ 704              	.LASF27:
+ 705 024c 5F5F7A65 		.ascii	"__zero_table_start__\000"
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccuLdxEE.s 			page 18
+
+
+ 705      726F5F74 
+ 705      61626C65 
+ 705      5F737461 
+ 705      72745F5F 
+ 706              	.LASF0:
+ 707 0261 7369676E 		.ascii	"signed char\000"
+ 707      65642063 
+ 707      68617200 
+ 708              	.LASF19:
+ 709 026d 70537263 		.ascii	"pSrc\000"
+ 709      00
+ 710              	.LASF34:
+ 711 0272 61726D5F 		.ascii	"arm_abs_q15\000"
+ 711      6162735F 
+ 711      71313500 
+ 712              	.LASF24:
+ 713 027e 5F5F636F 		.ascii	"__copy_table_start__\000"
+ 713      70795F74 
+ 713      61626C65 
+ 713      5F737461 
+ 713      72745F5F 
+ 714              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

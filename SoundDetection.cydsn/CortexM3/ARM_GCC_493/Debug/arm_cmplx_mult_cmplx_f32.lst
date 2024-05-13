@@ -1,0 +1,1298 @@
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"arm_cmplx_mult_cmplx_f32.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.global	__aeabi_fmul
+  19              		.global	__aeabi_fsub
+  20              		.global	__aeabi_fadd
+  21              		.section	.text.arm_cmplx_mult_cmplx_f32,"ax",%progbits
+  22              		.align	2
+  23              		.global	arm_cmplx_mult_cmplx_f32
+  24              		.thumb
+  25              		.thumb_func
+  26              		.type	arm_cmplx_mult_cmplx_f32, %function
+  27              	arm_cmplx_mult_cmplx_f32:
+  28              	.LFB84:
+  29              		.file 1 ".\\DSP\\Source\\ComplexMathFunctions\\arm_cmplx_mult_cmplx_f32.c"
+   1:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** /* ----------------------------------------------------------------------
+   2:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * Project:      CMSIS DSP Library
+   3:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * Title:        arm_cmplx_mult_cmplx_f32.c
+   4:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * Description:  Floating-point complex-by-complex multiplication
+   5:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  *
+   6:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * $Date:        23 April 2021
+   7:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * $Revision:    V1.9.0
+   8:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  *
+   9:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * Target Processor: Cortex-M and Cortex-A cores
+  10:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * -------------------------------------------------------------------- */
+  11:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** /*
+  12:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * Copyright (C) 2010-2021 ARM Limited or its affiliates. All rights reserved.
+  13:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  *
+  14:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * SPDX-License-Identifier: Apache-2.0
+  15:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  *
+  16:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * Licensed under the Apache License, Version 2.0 (the License); you may
+  17:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * not use this file except in compliance with the License.
+  18:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * You may obtain a copy of the License at
+  19:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  *
+  20:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * www.apache.org/licenses/LICENSE-2.0
+  21:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  *
+  22:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * Unless required by applicable law or agreed to in writing, software
+  23:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+  24:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  25:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * See the License for the specific language governing permissions and
+  26:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  * limitations under the License.
+  27:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  */
+  28:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 2
+
+
+  29:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** #include "dsp/complex_math_functions.h"
+  30:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+  31:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** /**
+  32:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   @ingroup groupCmplxMath
+  33:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  */
+  34:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+  35:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** /**
+  36:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   @defgroup CmplxByCmplxMult Complex-by-Complex Multiplication
+  37:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+  38:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   Multiplies a complex vector by another complex vector and generates a complex result.
+  39:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   The data in the complex arrays is stored in an interleaved fashion
+  40:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   (real, imag, real, imag, ...).
+  41:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   The parameter <code>numSamples</code> represents the number of complex
+  42:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   samples processed.  The complex arrays have a total of <code>2*numSamples</code>
+  43:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   real values.
+  44:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+  45:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   The underlying algorithm is used:
+  46:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+  47:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   <pre>
+  48:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   for (n = 0; n < numSamples; n++) {
+  49:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****       pDst[(2*n)+0] = pSrcA[(2*n)+0] * pSrcB[(2*n)+0] - pSrcA[(2*n)+1] * pSrcB[(2*n)+1];
+  50:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****       pDst[(2*n)+1] = pSrcA[(2*n)+0] * pSrcB[(2*n)+1] + pSrcA[(2*n)+1] * pSrcB[(2*n)+0];
+  51:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   }
+  52:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   </pre>
+  53:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+  54:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   There are separate functions for floating-point, Q15, and Q31 data types.
+  55:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  */
+  56:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+  57:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** /**
+  58:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   @addtogroup CmplxByCmplxMult
+  59:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   @{
+  60:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  */
+  61:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+  62:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** /**
+  63:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   @brief         Floating-point complex-by-complex multiplication.
+  64:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   @param[in]     pSrcA       points to first input vector
+  65:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   @param[in]     pSrcB       points to second input vector
+  66:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   @param[out]    pDst        points to output vector
+  67:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   @param[in]     numSamples  number of samples in each vector
+  68:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   @return        none
+  69:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****  */
+  70:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+  71:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** #if defined(ARM_MATH_MVEF) && !defined(ARM_MATH_AUTOVECTORIZE)
+  72:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+  73:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** void arm_cmplx_mult_cmplx_f32(
+  74:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   const float32_t * pSrcA,
+  75:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   const float32_t * pSrcB,
+  76:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         float32_t * pDst,
+  77:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         uint32_t numSamples)
+  78:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** {
+  79:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****      int32_t         blkCnt;
+  80:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     f32x4_t         vecSrcA, vecSrcB;
+  81:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     f32x4_t         vecSrcC, vecSrcD;
+  82:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     f32x4_t         vec_acc;
+  83:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+  84:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     blkCnt = numSamples >> 2;
+  85:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     blkCnt -= 1;
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 3
+
+
+  86:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     if (blkCnt > 0) {
+  87:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         /* should give more freedom to generate stall free code */
+  88:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         vecSrcA = vld1q(pSrcA);
+  89:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         vecSrcB = vld1q(pSrcB);
+  90:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         pSrcA += 4;
+  91:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         pSrcB += 4;
+  92:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+  93:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         while (blkCnt > 0) {
+  94:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vec_acc = vcmulq(vecSrcA, vecSrcB);
+  95:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vecSrcC = vld1q(pSrcA);
+  96:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             pSrcA += 4;
+  97:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+  98:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vec_acc = vcmlaq_rot90(vec_acc, vecSrcA, vecSrcB);
+  99:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vecSrcD = vld1q(pSrcB);
+ 100:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             pSrcB += 4;
+ 101:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vst1q(pDst, vec_acc);
+ 102:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             pDst += 4;
+ 103:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 104:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vec_acc = vcmulq(vecSrcC, vecSrcD);
+ 105:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vecSrcA = vld1q(pSrcA);
+ 106:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             pSrcA += 4;
+ 107:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 108:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vec_acc = vcmlaq_rot90(vec_acc, vecSrcC, vecSrcD);
+ 109:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vecSrcB = vld1q(pSrcB);
+ 110:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             pSrcB += 4;
+ 111:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vst1q(pDst, vec_acc);
+ 112:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             pDst += 4;
+ 113:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             /*
+ 114:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****              * Decrement the blockSize loop counter
+ 115:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****              */
+ 116:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             blkCnt--;
+ 117:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         }
+ 118:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 119:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         /* process last elements out of the loop avoid the armclang breaking the SW pipeline */
+ 120:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         vec_acc = vcmulq(vecSrcA, vecSrcB);
+ 121:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         vecSrcC = vld1q(pSrcA);
+ 122:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 123:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         vec_acc = vcmlaq_rot90(vec_acc, vecSrcA, vecSrcB);
+ 124:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         vecSrcD = vld1q(pSrcB);
+ 125:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         vst1q(pDst, vec_acc);
+ 126:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         pDst += 4;
+ 127:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 128:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         vec_acc = vcmulq(vecSrcC, vecSrcD);
+ 129:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         vec_acc = vcmlaq_rot90(vec_acc, vecSrcC, vecSrcD);
+ 130:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         vst1q(pDst, vec_acc);
+ 131:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         pDst += 4;
+ 132:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 133:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         /*
+ 134:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****          * tail
+ 135:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****          */
+ 136:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         blkCnt = CMPLX_DIM * (numSamples & 3);
+ 137:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         while (blkCnt > 0) {
+ 138:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             mve_pred16_t    p = vctp32q(blkCnt);
+ 139:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             pSrcA += 4;
+ 140:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             pSrcB += 4;
+ 141:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 142:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vecSrcA = vldrwq_z_f32(pSrcA, p);
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 4
+
+
+ 143:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vecSrcB = vldrwq_z_f32(pSrcB, p);
+ 144:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vec_acc = vcmulq_m(vuninitializedq_f32(),vecSrcA, vecSrcB, p);
+ 145:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vec_acc = vcmlaq_rot90_m(vec_acc, vecSrcA, vecSrcB, p);
+ 146:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 147:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vstrwq_p_f32(pDst, vec_acc, p);
+ 148:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             pDst += 4;
+ 149:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 150:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             blkCnt -= 4;
+ 151:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         }
+ 152:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     } else {
+ 153:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         /* small vector */
+ 154:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         blkCnt = numSamples * CMPLX_DIM;
+ 155:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         vec_acc = vdupq_n_f32(0.0f);
+ 156:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 157:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         do {
+ 158:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             mve_pred16_t    p = vctp32q(blkCnt);
+ 159:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 160:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vecSrcA = vldrwq_z_f32(pSrcA, p);
+ 161:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vecSrcB = vldrwq_z_f32(pSrcB, p);
+ 162:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 163:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vec_acc = vcmulq_m(vuninitializedq_f32(),vecSrcA, vecSrcB, p);
+ 164:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vec_acc = vcmlaq_rot90_m(vec_acc, vecSrcA, vecSrcB, p);
+ 165:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             vstrwq_p_f32(pDst, vec_acc, p);
+ 166:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             pDst += 4;
+ 167:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 168:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             /*
+ 169:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****              * Decrement the blkCnt loop counter
+ 170:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****              * Advance vector source and destination pointers
+ 171:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****              */
+ 172:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             pSrcA += 4;
+ 173:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             pSrcB += 4;
+ 174:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****             blkCnt -= 4;
+ 175:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         }
+ 176:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         while (blkCnt > 0);
+ 177:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     }
+ 178:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 179:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** }
+ 180:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 181:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** #else
+ 182:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** void arm_cmplx_mult_cmplx_f32(
+ 183:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   const float32_t * pSrcA,
+ 184:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   const float32_t * pSrcB,
+ 185:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         float32_t * pDst,
+ 186:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         uint32_t numSamples)
+ 187:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** {
+  30              		.loc 1 187 0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 8
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              	.LVL0:
+  35 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+  36              		.cfi_def_cfa_offset 36
+  37              		.cfi_offset 4, -36
+  38              		.cfi_offset 5, -32
+  39              		.cfi_offset 6, -28
+  40              		.cfi_offset 7, -24
+  41              		.cfi_offset 8, -20
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 5
+
+
+  42              		.cfi_offset 9, -16
+  43              		.cfi_offset 10, -12
+  44              		.cfi_offset 11, -8
+  45              		.cfi_offset 14, -4
+  46 0004 83B0     		sub	sp, sp, #12
+  47              		.cfi_def_cfa_offset 48
+  48 0006 9046     		mov	r8, r2
+  49 0008 1F46     		mov	r7, r3
+  50              	.LVL1:
+ 188:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     uint32_t blkCnt;                               /* Loop counter */
+ 189:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     float32_t a, b, c, d;  /* Temporary variables to store real and imaginary values */
+ 190:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 191:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** #if defined(ARM_MATH_NEON) && !defined(ARM_MATH_AUTOVECTORIZE)
+ 192:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     float32x4x2_t va, vb;
+ 193:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     float32x4x2_t outCplx;
+ 194:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 195:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     /* Compute 4 outputs at a time */
+ 196:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     blkCnt = numSamples >> 2U;
+ 197:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 198:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     while (blkCnt > 0U)
+ 199:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     {
+ 200:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         va = vld2q_f32(pSrcA);  // load & separate real/imag pSrcA (de-interleave 2)
+ 201:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         vb = vld2q_f32(pSrcB);  // load & separate real/imag pSrcB
+ 202:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 203:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 	/* Increment pointers */
+ 204:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         pSrcA += 8;
+ 205:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         pSrcB += 8;
+ 206:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 	
+ 207:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 	/* Re{C} = Re{A}*Re{B} - Im{A}*Im{B} */
+ 208:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         outCplx.val[0] = vmulq_f32(va.val[0], vb.val[0]);
+ 209:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         outCplx.val[0] = vmlsq_f32(outCplx.val[0], va.val[1], vb.val[1]);
+ 210:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 211:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 	/* Im{C} = Re{A}*Im{B} + Im{A}*Re{B} */
+ 212:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         outCplx.val[1] = vmulq_f32(va.val[0], vb.val[1]);
+ 213:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         outCplx.val[1] = vmlaq_f32(outCplx.val[1], va.val[1], vb.val[0]);
+ 214:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 215:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         vst2q_f32(pDst, outCplx);
+ 216:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 217:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 	/* Increment pointer */
+ 218:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         pDst += 8;
+ 219:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 220:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 	/* Decrement the loop counter */
+ 221:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****         blkCnt--;
+ 222:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     }
+ 223:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 224:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     /* Tail */
+ 225:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     blkCnt = numSamples & 3;
+ 226:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 227:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** #else
+ 228:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** #if defined (ARM_MATH_LOOPUNROLL) && !defined(ARM_MATH_AUTOVECTORIZE)
+ 229:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 230:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   /* Loop unrolling: Compute 4 outputs at a time */
+ 231:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   blkCnt = numSamples >> 2U;
+ 232:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 233:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   while (blkCnt > 0U)
+ 234:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   {
+ 235:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     /* C[2 * i    ] = A[2 * i] * B[2 * i    ] - A[2 * i + 1] * B[2 * i + 1]. */
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 6
+
+
+ 236:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     /* C[2 * i + 1] = A[2 * i] * B[2 * i + 1] + A[2 * i + 1] * B[2 * i    ]. */
+ 237:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 238:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     a = *pSrcA++;
+ 239:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     b = *pSrcA++;
+ 240:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     c = *pSrcB++;
+ 241:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     d = *pSrcB++;
+ 242:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     /* store result in destination buffer. */
+ 243:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     *pDst++ = (a * c) - (b * d);
+ 244:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     *pDst++ = (a * d) + (b * c);
+ 245:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 246:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     a = *pSrcA++;
+ 247:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     b = *pSrcA++;
+ 248:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     c = *pSrcB++;
+ 249:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     d = *pSrcB++;
+ 250:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     *pDst++ = (a * c) - (b * d);
+ 251:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     *pDst++ = (a * d) + (b * c);
+ 252:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 253:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     a = *pSrcA++;
+ 254:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     b = *pSrcA++;
+ 255:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     c = *pSrcB++;
+ 256:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     d = *pSrcB++;
+ 257:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     *pDst++ = (a * c) - (b * d);
+ 258:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     *pDst++ = (a * d) + (b * c);
+ 259:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 260:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     a = *pSrcA++;
+ 261:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     b = *pSrcA++;
+ 262:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     c = *pSrcB++;
+ 263:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     d = *pSrcB++;
+ 264:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     *pDst++ = (a * c) - (b * d);
+ 265:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     *pDst++ = (a * d) + (b * c);
+ 266:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 267:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     /* Decrement loop counter */
+ 268:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     blkCnt--;
+ 269:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   }
+ 270:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 271:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   /* Loop unrolling: Compute remaining outputs */
+ 272:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   blkCnt = numSamples % 0x4U;
+ 273:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 274:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** #else
+ 275:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 276:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   /* Initialize blkCnt with number of samples */
+ 277:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   blkCnt = numSamples;
+ 278:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 279:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** #endif /* #if defined (ARM_MATH_LOOPUNROLL) */
+ 280:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** #endif /* #if defined(ARM_MATH_NEON) */
+ 281:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 282:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   while (blkCnt > 0U)
+  51              		.loc 1 282 0
+  52 000a 2DE0     		b	.L2
+  53              	.LVL2:
+  54              	.L3:
+ 283:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   {
+ 284:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     /* C[2 * i    ] = A[2 * i] * B[2 * i    ] - A[2 * i + 1] * B[2 * i + 1]. */
+ 285:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     /* C[2 * i + 1] = A[2 * i] * B[2 * i + 1] + A[2 * i + 1] * B[2 * i    ]. */
+ 286:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 287:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     a = *pSrcA++;
+  55              		.loc 1 287 0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 7
+
+
+  56 000c 0446     		mov	r4, r0
+  57 000e 54F808BB 		ldr	fp, [r4], #8	@ float
+  58              	.LVL3:
+ 288:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     b = *pSrcA++;
+  59              		.loc 1 288 0
+  60 0012 D0F80490 		ldr	r9, [r0, #4]	@ float
+  61              	.LVL4:
+ 289:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     c = *pSrcB++;
+  62              		.loc 1 289 0
+  63 0016 0D46     		mov	r5, r1
+  64 0018 55F8083B 		ldr	r3, [r5], #8	@ float
+  65              	.LVL5:
+ 290:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     d = *pSrcB++;
+  66              		.loc 1 290 0
+  67 001c D1F804A0 		ldr	r10, [r1, #4]	@ float
+  68              	.LVL6:
+ 291:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 292:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     /* store result in destination buffer. */
+ 293:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     *pDst++ = (a * c) - (b * d);
+  69              		.loc 1 293 0
+  70 0020 5846     		mov	r0, fp
+  71 0022 0193     		str	r3, [sp, #4]	@ float
+  72 0024 1946     		mov	r1, r3
+  73 0026 FFF7FEFF 		bl	__aeabi_fmul
+  74              	.LVL7:
+  75 002a 0646     		mov	r6, r0
+  76 002c 4846     		mov	r0, r9
+  77 002e 5146     		mov	r1, r10
+  78 0030 FFF7FEFF 		bl	__aeabi_fmul
+  79              	.LVL8:
+  80 0034 0146     		mov	r1, r0
+  81 0036 3046     		mov	r0, r6
+  82 0038 FFF7FEFF 		bl	__aeabi_fsub
+  83              	.LVL9:
+  84 003c 4646     		mov	r6, r8
+  85 003e 46F8080B 		str	r0, [r6], #8	@ float
+  86              	.LVL10:
+ 294:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     *pDst++ = (a * d) + (b * c);
+  87              		.loc 1 294 0
+  88 0042 5846     		mov	r0, fp
+  89 0044 5146     		mov	r1, r10
+  90 0046 FFF7FEFF 		bl	__aeabi_fmul
+  91              	.LVL11:
+  92 004a 8246     		mov	r10, r0
+  93              	.LVL12:
+  94 004c 4846     		mov	r0, r9
+  95 004e 0199     		ldr	r1, [sp, #4]	@ float
+  96 0050 FFF7FEFF 		bl	__aeabi_fmul
+  97              	.LVL13:
+  98 0054 0146     		mov	r1, r0
+  99 0056 5046     		mov	r0, r10
+ 100 0058 FFF7FEFF 		bl	__aeabi_fadd
+ 101              	.LVL14:
+ 102 005c C8F80400 		str	r0, [r8, #4]	@ float
+ 295:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 296:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     /* Decrement loop counter */
+ 297:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     blkCnt--;
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 8
+
+
+ 103              		.loc 1 297 0
+ 104 0060 013F     		subs	r7, r7, #1
+ 105              	.LVL15:
+ 294:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     *pDst++ = (a * d) + (b * c);
+ 106              		.loc 1 294 0
+ 107 0062 B046     		mov	r8, r6
+ 290:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 108              		.loc 1 290 0
+ 109 0064 2946     		mov	r1, r5
+ 288:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****     c = *pSrcB++;
+ 110              		.loc 1 288 0
+ 111 0066 2046     		mov	r0, r4
+ 112              	.LVL16:
+ 113              	.L2:
+ 282:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   {
+ 114              		.loc 1 282 0
+ 115 0068 002F     		cmp	r7, #0
+ 116 006a CFD1     		bne	.L3
+ 298:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c ****   }
+ 299:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** 
+ 300:.\DSP\Source\ComplexMathFunctions/arm_cmplx_mult_cmplx_f32.c **** }
+ 117              		.loc 1 300 0
+ 118 006c 03B0     		add	sp, sp, #12
+ 119              		.cfi_def_cfa_offset 36
+ 120              		@ sp needed
+ 121 006e BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 122              		.cfi_endproc
+ 123              	.LFE84:
+ 124              		.size	arm_cmplx_mult_cmplx_f32, .-arm_cmplx_mult_cmplx_f32
+ 125 0072 00BF     		.text
+ 126              	.Letext0:
+ 127              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+ 128              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+ 129              		.file 4 ".\\DSP\\Include/arm_math_types.h"
+ 130              		.file 5 ".\\Core\\Include/cmsis_gcc.h"
+ 131              		.section	.debug_info,"",%progbits
+ 132              	.Ldebug_info0:
+ 133 0000 FA010000 		.4byte	0x1fa
+ 134 0004 0400     		.2byte	0x4
+ 135 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 136 000a 04       		.byte	0x4
+ 137 000b 01       		.uleb128 0x1
+ 138 000c 98010000 		.4byte	.LASF30
+ 139 0010 01       		.byte	0x1
+ 140 0011 B6000000 		.4byte	.LASF31
+ 141 0015 33010000 		.4byte	.LASF32
+ 142 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 143 001d 00000000 		.4byte	0
+ 144 0021 00000000 		.4byte	.Ldebug_line0
+ 145 0025 02       		.uleb128 0x2
+ 146 0026 01       		.byte	0x1
+ 147 0027 06       		.byte	0x6
+ 148 0028 7D020000 		.4byte	.LASF0
+ 149 002c 02       		.uleb128 0x2
+ 150 002d 01       		.byte	0x1
+ 151 002e 08       		.byte	0x8
+ 152 002f 48000000 		.4byte	.LASF1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 9
+
+
+ 153 0033 02       		.uleb128 0x2
+ 154 0034 02       		.byte	0x2
+ 155 0035 05       		.byte	0x5
+ 156 0036 8E010000 		.4byte	.LASF2
+ 157 003a 02       		.uleb128 0x2
+ 158 003b 02       		.byte	0x2
+ 159 003c 07       		.byte	0x7
+ 160 003d 82000000 		.4byte	.LASF3
+ 161 0041 02       		.uleb128 0x2
+ 162 0042 04       		.byte	0x4
+ 163 0043 05       		.byte	0x5
+ 164 0044 3A020000 		.4byte	.LASF4
+ 165 0048 03       		.uleb128 0x3
+ 166 0049 AB000000 		.4byte	.LASF9
+ 167 004d 02       		.byte	0x2
+ 168 004e 41       		.byte	0x41
+ 169 004f 53000000 		.4byte	0x53
+ 170 0053 02       		.uleb128 0x2
+ 171 0054 04       		.byte	0x4
+ 172 0055 07       		.byte	0x7
+ 173 0056 70000000 		.4byte	.LASF5
+ 174 005a 02       		.uleb128 0x2
+ 175 005b 08       		.byte	0x8
+ 176 005c 05       		.byte	0x5
+ 177 005d 20010000 		.4byte	.LASF6
+ 178 0061 02       		.uleb128 0x2
+ 179 0062 08       		.byte	0x8
+ 180 0063 07       		.byte	0x7
+ 181 0064 00010000 		.4byte	.LASF7
+ 182 0068 04       		.uleb128 0x4
+ 183 0069 04       		.byte	0x4
+ 184 006a 05       		.byte	0x5
+ 185 006b 696E7400 		.ascii	"int\000"
+ 186 006f 02       		.uleb128 0x2
+ 187 0070 04       		.byte	0x4
+ 188 0071 07       		.byte	0x7
+ 189 0072 F3000000 		.4byte	.LASF8
+ 190 0076 03       		.uleb128 0x3
+ 191 0077 31020000 		.4byte	.LASF10
+ 192 007b 03       		.byte	0x3
+ 193 007c 2D       		.byte	0x2d
+ 194 007d 48000000 		.4byte	0x48
+ 195 0081 02       		.uleb128 0x2
+ 196 0082 04       		.byte	0x4
+ 197 0083 07       		.byte	0x7
+ 198 0084 17010000 		.4byte	.LASF11
+ 199 0088 02       		.uleb128 0x2
+ 200 0089 01       		.byte	0x1
+ 201 008a 08       		.byte	0x8
+ 202 008b 2E010000 		.4byte	.LASF12
+ 203 008f 02       		.uleb128 0x2
+ 204 0090 08       		.byte	0x8
+ 205 0091 04       		.byte	0x4
+ 206 0092 9A000000 		.4byte	.LASF13
+ 207 0096 02       		.uleb128 0x2
+ 208 0097 04       		.byte	0x4
+ 209 0098 04       		.byte	0x4
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 10
+
+
+ 210 0099 3D000000 		.4byte	.LASF14
+ 211 009d 02       		.uleb128 0x2
+ 212 009e 08       		.byte	0x8
+ 213 009f 04       		.byte	0x4
+ 214 00a0 5C020000 		.4byte	.LASF15
+ 215 00a4 05       		.uleb128 0x5
+ 216 00a5 A1000000 		.4byte	.LASF16
+ 217 00a9 04       		.byte	0x4
+ 218 00aa 2F01     		.2byte	0x12f
+ 219 00ac 96000000 		.4byte	0x96
+ 220 00b0 06       		.uleb128 0x6
+ 221 00b1 43020000 		.4byte	.LASF33
+ 222 00b5 01       		.byte	0x1
+ 223 00b6 B6       		.byte	0xb6
+ 224 00b7 00000000 		.4byte	.LFB84
+ 225 00bb 72000000 		.4byte	.LFE84-.LFB84
+ 226 00bf 01       		.uleb128 0x1
+ 227 00c0 9C       		.byte	0x9c
+ 228 00c1 45010000 		.4byte	0x145
+ 229 00c5 07       		.uleb128 0x7
+ 230 00c6 22000000 		.4byte	.LASF17
+ 231 00ca 01       		.byte	0x1
+ 232 00cb B7       		.byte	0xb7
+ 233 00cc 45010000 		.4byte	0x145
+ 234 00d0 00000000 		.4byte	.LLST0
+ 235 00d4 07       		.uleb128 0x7
+ 236 00d5 28000000 		.4byte	.LASF18
+ 237 00d9 01       		.byte	0x1
+ 238 00da B8       		.byte	0xb8
+ 239 00db 45010000 		.4byte	0x145
+ 240 00df 36000000 		.4byte	.LLST1
+ 241 00e3 07       		.uleb128 0x7
+ 242 00e4 95000000 		.4byte	.LASF19
+ 243 00e8 01       		.byte	0x1
+ 244 00e9 B9       		.byte	0xb9
+ 245 00ea 50010000 		.4byte	0x150
+ 246 00ee 6C000000 		.4byte	.LLST2
+ 247 00f2 07       		.uleb128 0x7
+ 248 00f3 89020000 		.4byte	.LASF20
+ 249 00f7 01       		.byte	0x1
+ 250 00f8 BA       		.byte	0xba
+ 251 00f9 76000000 		.4byte	0x76
+ 252 00fd AD000000 		.4byte	.LLST3
+ 253 0101 08       		.uleb128 0x8
+ 254 0102 56000000 		.4byte	.LASF21
+ 255 0106 01       		.byte	0x1
+ 256 0107 BC       		.byte	0xbc
+ 257 0108 76000000 		.4byte	0x76
+ 258 010c CE000000 		.4byte	.LLST4
+ 259 0110 09       		.uleb128 0x9
+ 260 0111 6100     		.ascii	"a\000"
+ 261 0113 01       		.byte	0x1
+ 262 0114 BD       		.byte	0xbd
+ 263 0115 A4000000 		.4byte	0xa4
+ 264 0119 EC000000 		.4byte	.LLST5
+ 265 011d 09       		.uleb128 0x9
+ 266 011e 6200     		.ascii	"b\000"
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 11
+
+
+ 267 0120 01       		.byte	0x1
+ 268 0121 BD       		.byte	0xbd
+ 269 0122 A4000000 		.4byte	0xa4
+ 270 0126 FF000000 		.4byte	.LLST6
+ 271 012a 09       		.uleb128 0x9
+ 272 012b 6300     		.ascii	"c\000"
+ 273 012d 01       		.byte	0x1
+ 274 012e BD       		.byte	0xbd
+ 275 012f A4000000 		.4byte	0xa4
+ 276 0133 12010000 		.4byte	.LLST7
+ 277 0137 09       		.uleb128 0x9
+ 278 0138 6400     		.ascii	"d\000"
+ 279 013a 01       		.byte	0x1
+ 280 013b BD       		.byte	0xbd
+ 281 013c A4000000 		.4byte	0xa4
+ 282 0140 31010000 		.4byte	.LLST8
+ 283 0144 00       		.byte	0
+ 284 0145 0A       		.uleb128 0xa
+ 285 0146 04       		.byte	0x4
+ 286 0147 4B010000 		.4byte	0x14b
+ 287 014b 0B       		.uleb128 0xb
+ 288 014c A4000000 		.4byte	0xa4
+ 289 0150 0A       		.uleb128 0xa
+ 290 0151 04       		.byte	0x4
+ 291 0152 A4000000 		.4byte	0xa4
+ 292 0156 03       		.uleb128 0x3
+ 293 0157 00000000 		.4byte	.LASF22
+ 294 015b 05       		.byte	0x5
+ 295 015c 8B       		.byte	0x8b
+ 296 015d D4010000 		.4byte	0x1d4
+ 297 0161 0A       		.uleb128 0xa
+ 298 0162 04       		.byte	0x4
+ 299 0163 67010000 		.4byte	0x167
+ 300 0167 0B       		.uleb128 0xb
+ 301 0168 76000000 		.4byte	0x76
+ 302 016c 0A       		.uleb128 0xa
+ 303 016d 04       		.byte	0x4
+ 304 016e 76000000 		.4byte	0x76
+ 305 0172 0C       		.uleb128 0xc
+ 306 0173 94020000 		.4byte	.LASF23
+ 307 0177 05       		.byte	0x5
+ 308 0178 92       		.byte	0x92
+ 309 0179 7D010000 		.4byte	0x17d
+ 310 017d 0B       		.uleb128 0xb
+ 311 017e 56010000 		.4byte	0x156
+ 312 0182 0C       		.uleb128 0xc
+ 313 0183 5D000000 		.4byte	.LASF24
+ 314 0187 05       		.byte	0x5
+ 315 0188 93       		.byte	0x93
+ 316 0189 7D010000 		.4byte	0x17d
+ 317 018d 03       		.uleb128 0x3
+ 318 018e 2E000000 		.4byte	.LASF25
+ 319 0192 05       		.byte	0x5
+ 320 0193 90       		.byte	0x90
+ 321 0194 B3010000 		.4byte	0x1b3
+ 322 0198 0C       		.uleb128 0xc
+ 323 0199 68020000 		.4byte	.LASF26
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 12
+
+
+ 324 019d 05       		.byte	0x5
+ 325 019e 94       		.byte	0x94
+ 326 019f A3010000 		.4byte	0x1a3
+ 327 01a3 0B       		.uleb128 0xb
+ 328 01a4 8D010000 		.4byte	0x18d
+ 329 01a8 0C       		.uleb128 0xc
+ 330 01a9 0F000000 		.4byte	.LASF27
+ 331 01ad 05       		.byte	0x5
+ 332 01ae 95       		.byte	0x95
+ 333 01af A3010000 		.4byte	0x1a3
+ 334 01b3 0D       		.uleb128 0xd
+ 335 01b4 08       		.byte	0x8
+ 336 01b5 05       		.byte	0x5
+ 337 01b6 8D       		.byte	0x8d
+ 338 01b7 D4010000 		.4byte	0x1d4
+ 339 01bb 0E       		.uleb128 0xe
+ 340 01bc 43000000 		.4byte	.LASF28
+ 341 01c0 05       		.byte	0x5
+ 342 01c1 8E       		.byte	0x8e
+ 343 01c2 6C010000 		.4byte	0x16c
+ 344 01c6 00       		.byte	0
+ 345 01c7 0E       		.uleb128 0xe
+ 346 01c8 89010000 		.4byte	.LASF29
+ 347 01cc 05       		.byte	0x5
+ 348 01cd 8F       		.byte	0x8f
+ 349 01ce 76000000 		.4byte	0x76
+ 350 01d2 04       		.byte	0x4
+ 351 01d3 00       		.byte	0
+ 352 01d4 0F       		.uleb128 0xf
+ 353 01d5 0C       		.byte	0xc
+ 354 01d6 05       		.byte	0x5
+ 355 01d7 87       		.byte	0x87
+ 356 01d8 10       		.uleb128 0x10
+ 357 01d9 73726300 		.ascii	"src\000"
+ 358 01dd 05       		.byte	0x5
+ 359 01de 88       		.byte	0x88
+ 360 01df 61010000 		.4byte	0x161
+ 361 01e3 00       		.byte	0
+ 362 01e4 0E       		.uleb128 0xe
+ 363 01e5 43000000 		.4byte	.LASF28
+ 364 01e9 05       		.byte	0x5
+ 365 01ea 89       		.byte	0x89
+ 366 01eb 6C010000 		.4byte	0x16c
+ 367 01ef 04       		.byte	0x4
+ 368 01f0 0E       		.uleb128 0xe
+ 369 01f1 89010000 		.4byte	.LASF29
+ 370 01f5 05       		.byte	0x5
+ 371 01f6 8A       		.byte	0x8a
+ 372 01f7 76000000 		.4byte	0x76
+ 373 01fb 08       		.byte	0x8
+ 374 01fc 00       		.byte	0
+ 375 01fd 00       		.byte	0
+ 376              		.section	.debug_abbrev,"",%progbits
+ 377              	.Ldebug_abbrev0:
+ 378 0000 01       		.uleb128 0x1
+ 379 0001 11       		.uleb128 0x11
+ 380 0002 01       		.byte	0x1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 13
+
+
+ 381 0003 25       		.uleb128 0x25
+ 382 0004 0E       		.uleb128 0xe
+ 383 0005 13       		.uleb128 0x13
+ 384 0006 0B       		.uleb128 0xb
+ 385 0007 03       		.uleb128 0x3
+ 386 0008 0E       		.uleb128 0xe
+ 387 0009 1B       		.uleb128 0x1b
+ 388 000a 0E       		.uleb128 0xe
+ 389 000b 55       		.uleb128 0x55
+ 390 000c 17       		.uleb128 0x17
+ 391 000d 11       		.uleb128 0x11
+ 392 000e 01       		.uleb128 0x1
+ 393 000f 10       		.uleb128 0x10
+ 394 0010 17       		.uleb128 0x17
+ 395 0011 00       		.byte	0
+ 396 0012 00       		.byte	0
+ 397 0013 02       		.uleb128 0x2
+ 398 0014 24       		.uleb128 0x24
+ 399 0015 00       		.byte	0
+ 400 0016 0B       		.uleb128 0xb
+ 401 0017 0B       		.uleb128 0xb
+ 402 0018 3E       		.uleb128 0x3e
+ 403 0019 0B       		.uleb128 0xb
+ 404 001a 03       		.uleb128 0x3
+ 405 001b 0E       		.uleb128 0xe
+ 406 001c 00       		.byte	0
+ 407 001d 00       		.byte	0
+ 408 001e 03       		.uleb128 0x3
+ 409 001f 16       		.uleb128 0x16
+ 410 0020 00       		.byte	0
+ 411 0021 03       		.uleb128 0x3
+ 412 0022 0E       		.uleb128 0xe
+ 413 0023 3A       		.uleb128 0x3a
+ 414 0024 0B       		.uleb128 0xb
+ 415 0025 3B       		.uleb128 0x3b
+ 416 0026 0B       		.uleb128 0xb
+ 417 0027 49       		.uleb128 0x49
+ 418 0028 13       		.uleb128 0x13
+ 419 0029 00       		.byte	0
+ 420 002a 00       		.byte	0
+ 421 002b 04       		.uleb128 0x4
+ 422 002c 24       		.uleb128 0x24
+ 423 002d 00       		.byte	0
+ 424 002e 0B       		.uleb128 0xb
+ 425 002f 0B       		.uleb128 0xb
+ 426 0030 3E       		.uleb128 0x3e
+ 427 0031 0B       		.uleb128 0xb
+ 428 0032 03       		.uleb128 0x3
+ 429 0033 08       		.uleb128 0x8
+ 430 0034 00       		.byte	0
+ 431 0035 00       		.byte	0
+ 432 0036 05       		.uleb128 0x5
+ 433 0037 16       		.uleb128 0x16
+ 434 0038 00       		.byte	0
+ 435 0039 03       		.uleb128 0x3
+ 436 003a 0E       		.uleb128 0xe
+ 437 003b 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 14
+
+
+ 438 003c 0B       		.uleb128 0xb
+ 439 003d 3B       		.uleb128 0x3b
+ 440 003e 05       		.uleb128 0x5
+ 441 003f 49       		.uleb128 0x49
+ 442 0040 13       		.uleb128 0x13
+ 443 0041 00       		.byte	0
+ 444 0042 00       		.byte	0
+ 445 0043 06       		.uleb128 0x6
+ 446 0044 2E       		.uleb128 0x2e
+ 447 0045 01       		.byte	0x1
+ 448 0046 3F       		.uleb128 0x3f
+ 449 0047 19       		.uleb128 0x19
+ 450 0048 03       		.uleb128 0x3
+ 451 0049 0E       		.uleb128 0xe
+ 452 004a 3A       		.uleb128 0x3a
+ 453 004b 0B       		.uleb128 0xb
+ 454 004c 3B       		.uleb128 0x3b
+ 455 004d 0B       		.uleb128 0xb
+ 456 004e 27       		.uleb128 0x27
+ 457 004f 19       		.uleb128 0x19
+ 458 0050 11       		.uleb128 0x11
+ 459 0051 01       		.uleb128 0x1
+ 460 0052 12       		.uleb128 0x12
+ 461 0053 06       		.uleb128 0x6
+ 462 0054 40       		.uleb128 0x40
+ 463 0055 18       		.uleb128 0x18
+ 464 0056 9642     		.uleb128 0x2116
+ 465 0058 19       		.uleb128 0x19
+ 466 0059 01       		.uleb128 0x1
+ 467 005a 13       		.uleb128 0x13
+ 468 005b 00       		.byte	0
+ 469 005c 00       		.byte	0
+ 470 005d 07       		.uleb128 0x7
+ 471 005e 05       		.uleb128 0x5
+ 472 005f 00       		.byte	0
+ 473 0060 03       		.uleb128 0x3
+ 474 0061 0E       		.uleb128 0xe
+ 475 0062 3A       		.uleb128 0x3a
+ 476 0063 0B       		.uleb128 0xb
+ 477 0064 3B       		.uleb128 0x3b
+ 478 0065 0B       		.uleb128 0xb
+ 479 0066 49       		.uleb128 0x49
+ 480 0067 13       		.uleb128 0x13
+ 481 0068 02       		.uleb128 0x2
+ 482 0069 17       		.uleb128 0x17
+ 483 006a 00       		.byte	0
+ 484 006b 00       		.byte	0
+ 485 006c 08       		.uleb128 0x8
+ 486 006d 34       		.uleb128 0x34
+ 487 006e 00       		.byte	0
+ 488 006f 03       		.uleb128 0x3
+ 489 0070 0E       		.uleb128 0xe
+ 490 0071 3A       		.uleb128 0x3a
+ 491 0072 0B       		.uleb128 0xb
+ 492 0073 3B       		.uleb128 0x3b
+ 493 0074 0B       		.uleb128 0xb
+ 494 0075 49       		.uleb128 0x49
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 15
+
+
+ 495 0076 13       		.uleb128 0x13
+ 496 0077 02       		.uleb128 0x2
+ 497 0078 17       		.uleb128 0x17
+ 498 0079 00       		.byte	0
+ 499 007a 00       		.byte	0
+ 500 007b 09       		.uleb128 0x9
+ 501 007c 34       		.uleb128 0x34
+ 502 007d 00       		.byte	0
+ 503 007e 03       		.uleb128 0x3
+ 504 007f 08       		.uleb128 0x8
+ 505 0080 3A       		.uleb128 0x3a
+ 506 0081 0B       		.uleb128 0xb
+ 507 0082 3B       		.uleb128 0x3b
+ 508 0083 0B       		.uleb128 0xb
+ 509 0084 49       		.uleb128 0x49
+ 510 0085 13       		.uleb128 0x13
+ 511 0086 02       		.uleb128 0x2
+ 512 0087 17       		.uleb128 0x17
+ 513 0088 00       		.byte	0
+ 514 0089 00       		.byte	0
+ 515 008a 0A       		.uleb128 0xa
+ 516 008b 0F       		.uleb128 0xf
+ 517 008c 00       		.byte	0
+ 518 008d 0B       		.uleb128 0xb
+ 519 008e 0B       		.uleb128 0xb
+ 520 008f 49       		.uleb128 0x49
+ 521 0090 13       		.uleb128 0x13
+ 522 0091 00       		.byte	0
+ 523 0092 00       		.byte	0
+ 524 0093 0B       		.uleb128 0xb
+ 525 0094 26       		.uleb128 0x26
+ 526 0095 00       		.byte	0
+ 527 0096 49       		.uleb128 0x49
+ 528 0097 13       		.uleb128 0x13
+ 529 0098 00       		.byte	0
+ 530 0099 00       		.byte	0
+ 531 009a 0C       		.uleb128 0xc
+ 532 009b 34       		.uleb128 0x34
+ 533 009c 00       		.byte	0
+ 534 009d 03       		.uleb128 0x3
+ 535 009e 0E       		.uleb128 0xe
+ 536 009f 3A       		.uleb128 0x3a
+ 537 00a0 0B       		.uleb128 0xb
+ 538 00a1 3B       		.uleb128 0x3b
+ 539 00a2 0B       		.uleb128 0xb
+ 540 00a3 49       		.uleb128 0x49
+ 541 00a4 13       		.uleb128 0x13
+ 542 00a5 3F       		.uleb128 0x3f
+ 543 00a6 19       		.uleb128 0x19
+ 544 00a7 3C       		.uleb128 0x3c
+ 545 00a8 19       		.uleb128 0x19
+ 546 00a9 00       		.byte	0
+ 547 00aa 00       		.byte	0
+ 548 00ab 0D       		.uleb128 0xd
+ 549 00ac 13       		.uleb128 0x13
+ 550 00ad 01       		.byte	0x1
+ 551 00ae 0B       		.uleb128 0xb
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 16
+
+
+ 552 00af 0B       		.uleb128 0xb
+ 553 00b0 3A       		.uleb128 0x3a
+ 554 00b1 0B       		.uleb128 0xb
+ 555 00b2 3B       		.uleb128 0x3b
+ 556 00b3 0B       		.uleb128 0xb
+ 557 00b4 01       		.uleb128 0x1
+ 558 00b5 13       		.uleb128 0x13
+ 559 00b6 00       		.byte	0
+ 560 00b7 00       		.byte	0
+ 561 00b8 0E       		.uleb128 0xe
+ 562 00b9 0D       		.uleb128 0xd
+ 563 00ba 00       		.byte	0
+ 564 00bb 03       		.uleb128 0x3
+ 565 00bc 0E       		.uleb128 0xe
+ 566 00bd 3A       		.uleb128 0x3a
+ 567 00be 0B       		.uleb128 0xb
+ 568 00bf 3B       		.uleb128 0x3b
+ 569 00c0 0B       		.uleb128 0xb
+ 570 00c1 49       		.uleb128 0x49
+ 571 00c2 13       		.uleb128 0x13
+ 572 00c3 38       		.uleb128 0x38
+ 573 00c4 0B       		.uleb128 0xb
+ 574 00c5 00       		.byte	0
+ 575 00c6 00       		.byte	0
+ 576 00c7 0F       		.uleb128 0xf
+ 577 00c8 13       		.uleb128 0x13
+ 578 00c9 01       		.byte	0x1
+ 579 00ca 0B       		.uleb128 0xb
+ 580 00cb 0B       		.uleb128 0xb
+ 581 00cc 3A       		.uleb128 0x3a
+ 582 00cd 0B       		.uleb128 0xb
+ 583 00ce 3B       		.uleb128 0x3b
+ 584 00cf 0B       		.uleb128 0xb
+ 585 00d0 00       		.byte	0
+ 586 00d1 00       		.byte	0
+ 587 00d2 10       		.uleb128 0x10
+ 588 00d3 0D       		.uleb128 0xd
+ 589 00d4 00       		.byte	0
+ 590 00d5 03       		.uleb128 0x3
+ 591 00d6 08       		.uleb128 0x8
+ 592 00d7 3A       		.uleb128 0x3a
+ 593 00d8 0B       		.uleb128 0xb
+ 594 00d9 3B       		.uleb128 0x3b
+ 595 00da 0B       		.uleb128 0xb
+ 596 00db 49       		.uleb128 0x49
+ 597 00dc 13       		.uleb128 0x13
+ 598 00dd 38       		.uleb128 0x38
+ 599 00de 0B       		.uleb128 0xb
+ 600 00df 00       		.byte	0
+ 601 00e0 00       		.byte	0
+ 602 00e1 00       		.byte	0
+ 603              		.section	.debug_loc,"",%progbits
+ 604              	.Ldebug_loc0:
+ 605              	.LLST0:
+ 606 0000 00000000 		.4byte	.LVL0
+ 607 0004 0C000000 		.4byte	.LVL2
+ 608 0008 0100     		.2byte	0x1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 17
+
+
+ 609 000a 50       		.byte	0x50
+ 610 000b 0C000000 		.4byte	.LVL2
+ 611 000f 12000000 		.4byte	.LVL3
+ 612 0013 0300     		.2byte	0x3
+ 613 0015 70       		.byte	0x70
+ 614 0016 04       		.sleb128 4
+ 615 0017 9F       		.byte	0x9f
+ 616 0018 12000000 		.4byte	.LVL3
+ 617 001c 68000000 		.4byte	.LVL16
+ 618 0020 0100     		.2byte	0x1
+ 619 0022 54       		.byte	0x54
+ 620 0023 68000000 		.4byte	.LVL16
+ 621 0027 72000000 		.4byte	.LFE84
+ 622 002b 0100     		.2byte	0x1
+ 623 002d 50       		.byte	0x50
+ 624 002e 00000000 		.4byte	0
+ 625 0032 00000000 		.4byte	0
+ 626              	.LLST1:
+ 627 0036 00000000 		.4byte	.LVL0
+ 628 003a 16000000 		.4byte	.LVL4
+ 629 003e 0100     		.2byte	0x1
+ 630 0040 51       		.byte	0x51
+ 631 0041 16000000 		.4byte	.LVL4
+ 632 0045 1C000000 		.4byte	.LVL5
+ 633 0049 0300     		.2byte	0x3
+ 634 004b 71       		.byte	0x71
+ 635 004c 04       		.sleb128 4
+ 636 004d 9F       		.byte	0x9f
+ 637 004e 1C000000 		.4byte	.LVL5
+ 638 0052 68000000 		.4byte	.LVL16
+ 639 0056 0100     		.2byte	0x1
+ 640 0058 55       		.byte	0x55
+ 641 0059 68000000 		.4byte	.LVL16
+ 642 005d 72000000 		.4byte	.LFE84
+ 643 0061 0100     		.2byte	0x1
+ 644 0063 51       		.byte	0x51
+ 645 0064 00000000 		.4byte	0
+ 646 0068 00000000 		.4byte	0
+ 647              	.LLST2:
+ 648 006c 00000000 		.4byte	.LVL0
+ 649 0070 0C000000 		.4byte	.LVL2
+ 650 0074 0100     		.2byte	0x1
+ 651 0076 52       		.byte	0x52
+ 652 0077 0C000000 		.4byte	.LVL2
+ 653 007b 20000000 		.4byte	.LVL6
+ 654 007f 0100     		.2byte	0x1
+ 655 0081 58       		.byte	0x58
+ 656 0082 20000000 		.4byte	.LVL6
+ 657 0086 42000000 		.4byte	.LVL10
+ 658 008a 0300     		.2byte	0x3
+ 659 008c 78       		.byte	0x78
+ 660 008d 04       		.sleb128 4
+ 661 008e 9F       		.byte	0x9f
+ 662 008f 42000000 		.4byte	.LVL10
+ 663 0093 68000000 		.4byte	.LVL16
+ 664 0097 0100     		.2byte	0x1
+ 665 0099 56       		.byte	0x56
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 18
+
+
+ 666 009a 68000000 		.4byte	.LVL16
+ 667 009e 72000000 		.4byte	.LFE84
+ 668 00a2 0100     		.2byte	0x1
+ 669 00a4 58       		.byte	0x58
+ 670 00a5 00000000 		.4byte	0
+ 671 00a9 00000000 		.4byte	0
+ 672              	.LLST3:
+ 673 00ad 00000000 		.4byte	.LVL0
+ 674 00b1 0C000000 		.4byte	.LVL2
+ 675 00b5 0100     		.2byte	0x1
+ 676 00b7 53       		.byte	0x53
+ 677 00b8 0C000000 		.4byte	.LVL2
+ 678 00bc 72000000 		.4byte	.LFE84
+ 679 00c0 0400     		.2byte	0x4
+ 680 00c2 F3       		.byte	0xf3
+ 681 00c3 01       		.uleb128 0x1
+ 682 00c4 53       		.byte	0x53
+ 683 00c5 9F       		.byte	0x9f
+ 684 00c6 00000000 		.4byte	0
+ 685 00ca 00000000 		.4byte	0
+ 686              	.LLST4:
+ 687 00ce 0A000000 		.4byte	.LVL1
+ 688 00d2 0C000000 		.4byte	.LVL2
+ 689 00d6 0100     		.2byte	0x1
+ 690 00d8 53       		.byte	0x53
+ 691 00d9 0C000000 		.4byte	.LVL2
+ 692 00dd 72000000 		.4byte	.LFE84
+ 693 00e1 0100     		.2byte	0x1
+ 694 00e3 57       		.byte	0x57
+ 695 00e4 00000000 		.4byte	0
+ 696 00e8 00000000 		.4byte	0
+ 697              	.LLST5:
+ 698 00ec 12000000 		.4byte	.LVL3
+ 699 00f0 68000000 		.4byte	.LVL16
+ 700 00f4 0100     		.2byte	0x1
+ 701 00f6 5B       		.byte	0x5b
+ 702 00f7 00000000 		.4byte	0
+ 703 00fb 00000000 		.4byte	0
+ 704              	.LLST6:
+ 705 00ff 16000000 		.4byte	.LVL4
+ 706 0103 68000000 		.4byte	.LVL16
+ 707 0107 0100     		.2byte	0x1
+ 708 0109 59       		.byte	0x59
+ 709 010a 00000000 		.4byte	0
+ 710 010e 00000000 		.4byte	0
+ 711              	.LLST7:
+ 712 0112 1C000000 		.4byte	.LVL5
+ 713 0116 29000000 		.4byte	.LVL7-1
+ 714 011a 0100     		.2byte	0x1
+ 715 011c 53       		.byte	0x53
+ 716 011d 29000000 		.4byte	.LVL7-1
+ 717 0121 68000000 		.4byte	.LVL16
+ 718 0125 0200     		.2byte	0x2
+ 719 0127 91       		.byte	0x91
+ 720 0128 54       		.sleb128 -44
+ 721 0129 00000000 		.4byte	0
+ 722 012d 00000000 		.4byte	0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 19
+
+
+ 723              	.LLST8:
+ 724 0131 20000000 		.4byte	.LVL6
+ 725 0135 4C000000 		.4byte	.LVL12
+ 726 0139 0100     		.2byte	0x1
+ 727 013b 5A       		.byte	0x5a
+ 728 013c 00000000 		.4byte	0
+ 729 0140 00000000 		.4byte	0
+ 730              		.section	.debug_aranges,"",%progbits
+ 731 0000 1C000000 		.4byte	0x1c
+ 732 0004 0200     		.2byte	0x2
+ 733 0006 00000000 		.4byte	.Ldebug_info0
+ 734 000a 04       		.byte	0x4
+ 735 000b 00       		.byte	0
+ 736 000c 0000     		.2byte	0
+ 737 000e 0000     		.2byte	0
+ 738 0010 00000000 		.4byte	.LFB84
+ 739 0014 72000000 		.4byte	.LFE84-.LFB84
+ 740 0018 00000000 		.4byte	0
+ 741 001c 00000000 		.4byte	0
+ 742              		.section	.debug_ranges,"",%progbits
+ 743              	.Ldebug_ranges0:
+ 744 0000 00000000 		.4byte	.LFB84
+ 745 0004 72000000 		.4byte	.LFE84
+ 746 0008 00000000 		.4byte	0
+ 747 000c 00000000 		.4byte	0
+ 748              		.section	.debug_line,"",%progbits
+ 749              	.Ldebug_line0:
+ 750 0000 B6010000 		.section	.debug_str,"MS",%progbits,1
+ 750      02008B01 
+ 750      00000201 
+ 750      FB0E0D00 
+ 750      01010101 
+ 751              	.LASF22:
+ 752 0000 5F5F636F 		.ascii	"__copy_table_t\000"
+ 752      70795F74 
+ 752      61626C65 
+ 752      5F7400
+ 753              	.LASF27:
+ 754 000f 5F5F7A65 		.ascii	"__zero_table_end__\000"
+ 754      726F5F74 
+ 754      61626C65 
+ 754      5F656E64 
+ 754      5F5F00
+ 755              	.LASF17:
+ 756 0022 70537263 		.ascii	"pSrcA\000"
+ 756      4100
+ 757              	.LASF18:
+ 758 0028 70537263 		.ascii	"pSrcB\000"
+ 758      4200
+ 759              	.LASF25:
+ 760 002e 5F5F7A65 		.ascii	"__zero_table_t\000"
+ 760      726F5F74 
+ 760      61626C65 
+ 760      5F7400
+ 761              	.LASF14:
+ 762 003d 666C6F61 		.ascii	"float\000"
+ 762      7400
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 20
+
+
+ 763              	.LASF28:
+ 764 0043 64657374 		.ascii	"dest\000"
+ 764      00
+ 765              	.LASF1:
+ 766 0048 756E7369 		.ascii	"unsigned char\000"
+ 766      676E6564 
+ 766      20636861 
+ 766      7200
+ 767              	.LASF21:
+ 768 0056 626C6B43 		.ascii	"blkCnt\000"
+ 768      6E7400
+ 769              	.LASF24:
+ 770 005d 5F5F636F 		.ascii	"__copy_table_end__\000"
+ 770      70795F74 
+ 770      61626C65 
+ 770      5F656E64 
+ 770      5F5F00
+ 771              	.LASF5:
+ 772 0070 6C6F6E67 		.ascii	"long unsigned int\000"
+ 772      20756E73 
+ 772      69676E65 
+ 772      6420696E 
+ 772      7400
+ 773              	.LASF3:
+ 774 0082 73686F72 		.ascii	"short unsigned int\000"
+ 774      7420756E 
+ 774      7369676E 
+ 774      65642069 
+ 774      6E7400
+ 775              	.LASF19:
+ 776 0095 70447374 		.ascii	"pDst\000"
+ 776      00
+ 777              	.LASF13:
+ 778 009a 646F7562 		.ascii	"double\000"
+ 778      6C6500
+ 779              	.LASF16:
+ 780 00a1 666C6F61 		.ascii	"float32_t\000"
+ 780      7433325F 
+ 780      7400
+ 781              	.LASF9:
+ 782 00ab 5F5F7569 		.ascii	"__uint32_t\000"
+ 782      6E743332 
+ 782      5F7400
+ 783              	.LASF31:
+ 784 00b6 2E5C4453 		.ascii	".\\DSP\\Source\\ComplexMathFunctions\\arm_cmplx_mul"
+ 784      505C536F 
+ 784      75726365 
+ 784      5C436F6D 
+ 784      706C6578 
+ 785 00e5 745F636D 		.ascii	"t_cmplx_f32.c\000"
+ 785      706C785F 
+ 785      6633322E 
+ 785      6300
+ 786              	.LASF8:
+ 787 00f3 756E7369 		.ascii	"unsigned int\000"
+ 787      676E6564 
+ 787      20696E74 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 21
+
+
+ 787      00
+ 788              	.LASF7:
+ 789 0100 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 789      206C6F6E 
+ 789      6720756E 
+ 789      7369676E 
+ 789      65642069 
+ 790              	.LASF11:
+ 791 0117 73697A65 		.ascii	"sizetype\000"
+ 791      74797065 
+ 791      00
+ 792              	.LASF6:
+ 793 0120 6C6F6E67 		.ascii	"long long int\000"
+ 793      206C6F6E 
+ 793      6720696E 
+ 793      7400
+ 794              	.LASF12:
+ 795 012e 63686172 		.ascii	"char\000"
+ 795      00
+ 796              	.LASF32:
+ 797 0133 5C5C766D 		.ascii	"\\\\vmware-host\\Shared Folders\\Documents\\PSoC Cr"
+ 797      77617265 
+ 797      2D686F73 
+ 797      745C5368 
+ 797      61726564 
+ 798 0161 6561746F 		.ascii	"eator\\FinalProject\\SoundDetection.cydsn\000"
+ 798      725C4669 
+ 798      6E616C50 
+ 798      726F6A65 
+ 798      63745C53 
+ 799              	.LASF29:
+ 800 0189 776C656E 		.ascii	"wlen\000"
+ 800      00
+ 801              	.LASF2:
+ 802 018e 73686F72 		.ascii	"short int\000"
+ 802      7420696E 
+ 802      7400
+ 803              	.LASF30:
+ 804 0198 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 804      4320342E 
+ 804      392E3320 
+ 804      32303135 
+ 804      30333033 
+ 805 01cb 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 805      20726576 
+ 805      6973696F 
+ 805      6E203232 
+ 805      31323230 
+ 806 01fe 67202D73 		.ascii	"g -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 806      74643D67 
+ 806      6E753939 
+ 806      202D6666 
+ 806      756E6374 
+ 807              	.LASF10:
+ 808 0231 75696E74 		.ascii	"uint32_t\000"
+ 808      33325F74 
+ 808      00
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccMeLXre.s 			page 22
+
+
+ 809              	.LASF4:
+ 810 023a 6C6F6E67 		.ascii	"long int\000"
+ 810      20696E74 
+ 810      00
+ 811              	.LASF33:
+ 812 0243 61726D5F 		.ascii	"arm_cmplx_mult_cmplx_f32\000"
+ 812      636D706C 
+ 812      785F6D75 
+ 812      6C745F63 
+ 812      6D706C78 
+ 813              	.LASF15:
+ 814 025c 6C6F6E67 		.ascii	"long double\000"
+ 814      20646F75 
+ 814      626C6500 
+ 815              	.LASF26:
+ 816 0268 5F5F7A65 		.ascii	"__zero_table_start__\000"
+ 816      726F5F74 
+ 816      61626C65 
+ 816      5F737461 
+ 816      72745F5F 
+ 817              	.LASF0:
+ 818 027d 7369676E 		.ascii	"signed char\000"
+ 818      65642063 
+ 818      68617200 
+ 819              	.LASF20:
+ 820 0289 6E756D53 		.ascii	"numSamples\000"
+ 820      616D706C 
+ 820      657300
+ 821              	.LASF23:
+ 822 0294 5F5F636F 		.ascii	"__copy_table_start__\000"
+ 822      70795F74 
+ 822      61626C65 
+ 822      5F737461 
+ 822      72745F5F 
+ 823              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

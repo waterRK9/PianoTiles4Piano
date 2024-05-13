@@ -1,0 +1,1775 @@
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"GUI_X.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.text.GUI_X_Systick_Intr,"ax",%progbits
+  19              		.align	1
+  20              		.global	GUI_X_Systick_Intr
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	GUI_X_Systick_Intr, %function
+  24              	GUI_X_Systick_Intr:
+  25              	.LFB74:
+  26              		.file 1 ".\\GUI_X.c"
+   1:.\GUI_X.c     **** /*********************************************************************
+   2:.\GUI_X.c     **** *                SEGGER Microcontroller GmbH & Co. KG                *
+   3:.\GUI_X.c     **** *        Solutions for real time microcontroller applications        *
+   4:.\GUI_X.c     **** **********************************************************************
+   5:.\GUI_X.c     **** *                                                                    *
+   6:.\GUI_X.c     **** *        (c) 1996 - 2017  SEGGER Microcontroller GmbH & Co. KG       *
+   7:.\GUI_X.c     **** *                                                                    *
+   8:.\GUI_X.c     **** *        Internet: www.segger.com    Support:  support@segger.com    *
+   9:.\GUI_X.c     **** *                                                                    *
+  10:.\GUI_X.c     **** **********************************************************************
+  11:.\GUI_X.c     **** 
+  12:.\GUI_X.c     **** ** emWin V5.46 - Graphical user interface for embedded applications **
+  13:.\GUI_X.c     **** All  Intellectual Property rights  in the Software belongs to  SEGGER.
+  14:.\GUI_X.c     **** emWin is protected by  international copyright laws.  Knowledge of the
+  15:.\GUI_X.c     **** source code may not be used to write a similar product.  This file may
+  16:.\GUI_X.c     **** only be used in accordance with the following terms:
+  17:.\GUI_X.c     **** 
+  18:.\GUI_X.c     **** The software  has been licensed to  Cypress Semiconductor Corporation,
+  19:.\GUI_X.c     **** whose registered  office is situated  at 198 Champion Ct. San Jose, CA 
+  20:.\GUI_X.c     **** 95134 USA  solely for the  purposes of creating  libraries for Cypress
+  21:.\GUI_X.c     **** PSoC3 and  PSoC5 processor-based devices,  sublicensed and distributed
+  22:.\GUI_X.c     **** under  the  terms  and  conditions  of  the  Cypress  End User License
+  23:.\GUI_X.c     **** Agreement.
+  24:.\GUI_X.c     **** Full source code is available at: www.segger.com
+  25:.\GUI_X.c     **** 
+  26:.\GUI_X.c     **** We appreciate your understanding and fairness.
+  27:.\GUI_X.c     **** ----------------------------------------------------------------------
+  28:.\GUI_X.c     **** Licensing information
+  29:.\GUI_X.c     **** Licensor:                 SEGGER Microcontroller Systems LLC
+  30:.\GUI_X.c     **** Licensed to:              Cypress Semiconductor Corp, 198 Champion Ct., San Jose, CA 95134, USA
+  31:.\GUI_X.c     **** Licensed SEGGER software: emWin
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 2
+
+
+  32:.\GUI_X.c     **** License number:           GUI-00319
+  33:.\GUI_X.c     **** License model:            Services and License Agreement, signed June 10th, 2009
+  34:.\GUI_X.c     **** Licensed platform:        Any Cypress platform (Initial targets are: PSoC3, PSoC5)
+  35:.\GUI_X.c     **** ----------------------------------------------------------------------
+  36:.\GUI_X.c     **** Support and Update Agreement (SUA)
+  37:.\GUI_X.c     **** SUA period:               2009-06-12 - 2022-07-27
+  38:.\GUI_X.c     **** Contact to extend SUA:    sales@segger.com
+  39:.\GUI_X.c     **** ----------------------------------------------------------------------
+  40:.\GUI_X.c     **** File        : GUI_X.C
+  41:.\GUI_X.c     **** Purpose     : Config / System dependent externals for GUI
+  42:.\GUI_X.c     **** ---------------------------END-OF-HEADER------------------------------
+  43:.\GUI_X.c     **** */
+  44:.\GUI_X.c     **** 
+  45:.\GUI_X.c     **** #include "GUI.h"
+  46:.\GUI_X.c     **** 
+  47:.\GUI_X.c     **** #include "project.h"
+  48:.\GUI_X.c     **** 
+  49:.\GUI_X.c     **** /*********************************************************************
+  50:.\GUI_X.c     **** *
+  51:.\GUI_X.c     **** *       Function Prototypes
+  52:.\GUI_X.c     **** */
+  53:.\GUI_X.c     **** void GUI_X_Systick_Init(void);
+  54:.\GUI_X.c     **** 
+  55:.\GUI_X.c     **** /*********************************************************************
+  56:.\GUI_X.c     **** *
+  57:.\GUI_X.c     **** *       Global data
+  58:.\GUI_X.c     **** */
+  59:.\GUI_X.c     **** volatile GUI_TIMER_TIME OS_TimeMS;
+  60:.\GUI_X.c     **** 
+  61:.\GUI_X.c     **** /*********************************************************************
+  62:.\GUI_X.c     **** *
+  63:.\GUI_X.c     **** *      Timing:
+  64:.\GUI_X.c     **** *                 GUI_X_GetTime()
+  65:.\GUI_X.c     **** *                 GUI_X_Delay(int)
+  66:.\GUI_X.c     **** *
+  67:.\GUI_X.c     **** *   Some timing dependent routines require a GetTime
+  68:.\GUI_X.c     **** *   and delay function. Default time unit (tick), normally is
+  69:.\GUI_X.c     **** *   1 ms.
+  70:.\GUI_X.c     **** */
+  71:.\GUI_X.c     **** 
+  72:.\GUI_X.c     **** GUI_TIMER_TIME GUI_X_GetTime(void) { 
+  73:.\GUI_X.c     ****   return OS_TimeMS; 
+  74:.\GUI_X.c     **** }
+  75:.\GUI_X.c     **** 
+  76:.\GUI_X.c     **** void GUI_X_Delay(int ms) { 
+  77:.\GUI_X.c     ****   int tEnd = OS_TimeMS + ms;
+  78:.\GUI_X.c     ****   while ((tEnd - OS_TimeMS) > 0);
+  79:.\GUI_X.c     **** }
+  80:.\GUI_X.c     **** 
+  81:.\GUI_X.c     **** /*********************************************************************
+  82:.\GUI_X.c     **** *
+  83:.\GUI_X.c     **** *       GUI_X_Init()
+  84:.\GUI_X.c     **** *
+  85:.\GUI_X.c     **** * Note:
+  86:.\GUI_X.c     **** *     GUI_X_Init() is called from GUI_Init is a possibility to init
+  87:.\GUI_X.c     **** *     some hardware which needs to be up and running before the GUI.
+  88:.\GUI_X.c     **** */
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 3
+
+
+  89:.\GUI_X.c     **** void GUI_X_Init(void) {
+  90:.\GUI_X.c     ****   GUI_X_Systick_Init();
+  91:.\GUI_X.c     **** }
+  92:.\GUI_X.c     **** 
+  93:.\GUI_X.c     **** 
+  94:.\GUI_X.c     **** /*********************************************************************
+  95:.\GUI_X.c     **** *
+  96:.\GUI_X.c     **** *       GUI_X_ExecIdle
+  97:.\GUI_X.c     **** *
+  98:.\GUI_X.c     **** * Note:
+  99:.\GUI_X.c     **** *  Called if WM is in idle state
+ 100:.\GUI_X.c     **** */
+ 101:.\GUI_X.c     **** void GUI_X_ExecIdle(void) {}
+ 102:.\GUI_X.c     **** 
+ 103:.\GUI_X.c     **** /*********************************************************************
+ 104:.\GUI_X.c     **** *
+ 105:.\GUI_X.c     **** *      Logging: OS dependent
+ 106:.\GUI_X.c     **** 
+ 107:.\GUI_X.c     **** Note:
+ 108:.\GUI_X.c     ****   Logging is used in higher debug levels only. The typical target
+ 109:.\GUI_X.c     ****   build does not use logging and does therefor not require any of
+ 110:.\GUI_X.c     ****   the logging routines below. For a release build without logging
+ 111:.\GUI_X.c     ****   the routines below may be eliminated to save some space.
+ 112:.\GUI_X.c     ****   (If the linker is not function aware and eliminates unreferenced
+ 113:.\GUI_X.c     ****   functions automatically)
+ 114:.\GUI_X.c     **** 
+ 115:.\GUI_X.c     **** */
+ 116:.\GUI_X.c     **** 
+ 117:.\GUI_X.c     **** void GUI_X_Log     (const char *s) { GUI_USE_PARA(s); }
+ 118:.\GUI_X.c     **** void GUI_X_Warn    (const char *s) { GUI_USE_PARA(s); }
+ 119:.\GUI_X.c     **** void GUI_X_ErrorOut(const char *s) { GUI_USE_PARA(s); }
+ 120:.\GUI_X.c     **** 
+ 121:.\GUI_X.c     **** /*********************************************************************
+ 122:.\GUI_X.c     **** *
+ 123:.\GUI_X.c     **** *         Setup Systick for timing
+ 124:.\GUI_X.c     **** *
+ 125:.\GUI_X.c     **** */
+ 126:.\GUI_X.c     **** /*********************************************************************
+ 127:.\GUI_X.c     **** *
+ 128:.\GUI_X.c     **** *       GUI_X_Systick_Intr
+ 129:.\GUI_X.c     **** *
+ 130:.\GUI_X.c     **** * Purpose:
+ 131:.\GUI_X.c     **** *   Interrupt Service Routine for Systick.
+ 132:.\GUI_X.c     **** */
+ 133:.\GUI_X.c     **** void GUI_X_Systick_Intr(void){    
+  27              		.loc 1 133 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+ 134:.\GUI_X.c     ****   OS_TimeMS++;
+  32              		.loc 1 134 0
+  33 0000 024A     		ldr	r2, .L2
+  34 0002 1368     		ldr	r3, [r2]
+  35 0004 0133     		adds	r3, r3, #1
+  36 0006 1360     		str	r3, [r2]
+  37 0008 7047     		bx	lr
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 4
+
+
+  38              	.L3:
+  39 000a 00BF     		.align	2
+  40              	.L2:
+  41 000c 00000000 		.word	OS_TimeMS
+  42              		.cfi_endproc
+  43              	.LFE74:
+  44              		.size	GUI_X_Systick_Intr, .-GUI_X_Systick_Intr
+  45              		.section	.text.GUI_X_GetTime,"ax",%progbits
+  46              		.align	1
+  47              		.global	GUI_X_GetTime
+  48              		.thumb
+  49              		.thumb_func
+  50              		.type	GUI_X_GetTime, %function
+  51              	GUI_X_GetTime:
+  52              	.LFB67:
+  72:.\GUI_X.c     ****   return OS_TimeMS; 
+  53              		.loc 1 72 0
+  54              		.cfi_startproc
+  55              		@ args = 0, pretend = 0, frame = 0
+  56              		@ frame_needed = 0, uses_anonymous_args = 0
+  57              		@ link register save eliminated.
+  73:.\GUI_X.c     **** }
+  58              		.loc 1 73 0
+  59 0000 014B     		ldr	r3, .L5
+  60 0002 1868     		ldr	r0, [r3]
+  74:.\GUI_X.c     **** 
+  61              		.loc 1 74 0
+  62 0004 7047     		bx	lr
+  63              	.L6:
+  64 0006 00BF     		.align	2
+  65              	.L5:
+  66 0008 00000000 		.word	OS_TimeMS
+  67              		.cfi_endproc
+  68              	.LFE67:
+  69              		.size	GUI_X_GetTime, .-GUI_X_GetTime
+  70              		.section	.text.GUI_X_Delay,"ax",%progbits
+  71              		.align	1
+  72              		.global	GUI_X_Delay
+  73              		.thumb
+  74              		.thumb_func
+  75              		.type	GUI_X_Delay, %function
+  76              	GUI_X_Delay:
+  77              	.LFB68:
+  76:.\GUI_X.c     ****   int tEnd = OS_TimeMS + ms;
+  78              		.loc 1 76 0
+  79              		.cfi_startproc
+  80              		@ args = 0, pretend = 0, frame = 0
+  81              		@ frame_needed = 0, uses_anonymous_args = 0
+  82              		@ link register save eliminated.
+  83              	.LVL0:
+  77:.\GUI_X.c     ****   while ((tEnd - OS_TimeMS) > 0);
+  84              		.loc 1 77 0
+  85 0000 034B     		ldr	r3, .L11
+  86 0002 1A68     		ldr	r2, [r3]
+  87 0004 1044     		add	r0, r0, r2
+  88              	.LVL1:
+  89              	.L8:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 5
+
+
+  78:.\GUI_X.c     **** }
+  90              		.loc 1 78 0 discriminator 1
+  91 0006 1A68     		ldr	r2, [r3]
+  92 0008 821A     		subs	r2, r0, r2
+  93 000a 002A     		cmp	r2, #0
+  94 000c FBDC     		bgt	.L8
+  79:.\GUI_X.c     **** 
+  95              		.loc 1 79 0
+  96 000e 7047     		bx	lr
+  97              	.L12:
+  98              		.align	2
+  99              	.L11:
+ 100 0010 00000000 		.word	OS_TimeMS
+ 101              		.cfi_endproc
+ 102              	.LFE68:
+ 103              		.size	GUI_X_Delay, .-GUI_X_Delay
+ 104              		.section	.text.GUI_X_ExecIdle,"ax",%progbits
+ 105              		.align	1
+ 106              		.global	GUI_X_ExecIdle
+ 107              		.thumb
+ 108              		.thumb_func
+ 109              		.type	GUI_X_ExecIdle, %function
+ 110              	GUI_X_ExecIdle:
+ 111              	.LFB70:
+ 101:.\GUI_X.c     **** 
+ 112              		.loc 1 101 0
+ 113              		.cfi_startproc
+ 114              		@ args = 0, pretend = 0, frame = 0
+ 115              		@ frame_needed = 0, uses_anonymous_args = 0
+ 116              		@ link register save eliminated.
+ 117 0000 7047     		bx	lr
+ 118              		.cfi_endproc
+ 119              	.LFE70:
+ 120              		.size	GUI_X_ExecIdle, .-GUI_X_ExecIdle
+ 121              		.section	.text.GUI_X_Log,"ax",%progbits
+ 122              		.align	1
+ 123              		.global	GUI_X_Log
+ 124              		.thumb
+ 125              		.thumb_func
+ 126              		.type	GUI_X_Log, %function
+ 127              	GUI_X_Log:
+ 128              	.LFB71:
+ 117:.\GUI_X.c     **** void GUI_X_Warn    (const char *s) { GUI_USE_PARA(s); }
+ 129              		.loc 1 117 0
+ 130              		.cfi_startproc
+ 131              		@ args = 0, pretend = 0, frame = 0
+ 132              		@ frame_needed = 0, uses_anonymous_args = 0
+ 133              		@ link register save eliminated.
+ 134              	.LVL2:
+ 135 0000 7047     		bx	lr
+ 136              		.cfi_endproc
+ 137              	.LFE71:
+ 138              		.size	GUI_X_Log, .-GUI_X_Log
+ 139              		.section	.text.GUI_X_Warn,"ax",%progbits
+ 140              		.align	1
+ 141              		.global	GUI_X_Warn
+ 142              		.thumb
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 6
+
+
+ 143              		.thumb_func
+ 144              		.type	GUI_X_Warn, %function
+ 145              	GUI_X_Warn:
+ 146              	.LFB72:
+ 118:.\GUI_X.c     **** void GUI_X_ErrorOut(const char *s) { GUI_USE_PARA(s); }
+ 147              		.loc 1 118 0
+ 148              		.cfi_startproc
+ 149              		@ args = 0, pretend = 0, frame = 0
+ 150              		@ frame_needed = 0, uses_anonymous_args = 0
+ 151              		@ link register save eliminated.
+ 152              	.LVL3:
+ 153 0000 7047     		bx	lr
+ 154              		.cfi_endproc
+ 155              	.LFE72:
+ 156              		.size	GUI_X_Warn, .-GUI_X_Warn
+ 157              		.section	.text.GUI_X_ErrorOut,"ax",%progbits
+ 158              		.align	1
+ 159              		.global	GUI_X_ErrorOut
+ 160              		.thumb
+ 161              		.thumb_func
+ 162              		.type	GUI_X_ErrorOut, %function
+ 163              	GUI_X_ErrorOut:
+ 164              	.LFB73:
+ 119:.\GUI_X.c     **** 
+ 165              		.loc 1 119 0
+ 166              		.cfi_startproc
+ 167              		@ args = 0, pretend = 0, frame = 0
+ 168              		@ frame_needed = 0, uses_anonymous_args = 0
+ 169              		@ link register save eliminated.
+ 170              	.LVL4:
+ 171 0000 7047     		bx	lr
+ 172              		.cfi_endproc
+ 173              	.LFE73:
+ 174              		.size	GUI_X_ErrorOut, .-GUI_X_ErrorOut
+ 175              		.section	.text.GUI_X_Systick_Init,"ax",%progbits
+ 176              		.align	1
+ 177              		.global	GUI_X_Systick_Init
+ 178              		.thumb
+ 179              		.thumb_func
+ 180              		.type	GUI_X_Systick_Init, %function
+ 181              	GUI_X_Systick_Init:
+ 182              	.LFB75:
+ 135:.\GUI_X.c     **** }
+ 136:.\GUI_X.c     **** 
+ 137:.\GUI_X.c     **** /*********************************************************************
+ 138:.\GUI_X.c     **** *
+ 139:.\GUI_X.c     **** *       GUI_X_Systick_Init()
+ 140:.\GUI_X.c     **** *
+ 141:.\GUI_X.c     **** * Purpose:
+ 142:.\GUI_X.c     **** *   Sets up the Systick interrupt and enable it.
+ 143:.\GUI_X.c     **** */
+ 144:.\GUI_X.c     **** void GUI_X_Systick_Init(void){  
+ 183              		.loc 1 144 0
+ 184              		.cfi_startproc
+ 185              		@ args = 0, pretend = 0, frame = 0
+ 186              		@ frame_needed = 0, uses_anonymous_args = 0
+ 187              		.loc 1 144 0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 7
+
+
+ 188 0000 10B5     		push	{r4, lr}
+ 189              		.cfi_def_cfa_offset 8
+ 190              		.cfi_offset 4, -8
+ 191              		.cfi_offset 14, -4
+ 145:.\GUI_X.c     ****   uint32_t i; 
+ 146:.\GUI_X.c     ****   CySysTickStart();
+ 192              		.loc 1 146 0
+ 193 0002 FFF7FEFF 		bl	CySysTickStart
+ 194              	.LVL5:
+ 147:.\GUI_X.c     ****   //
+ 148:.\GUI_X.c     ****   // Find unused callback slot.
+ 149:.\GUI_X.c     ****   //
+ 150:.\GUI_X.c     ****     for (i = 0u; i < CY_SYS_SYST_NUM_OF_CALLBACKS; i++)
+ 195              		.loc 1 150 0
+ 196 0006 0024     		movs	r4, #0
+ 197              	.LVL6:
+ 198              	.L19:
+ 151:.\GUI_X.c     ****     {
+ 152:.\GUI_X.c     ****         if (CySysTickGetCallback(i) == NULL)
+ 199              		.loc 1 152 0
+ 200 0008 2046     		mov	r0, r4
+ 201 000a FFF7FEFF 		bl	CySysTickGetCallback
+ 202              	.LVL7:
+ 203 000e 28B9     		cbnz	r0, .L18
+ 153:.\GUI_X.c     ****         {
+ 154:.\GUI_X.c     ****             CySysTickSetCallback(i, GUI_X_Systick_Intr);
+ 204              		.loc 1 154 0
+ 205 0010 2046     		mov	r0, r4
+ 155:.\GUI_X.c     ****             break;
+ 156:.\GUI_X.c     ****         }
+ 157:.\GUI_X.c     ****     }
+ 158:.\GUI_X.c     ****     
+ 159:.\GUI_X.c     ****     CYASSERT(i < CY_SYS_SYST_NUM_OF_CALLBACKS);
+ 160:.\GUI_X.c     **** }
+ 206              		.loc 1 160 0
+ 207 0012 BDE81040 		pop	{r4, lr}
+ 208              		.cfi_remember_state
+ 209              		.cfi_restore 14
+ 210              		.cfi_restore 4
+ 211              		.cfi_def_cfa_offset 0
+ 212              	.LVL8:
+ 154:.\GUI_X.c     ****             break;
+ 213              		.loc 1 154 0
+ 214 0016 0349     		ldr	r1, .L21
+ 215 0018 FFF7FEBF 		b	CySysTickSetCallback
+ 216              	.LVL9:
+ 217              	.L18:
+ 218              		.cfi_restore_state
+ 150:.\GUI_X.c     ****     {
+ 219              		.loc 1 150 0 discriminator 2
+ 220 001c 0134     		adds	r4, r4, #1
+ 221              	.LVL10:
+ 222 001e 052C     		cmp	r4, #5
+ 223 0020 F2D1     		bne	.L19
+ 224              		.loc 1 160 0
+ 225 0022 10BD     		pop	{r4, pc}
+ 226              	.LVL11:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 8
+
+
+ 227              	.L22:
+ 228              		.align	2
+ 229              	.L21:
+ 230 0024 00000000 		.word	GUI_X_Systick_Intr
+ 231              		.cfi_endproc
+ 232              	.LFE75:
+ 233              		.size	GUI_X_Systick_Init, .-GUI_X_Systick_Init
+ 234              		.section	.text.GUI_X_Init,"ax",%progbits
+ 235              		.align	1
+ 236              		.global	GUI_X_Init
+ 237              		.thumb
+ 238              		.thumb_func
+ 239              		.type	GUI_X_Init, %function
+ 240              	GUI_X_Init:
+ 241              	.LFB69:
+  89:.\GUI_X.c     ****   GUI_X_Systick_Init();
+ 242              		.loc 1 89 0
+ 243              		.cfi_startproc
+ 244              		@ args = 0, pretend = 0, frame = 0
+ 245              		@ frame_needed = 0, uses_anonymous_args = 0
+ 246              		@ link register save eliminated.
+  90:.\GUI_X.c     **** }
+ 247              		.loc 1 90 0
+ 248 0000 FFF7FEBF 		b	GUI_X_Systick_Init
+ 249              	.LVL12:
+ 250              		.cfi_endproc
+ 251              	.LFE69:
+ 252              		.size	GUI_X_Init, .-GUI_X_Init
+ 253              		.comm	OS_TimeMS,4,4
+ 254              		.comm	NP_g_nFrameBufferSize,4,4
+ 255              		.comm	NP_g_pFrameBuffer,4,4
+ 256              		.comm	NP_g_bOwnsBuffer,1,1
+ 257              		.comm	NP_g_nDMA_TD,1,1
+ 258              		.comm	NP_g_nDMA_Chan,1,1
+ 259              		.comm	NP_g_nNumberOfPixels,4,4
+ 260              		.text
+ 261              	.Letext0:
+ 262              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+ 263              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+ 264              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 265              		.file 5 "Generated_Source\\PSoC5/CyLib.h"
+ 266              		.file 6 "Generated_Source\\PSoC5/NP_funcs.h"
+ 267              		.file 7 ".\\Core\\Include/cmsis_gcc.h"
+ 268              		.file 8 ".\\Core\\Include/core_cm3.h"
+ 269              		.section	.debug_info,"",%progbits
+ 270              	.Ldebug_info0:
+ 271 0000 97030000 		.4byte	0x397
+ 272 0004 0400     		.2byte	0x4
+ 273 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 274 000a 04       		.byte	0x4
+ 275 000b 01       		.uleb128 0x1
+ 276 000c E7000000 		.4byte	.LASF45
+ 277 0010 01       		.byte	0x1
+ 278 0011 C9010000 		.4byte	.LASF46
+ 279 0015 39020000 		.4byte	.LASF47
+ 280 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 281 001d 00000000 		.4byte	0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 9
+
+
+ 282 0021 00000000 		.4byte	.Ldebug_line0
+ 283 0025 02       		.uleb128 0x2
+ 284 0026 04       		.byte	0x4
+ 285 0027 05       		.byte	0x5
+ 286 0028 696E7400 		.ascii	"int\000"
+ 287 002c 03       		.uleb128 0x3
+ 288 002d 04       		.byte	0x4
+ 289 002e 07       		.byte	0x7
+ 290 002f 2C020000 		.4byte	.LASF0
+ 291 0033 03       		.uleb128 0x3
+ 292 0034 04       		.byte	0x4
+ 293 0035 07       		.byte	0x7
+ 294 0036 A1010000 		.4byte	.LASF1
+ 295 003a 03       		.uleb128 0x3
+ 296 003b 02       		.byte	0x2
+ 297 003c 05       		.byte	0x5
+ 298 003d 8D000000 		.4byte	.LASF2
+ 299 0041 03       		.uleb128 0x3
+ 300 0042 01       		.byte	0x1
+ 301 0043 08       		.byte	0x8
+ 302 0044 88020000 		.4byte	.LASF3
+ 303 0048 03       		.uleb128 0x3
+ 304 0049 01       		.byte	0x1
+ 305 004a 08       		.byte	0x8
+ 306 004b D9000000 		.4byte	.LASF4
+ 307 004f 04       		.uleb128 0x4
+ 308 0050 03       		.uleb128 0x3
+ 309 0051 04       		.byte	0x4
+ 310 0052 05       		.byte	0x5
+ 311 0053 54000000 		.4byte	.LASF5
+ 312 0057 05       		.uleb128 0x5
+ 313 0058 04       		.byte	0x4
+ 314 0059 4F000000 		.4byte	0x4f
+ 315 005d 05       		.uleb128 0x5
+ 316 005e 04       		.byte	0x4
+ 317 005f 63000000 		.4byte	0x63
+ 318 0063 06       		.uleb128 0x6
+ 319 0064 41000000 		.4byte	0x41
+ 320 0068 03       		.uleb128 0x3
+ 321 0069 02       		.byte	0x2
+ 322 006a 07       		.byte	0x7
+ 323 006b 5D000000 		.4byte	.LASF6
+ 324 006f 03       		.uleb128 0x3
+ 325 0070 01       		.byte	0x1
+ 326 0071 06       		.byte	0x6
+ 327 0072 6A030000 		.4byte	.LASF7
+ 328 0076 03       		.uleb128 0x3
+ 329 0077 04       		.byte	0x4
+ 330 0078 07       		.byte	0x7
+ 331 0079 B1020000 		.4byte	.LASF8
+ 332 007d 07       		.uleb128 0x7
+ 333 007e 70000000 		.4byte	.LASF9
+ 334 0082 02       		.byte	0x2
+ 335 0083 3F       		.byte	0x3f
+ 336 0084 50000000 		.4byte	0x50
+ 337 0088 07       		.uleb128 0x7
+ 338 0089 0B020000 		.4byte	.LASF10
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 10
+
+
+ 339 008d 02       		.byte	0x2
+ 340 008e 41       		.byte	0x41
+ 341 008f 33000000 		.4byte	0x33
+ 342 0093 03       		.uleb128 0x3
+ 343 0094 08       		.byte	0x8
+ 344 0095 05       		.byte	0x5
+ 345 0096 BF020000 		.4byte	.LASF11
+ 346 009a 03       		.uleb128 0x3
+ 347 009b 08       		.byte	0x8
+ 348 009c 07       		.byte	0x7
+ 349 009d C2000000 		.4byte	.LASF12
+ 350 00a1 07       		.uleb128 0x7
+ 351 00a2 A9020000 		.4byte	.LASF13
+ 352 00a6 03       		.byte	0x3
+ 353 00a7 2C       		.byte	0x2c
+ 354 00a8 7D000000 		.4byte	0x7d
+ 355 00ac 07       		.uleb128 0x7
+ 356 00ad 37030000 		.4byte	.LASF14
+ 357 00b1 03       		.byte	0x3
+ 358 00b2 2D       		.byte	0x2d
+ 359 00b3 88000000 		.4byte	0x88
+ 360 00b7 08       		.uleb128 0x8
+ 361 00b8 23030000 		.4byte	.LASF15
+ 362 00bc 04       		.byte	0x4
+ 363 00bd 9201     		.2byte	0x192
+ 364 00bf 48000000 		.4byte	0x48
+ 365 00c3 08       		.uleb128 0x8
+ 366 00c4 16020000 		.4byte	.LASF16
+ 367 00c8 04       		.byte	0x4
+ 368 00c9 9401     		.2byte	0x194
+ 369 00cb 33000000 		.4byte	0x33
+ 370 00cf 03       		.uleb128 0x3
+ 371 00d0 04       		.byte	0x4
+ 372 00d1 04       		.byte	0x4
+ 373 00d2 B1000000 		.4byte	.LASF17
+ 374 00d6 03       		.uleb128 0x3
+ 375 00d7 08       		.byte	0x8
+ 376 00d8 04       		.byte	0x4
+ 377 00d9 F7010000 		.4byte	.LASF18
+ 378 00dd 09       		.uleb128 0x9
+ 379 00de B7000000 		.4byte	0xb7
+ 380 00e2 07       		.uleb128 0x7
+ 381 00e3 CD020000 		.4byte	.LASF19
+ 382 00e7 05       		.byte	0x5
+ 383 00e8 AC       		.byte	0xac
+ 384 00e9 57000000 		.4byte	0x57
+ 385 00ed 0A       		.uleb128 0xa
+ 386 00ee 37000000 		.4byte	.LASF20
+ 387 00f2 01       		.byte	0x1
+ 388 00f3 85       		.byte	0x85
+ 389 00f4 00000000 		.4byte	.LFB74
+ 390 00f8 10000000 		.4byte	.LFE74-.LFB74
+ 391 00fc 01       		.uleb128 0x1
+ 392 00fd 9C       		.byte	0x9c
+ 393 00fe 0B       		.uleb128 0xb
+ 394 00ff 29030000 		.4byte	.LASF48
+ 395 0103 01       		.byte	0x1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 11
+
+
+ 396 0104 48       		.byte	0x48
+ 397 0105 25000000 		.4byte	0x25
+ 398 0109 00000000 		.4byte	.LFB67
+ 399 010d 0C000000 		.4byte	.LFE67-.LFB67
+ 400 0111 01       		.uleb128 0x1
+ 401 0112 9C       		.byte	0x9c
+ 402 0113 0C       		.uleb128 0xc
+ 403 0114 DF020000 		.4byte	.LASF22
+ 404 0118 01       		.byte	0x1
+ 405 0119 4C       		.byte	0x4c
+ 406 011a 00000000 		.4byte	.LFB68
+ 407 011e 14000000 		.4byte	.LFE68-.LFB68
+ 408 0122 01       		.uleb128 0x1
+ 409 0123 9C       		.byte	0x9c
+ 410 0124 44010000 		.4byte	0x144
+ 411 0128 0D       		.uleb128 0xd
+ 412 0129 6D7300   		.ascii	"ms\000"
+ 413 012c 01       		.byte	0x1
+ 414 012d 4C       		.byte	0x4c
+ 415 012e 25000000 		.4byte	0x25
+ 416 0132 00000000 		.4byte	.LLST0
+ 417 0136 0E       		.uleb128 0xe
+ 418 0137 BA020000 		.4byte	.LASF27
+ 419 013b 01       		.byte	0x1
+ 420 013c 4D       		.byte	0x4d
+ 421 013d 25000000 		.4byte	0x25
+ 422 0141 01       		.uleb128 0x1
+ 423 0142 50       		.byte	0x50
+ 424 0143 00       		.byte	0
+ 425 0144 0A       		.uleb128 0xa
+ 426 0145 EB020000 		.4byte	.LASF21
+ 427 0149 01       		.byte	0x1
+ 428 014a 65       		.byte	0x65
+ 429 014b 00000000 		.4byte	.LFB70
+ 430 014f 02000000 		.4byte	.LFE70-.LFB70
+ 431 0153 01       		.uleb128 0x1
+ 432 0154 9C       		.byte	0x9c
+ 433 0155 0C       		.uleb128 0xc
+ 434 0156 4A000000 		.4byte	.LASF23
+ 435 015a 01       		.byte	0x1
+ 436 015b 75       		.byte	0x75
+ 437 015c 00000000 		.4byte	.LFB71
+ 438 0160 02000000 		.4byte	.LFE71-.LFB71
+ 439 0164 01       		.uleb128 0x1
+ 440 0165 9C       		.byte	0x9c
+ 441 0166 76010000 		.4byte	0x176
+ 442 016a 0F       		.uleb128 0xf
+ 443 016b 7300     		.ascii	"s\000"
+ 444 016d 01       		.byte	0x1
+ 445 016e 75       		.byte	0x75
+ 446 016f 5D000000 		.4byte	0x5d
+ 447 0173 01       		.uleb128 0x1
+ 448 0174 50       		.byte	0x50
+ 449 0175 00       		.byte	0
+ 450 0176 0C       		.uleb128 0xc
+ 451 0177 B7000000 		.4byte	.LASF24
+ 452 017b 01       		.byte	0x1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 12
+
+
+ 453 017c 76       		.byte	0x76
+ 454 017d 00000000 		.4byte	.LFB72
+ 455 0181 02000000 		.4byte	.LFE72-.LFB72
+ 456 0185 01       		.uleb128 0x1
+ 457 0186 9C       		.byte	0x9c
+ 458 0187 97010000 		.4byte	0x197
+ 459 018b 0F       		.uleb128 0xf
+ 460 018c 7300     		.ascii	"s\000"
+ 461 018e 01       		.byte	0x1
+ 462 018f 76       		.byte	0x76
+ 463 0190 5D000000 		.4byte	0x5d
+ 464 0194 01       		.uleb128 0x1
+ 465 0195 50       		.byte	0x50
+ 466 0196 00       		.byte	0
+ 467 0197 0C       		.uleb128 0xc
+ 468 0198 1D020000 		.4byte	.LASF25
+ 469 019c 01       		.byte	0x1
+ 470 019d 77       		.byte	0x77
+ 471 019e 00000000 		.4byte	.LFB73
+ 472 01a2 02000000 		.4byte	.LFE73-.LFB73
+ 473 01a6 01       		.uleb128 0x1
+ 474 01a7 9C       		.byte	0x9c
+ 475 01a8 B8010000 		.4byte	0x1b8
+ 476 01ac 0F       		.uleb128 0xf
+ 477 01ad 7300     		.ascii	"s\000"
+ 478 01af 01       		.byte	0x1
+ 479 01b0 77       		.byte	0x77
+ 480 01b1 5D000000 		.4byte	0x5d
+ 481 01b5 01       		.uleb128 0x1
+ 482 01b6 50       		.byte	0x50
+ 483 01b7 00       		.byte	0
+ 484 01b8 0C       		.uleb128 0xc
+ 485 01b9 E4010000 		.4byte	.LASF26
+ 486 01bd 01       		.byte	0x1
+ 487 01be 90       		.byte	0x90
+ 488 01bf 00000000 		.4byte	.LFB75
+ 489 01c3 28000000 		.4byte	.LFE75-.LFB75
+ 490 01c7 01       		.uleb128 0x1
+ 491 01c8 9C       		.byte	0x9c
+ 492 01c9 0B020000 		.4byte	0x20b
+ 493 01cd 10       		.uleb128 0x10
+ 494 01ce 6900     		.ascii	"i\000"
+ 495 01d0 01       		.byte	0x1
+ 496 01d1 91       		.byte	0x91
+ 497 01d2 AC000000 		.4byte	0xac
+ 498 01d6 21000000 		.4byte	.LLST1
+ 499 01da 11       		.uleb128 0x11
+ 500 01db 06000000 		.4byte	.LVL5
+ 501 01df 68030000 		.4byte	0x368
+ 502 01e3 12       		.uleb128 0x12
+ 503 01e4 0E000000 		.4byte	.LVL7
+ 504 01e8 6F030000 		.4byte	0x36f
+ 505 01ec F7010000 		.4byte	0x1f7
+ 506 01f0 13       		.uleb128 0x13
+ 507 01f1 01       		.uleb128 0x1
+ 508 01f2 50       		.byte	0x50
+ 509 01f3 02       		.uleb128 0x2
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 13
+
+
+ 510 01f4 74       		.byte	0x74
+ 511 01f5 00       		.sleb128 0
+ 512 01f6 00       		.byte	0
+ 513 01f7 14       		.uleb128 0x14
+ 514 01f8 1C000000 		.4byte	.LVL9
+ 515 01fc 84030000 		.4byte	0x384
+ 516 0200 13       		.uleb128 0x13
+ 517 0201 01       		.uleb128 0x1
+ 518 0202 51       		.byte	0x51
+ 519 0203 05       		.uleb128 0x5
+ 520 0204 03       		.byte	0x3
+ 521 0205 00000000 		.4byte	GUI_X_Systick_Intr
+ 522 0209 00       		.byte	0
+ 523 020a 00       		.byte	0
+ 524 020b 0C       		.uleb128 0xc
+ 525 020c A6000000 		.4byte	.LASF28
+ 526 0210 01       		.byte	0x1
+ 527 0211 59       		.byte	0x59
+ 528 0212 00000000 		.4byte	.LFB69
+ 529 0216 04000000 		.4byte	.LFE69-.LFB69
+ 530 021a 01       		.uleb128 0x1
+ 531 021b 9C       		.byte	0x9c
+ 532 021c 2A020000 		.4byte	0x22a
+ 533 0220 15       		.uleb128 0x15
+ 534 0221 04000000 		.4byte	.LVL12
+ 535 0225 B8010000 		.4byte	0x1b8
+ 536 0229 00       		.byte	0
+ 537 022a 16       		.uleb128 0x16
+ 538 022b 76030000 		.4byte	.LASF29
+ 539 022f 06       		.byte	0x6
+ 540 0230 17       		.byte	0x17
+ 541 0231 2C000000 		.4byte	0x2c
+ 542 0235 05       		.uleb128 0x5
+ 543 0236 03       		.byte	0x3
+ 544 0237 00000000 		.4byte	NP_g_nNumberOfPixels
+ 545 023b 16       		.uleb128 0x16
+ 546 023c FA020000 		.4byte	.LASF30
+ 547 0240 06       		.byte	0x6
+ 548 0241 18       		.byte	0x18
+ 549 0242 B7000000 		.4byte	0xb7
+ 550 0246 05       		.uleb128 0x5
+ 551 0247 03       		.byte	0x3
+ 552 0248 00000000 		.4byte	NP_g_nDMA_Chan
+ 553 024c 16       		.uleb128 0x16
+ 554 024d FE010000 		.4byte	.LASF31
+ 555 0251 06       		.byte	0x6
+ 556 0252 19       		.byte	0x19
+ 557 0253 B7000000 		.4byte	0xb7
+ 558 0257 05       		.uleb128 0x5
+ 559 0258 03       		.byte	0x3
+ 560 0259 00000000 		.4byte	NP_g_nDMA_TD
+ 561 025d 16       		.uleb128 0x16
+ 562 025e D3010000 		.4byte	.LASF32
+ 563 0262 06       		.byte	0x6
+ 564 0263 1A       		.byte	0x1a
+ 565 0264 B7000000 		.4byte	0xb7
+ 566 0268 05       		.uleb128 0x5
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 14
+
+
+ 567 0269 03       		.byte	0x3
+ 568 026a 00000000 		.4byte	NP_g_bOwnsBuffer
+ 569 026e 16       		.uleb128 0x16
+ 570 026f 80010000 		.4byte	.LASF33
+ 571 0273 06       		.byte	0x6
+ 572 0274 1C       		.byte	0x1c
+ 573 0275 7F020000 		.4byte	0x27f
+ 574 0279 05       		.uleb128 0x5
+ 575 027a 03       		.byte	0x3
+ 576 027b 00000000 		.4byte	NP_g_pFrameBuffer
+ 577 027f 05       		.uleb128 0x5
+ 578 0280 04       		.byte	0x4
+ 579 0281 DD000000 		.4byte	0xdd
+ 580 0285 16       		.uleb128 0x16
+ 581 0286 B3010000 		.4byte	.LASF34
+ 582 028a 06       		.byte	0x6
+ 583 028b 1D       		.byte	0x1d
+ 584 028c 2C000000 		.4byte	0x2c
+ 585 0290 05       		.uleb128 0x5
+ 586 0291 03       		.byte	0x3
+ 587 0292 00000000 		.4byte	NP_g_nFrameBufferSize
+ 588 0296 07       		.uleb128 0x7
+ 589 0297 13000000 		.4byte	.LASF35
+ 590 029b 07       		.byte	0x7
+ 591 029c 8B       		.byte	0x8b
+ 592 029d 3B030000 		.4byte	0x33b
+ 593 02a1 05       		.uleb128 0x5
+ 594 02a2 04       		.byte	0x4
+ 595 02a3 A7020000 		.4byte	0x2a7
+ 596 02a7 06       		.uleb128 0x6
+ 597 02a8 AC000000 		.4byte	0xac
+ 598 02ac 05       		.uleb128 0x5
+ 599 02ad 04       		.byte	0x4
+ 600 02ae AC000000 		.4byte	0xac
+ 601 02b2 17       		.uleb128 0x17
+ 602 02b3 40030000 		.4byte	.LASF36
+ 603 02b7 07       		.byte	0x7
+ 604 02b8 92       		.byte	0x92
+ 605 02b9 BD020000 		.4byte	0x2bd
+ 606 02bd 06       		.uleb128 0x6
+ 607 02be 96020000 		.4byte	0x296
+ 608 02c2 17       		.uleb128 0x17
+ 609 02c3 7A000000 		.4byte	.LASF37
+ 610 02c7 07       		.byte	0x7
+ 611 02c8 93       		.byte	0x93
+ 612 02c9 BD020000 		.4byte	0x2bd
+ 613 02cd 07       		.uleb128 0x7
+ 614 02ce 97000000 		.4byte	.LASF38
+ 615 02d2 07       		.byte	0x7
+ 616 02d3 90       		.byte	0x90
+ 617 02d4 1A030000 		.4byte	0x31a
+ 618 02d8 17       		.uleb128 0x17
+ 619 02d9 55030000 		.4byte	.LASF39
+ 620 02dd 07       		.byte	0x7
+ 621 02de 94       		.byte	0x94
+ 622 02df E3020000 		.4byte	0x2e3
+ 623 02e3 06       		.uleb128 0x6
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 15
+
+
+ 624 02e4 CD020000 		.4byte	0x2cd
+ 625 02e8 17       		.uleb128 0x17
+ 626 02e9 00000000 		.4byte	.LASF40
+ 627 02ed 07       		.byte	0x7
+ 628 02ee 95       		.byte	0x95
+ 629 02ef E3020000 		.4byte	0x2e3
+ 630 02f3 18       		.uleb128 0x18
+ 631 02f4 92020000 		.4byte	.LASF41
+ 632 02f8 08       		.byte	0x8
+ 633 02f9 4A07     		.2byte	0x74a
+ 634 02fb FF020000 		.4byte	0x2ff
+ 635 02ff 09       		.uleb128 0x9
+ 636 0300 A1000000 		.4byte	0xa1
+ 637 0304 16       		.uleb128 0x16
+ 638 0305 9F020000 		.4byte	.LASF42
+ 639 0309 01       		.byte	0x1
+ 640 030a 3B       		.byte	0x3b
+ 641 030b 15030000 		.4byte	0x315
+ 642 030f 05       		.uleb128 0x5
+ 643 0310 03       		.byte	0x3
+ 644 0311 00000000 		.4byte	OS_TimeMS
+ 645 0315 09       		.uleb128 0x9
+ 646 0316 25000000 		.4byte	0x25
+ 647 031a 19       		.uleb128 0x19
+ 648 031b 08       		.byte	0x8
+ 649 031c 07       		.byte	0x7
+ 650 031d 8D       		.byte	0x8d
+ 651 031e 3B030000 		.4byte	0x33b
+ 652 0322 1A       		.uleb128 0x1a
+ 653 0323 8D020000 		.4byte	.LASF43
+ 654 0327 07       		.byte	0x7
+ 655 0328 8E       		.byte	0x8e
+ 656 0329 AC020000 		.4byte	0x2ac
+ 657 032d 00       		.byte	0
+ 658 032e 1A       		.uleb128 0x1a
+ 659 032f 09030000 		.4byte	.LASF44
+ 660 0333 07       		.byte	0x7
+ 661 0334 8F       		.byte	0x8f
+ 662 0335 AC000000 		.4byte	0xac
+ 663 0339 04       		.byte	0x4
+ 664 033a 00       		.byte	0
+ 665 033b 19       		.uleb128 0x19
+ 666 033c 0C       		.byte	0xc
+ 667 033d 07       		.byte	0x7
+ 668 033e 87       		.byte	0x87
+ 669 033f 68030000 		.4byte	0x368
+ 670 0343 1B       		.uleb128 0x1b
+ 671 0344 73726300 		.ascii	"src\000"
+ 672 0348 07       		.byte	0x7
+ 673 0349 88       		.byte	0x88
+ 674 034a A1020000 		.4byte	0x2a1
+ 675 034e 00       		.byte	0
+ 676 034f 1A       		.uleb128 0x1a
+ 677 0350 8D020000 		.4byte	.LASF43
+ 678 0354 07       		.byte	0x7
+ 679 0355 89       		.byte	0x89
+ 680 0356 AC020000 		.4byte	0x2ac
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 16
+
+
+ 681 035a 04       		.byte	0x4
+ 682 035b 1A       		.uleb128 0x1a
+ 683 035c 09030000 		.4byte	.LASF44
+ 684 0360 07       		.byte	0x7
+ 685 0361 8A       		.byte	0x8a
+ 686 0362 AC000000 		.4byte	0xac
+ 687 0366 08       		.byte	0x8
+ 688 0367 00       		.byte	0
+ 689 0368 1C       		.uleb128 0x1c
+ 690 0369 92010000 		.4byte	.LASF49
+ 691 036d 05       		.byte	0x5
+ 692 036e AE       		.byte	0xae
+ 693 036f 1D       		.uleb128 0x1d
+ 694 0370 0E030000 		.4byte	.LASF50
+ 695 0374 05       		.byte	0x5
+ 696 0375 B8       		.byte	0xb8
+ 697 0376 E2000000 		.4byte	0xe2
+ 698 037a 84030000 		.4byte	0x384
+ 699 037e 1E       		.uleb128 0x1e
+ 700 037f C3000000 		.4byte	0xc3
+ 701 0383 00       		.byte	0
+ 702 0384 1F       		.uleb128 0x1f
+ 703 0385 22000000 		.4byte	.LASF51
+ 704 0389 05       		.byte	0x5
+ 705 038a B7       		.byte	0xb7
+ 706 038b E2000000 		.4byte	0xe2
+ 707 038f 1E       		.uleb128 0x1e
+ 708 0390 C3000000 		.4byte	0xc3
+ 709 0394 1E       		.uleb128 0x1e
+ 710 0395 E2000000 		.4byte	0xe2
+ 711 0399 00       		.byte	0
+ 712 039a 00       		.byte	0
+ 713              		.section	.debug_abbrev,"",%progbits
+ 714              	.Ldebug_abbrev0:
+ 715 0000 01       		.uleb128 0x1
+ 716 0001 11       		.uleb128 0x11
+ 717 0002 01       		.byte	0x1
+ 718 0003 25       		.uleb128 0x25
+ 719 0004 0E       		.uleb128 0xe
+ 720 0005 13       		.uleb128 0x13
+ 721 0006 0B       		.uleb128 0xb
+ 722 0007 03       		.uleb128 0x3
+ 723 0008 0E       		.uleb128 0xe
+ 724 0009 1B       		.uleb128 0x1b
+ 725 000a 0E       		.uleb128 0xe
+ 726 000b 55       		.uleb128 0x55
+ 727 000c 17       		.uleb128 0x17
+ 728 000d 11       		.uleb128 0x11
+ 729 000e 01       		.uleb128 0x1
+ 730 000f 10       		.uleb128 0x10
+ 731 0010 17       		.uleb128 0x17
+ 732 0011 00       		.byte	0
+ 733 0012 00       		.byte	0
+ 734 0013 02       		.uleb128 0x2
+ 735 0014 24       		.uleb128 0x24
+ 736 0015 00       		.byte	0
+ 737 0016 0B       		.uleb128 0xb
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 17
+
+
+ 738 0017 0B       		.uleb128 0xb
+ 739 0018 3E       		.uleb128 0x3e
+ 740 0019 0B       		.uleb128 0xb
+ 741 001a 03       		.uleb128 0x3
+ 742 001b 08       		.uleb128 0x8
+ 743 001c 00       		.byte	0
+ 744 001d 00       		.byte	0
+ 745 001e 03       		.uleb128 0x3
+ 746 001f 24       		.uleb128 0x24
+ 747 0020 00       		.byte	0
+ 748 0021 0B       		.uleb128 0xb
+ 749 0022 0B       		.uleb128 0xb
+ 750 0023 3E       		.uleb128 0x3e
+ 751 0024 0B       		.uleb128 0xb
+ 752 0025 03       		.uleb128 0x3
+ 753 0026 0E       		.uleb128 0xe
+ 754 0027 00       		.byte	0
+ 755 0028 00       		.byte	0
+ 756 0029 04       		.uleb128 0x4
+ 757 002a 15       		.uleb128 0x15
+ 758 002b 00       		.byte	0
+ 759 002c 27       		.uleb128 0x27
+ 760 002d 19       		.uleb128 0x19
+ 761 002e 00       		.byte	0
+ 762 002f 00       		.byte	0
+ 763 0030 05       		.uleb128 0x5
+ 764 0031 0F       		.uleb128 0xf
+ 765 0032 00       		.byte	0
+ 766 0033 0B       		.uleb128 0xb
+ 767 0034 0B       		.uleb128 0xb
+ 768 0035 49       		.uleb128 0x49
+ 769 0036 13       		.uleb128 0x13
+ 770 0037 00       		.byte	0
+ 771 0038 00       		.byte	0
+ 772 0039 06       		.uleb128 0x6
+ 773 003a 26       		.uleb128 0x26
+ 774 003b 00       		.byte	0
+ 775 003c 49       		.uleb128 0x49
+ 776 003d 13       		.uleb128 0x13
+ 777 003e 00       		.byte	0
+ 778 003f 00       		.byte	0
+ 779 0040 07       		.uleb128 0x7
+ 780 0041 16       		.uleb128 0x16
+ 781 0042 00       		.byte	0
+ 782 0043 03       		.uleb128 0x3
+ 783 0044 0E       		.uleb128 0xe
+ 784 0045 3A       		.uleb128 0x3a
+ 785 0046 0B       		.uleb128 0xb
+ 786 0047 3B       		.uleb128 0x3b
+ 787 0048 0B       		.uleb128 0xb
+ 788 0049 49       		.uleb128 0x49
+ 789 004a 13       		.uleb128 0x13
+ 790 004b 00       		.byte	0
+ 791 004c 00       		.byte	0
+ 792 004d 08       		.uleb128 0x8
+ 793 004e 16       		.uleb128 0x16
+ 794 004f 00       		.byte	0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 18
+
+
+ 795 0050 03       		.uleb128 0x3
+ 796 0051 0E       		.uleb128 0xe
+ 797 0052 3A       		.uleb128 0x3a
+ 798 0053 0B       		.uleb128 0xb
+ 799 0054 3B       		.uleb128 0x3b
+ 800 0055 05       		.uleb128 0x5
+ 801 0056 49       		.uleb128 0x49
+ 802 0057 13       		.uleb128 0x13
+ 803 0058 00       		.byte	0
+ 804 0059 00       		.byte	0
+ 805 005a 09       		.uleb128 0x9
+ 806 005b 35       		.uleb128 0x35
+ 807 005c 00       		.byte	0
+ 808 005d 49       		.uleb128 0x49
+ 809 005e 13       		.uleb128 0x13
+ 810 005f 00       		.byte	0
+ 811 0060 00       		.byte	0
+ 812 0061 0A       		.uleb128 0xa
+ 813 0062 2E       		.uleb128 0x2e
+ 814 0063 00       		.byte	0
+ 815 0064 3F       		.uleb128 0x3f
+ 816 0065 19       		.uleb128 0x19
+ 817 0066 03       		.uleb128 0x3
+ 818 0067 0E       		.uleb128 0xe
+ 819 0068 3A       		.uleb128 0x3a
+ 820 0069 0B       		.uleb128 0xb
+ 821 006a 3B       		.uleb128 0x3b
+ 822 006b 0B       		.uleb128 0xb
+ 823 006c 27       		.uleb128 0x27
+ 824 006d 19       		.uleb128 0x19
+ 825 006e 11       		.uleb128 0x11
+ 826 006f 01       		.uleb128 0x1
+ 827 0070 12       		.uleb128 0x12
+ 828 0071 06       		.uleb128 0x6
+ 829 0072 40       		.uleb128 0x40
+ 830 0073 18       		.uleb128 0x18
+ 831 0074 9742     		.uleb128 0x2117
+ 832 0076 19       		.uleb128 0x19
+ 833 0077 00       		.byte	0
+ 834 0078 00       		.byte	0
+ 835 0079 0B       		.uleb128 0xb
+ 836 007a 2E       		.uleb128 0x2e
+ 837 007b 00       		.byte	0
+ 838 007c 3F       		.uleb128 0x3f
+ 839 007d 19       		.uleb128 0x19
+ 840 007e 03       		.uleb128 0x3
+ 841 007f 0E       		.uleb128 0xe
+ 842 0080 3A       		.uleb128 0x3a
+ 843 0081 0B       		.uleb128 0xb
+ 844 0082 3B       		.uleb128 0x3b
+ 845 0083 0B       		.uleb128 0xb
+ 846 0084 27       		.uleb128 0x27
+ 847 0085 19       		.uleb128 0x19
+ 848 0086 49       		.uleb128 0x49
+ 849 0087 13       		.uleb128 0x13
+ 850 0088 11       		.uleb128 0x11
+ 851 0089 01       		.uleb128 0x1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 19
+
+
+ 852 008a 12       		.uleb128 0x12
+ 853 008b 06       		.uleb128 0x6
+ 854 008c 40       		.uleb128 0x40
+ 855 008d 18       		.uleb128 0x18
+ 856 008e 9742     		.uleb128 0x2117
+ 857 0090 19       		.uleb128 0x19
+ 858 0091 00       		.byte	0
+ 859 0092 00       		.byte	0
+ 860 0093 0C       		.uleb128 0xc
+ 861 0094 2E       		.uleb128 0x2e
+ 862 0095 01       		.byte	0x1
+ 863 0096 3F       		.uleb128 0x3f
+ 864 0097 19       		.uleb128 0x19
+ 865 0098 03       		.uleb128 0x3
+ 866 0099 0E       		.uleb128 0xe
+ 867 009a 3A       		.uleb128 0x3a
+ 868 009b 0B       		.uleb128 0xb
+ 869 009c 3B       		.uleb128 0x3b
+ 870 009d 0B       		.uleb128 0xb
+ 871 009e 27       		.uleb128 0x27
+ 872 009f 19       		.uleb128 0x19
+ 873 00a0 11       		.uleb128 0x11
+ 874 00a1 01       		.uleb128 0x1
+ 875 00a2 12       		.uleb128 0x12
+ 876 00a3 06       		.uleb128 0x6
+ 877 00a4 40       		.uleb128 0x40
+ 878 00a5 18       		.uleb128 0x18
+ 879 00a6 9742     		.uleb128 0x2117
+ 880 00a8 19       		.uleb128 0x19
+ 881 00a9 01       		.uleb128 0x1
+ 882 00aa 13       		.uleb128 0x13
+ 883 00ab 00       		.byte	0
+ 884 00ac 00       		.byte	0
+ 885 00ad 0D       		.uleb128 0xd
+ 886 00ae 05       		.uleb128 0x5
+ 887 00af 00       		.byte	0
+ 888 00b0 03       		.uleb128 0x3
+ 889 00b1 08       		.uleb128 0x8
+ 890 00b2 3A       		.uleb128 0x3a
+ 891 00b3 0B       		.uleb128 0xb
+ 892 00b4 3B       		.uleb128 0x3b
+ 893 00b5 0B       		.uleb128 0xb
+ 894 00b6 49       		.uleb128 0x49
+ 895 00b7 13       		.uleb128 0x13
+ 896 00b8 02       		.uleb128 0x2
+ 897 00b9 17       		.uleb128 0x17
+ 898 00ba 00       		.byte	0
+ 899 00bb 00       		.byte	0
+ 900 00bc 0E       		.uleb128 0xe
+ 901 00bd 34       		.uleb128 0x34
+ 902 00be 00       		.byte	0
+ 903 00bf 03       		.uleb128 0x3
+ 904 00c0 0E       		.uleb128 0xe
+ 905 00c1 3A       		.uleb128 0x3a
+ 906 00c2 0B       		.uleb128 0xb
+ 907 00c3 3B       		.uleb128 0x3b
+ 908 00c4 0B       		.uleb128 0xb
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 20
+
+
+ 909 00c5 49       		.uleb128 0x49
+ 910 00c6 13       		.uleb128 0x13
+ 911 00c7 02       		.uleb128 0x2
+ 912 00c8 18       		.uleb128 0x18
+ 913 00c9 00       		.byte	0
+ 914 00ca 00       		.byte	0
+ 915 00cb 0F       		.uleb128 0xf
+ 916 00cc 05       		.uleb128 0x5
+ 917 00cd 00       		.byte	0
+ 918 00ce 03       		.uleb128 0x3
+ 919 00cf 08       		.uleb128 0x8
+ 920 00d0 3A       		.uleb128 0x3a
+ 921 00d1 0B       		.uleb128 0xb
+ 922 00d2 3B       		.uleb128 0x3b
+ 923 00d3 0B       		.uleb128 0xb
+ 924 00d4 49       		.uleb128 0x49
+ 925 00d5 13       		.uleb128 0x13
+ 926 00d6 02       		.uleb128 0x2
+ 927 00d7 18       		.uleb128 0x18
+ 928 00d8 00       		.byte	0
+ 929 00d9 00       		.byte	0
+ 930 00da 10       		.uleb128 0x10
+ 931 00db 34       		.uleb128 0x34
+ 932 00dc 00       		.byte	0
+ 933 00dd 03       		.uleb128 0x3
+ 934 00de 08       		.uleb128 0x8
+ 935 00df 3A       		.uleb128 0x3a
+ 936 00e0 0B       		.uleb128 0xb
+ 937 00e1 3B       		.uleb128 0x3b
+ 938 00e2 0B       		.uleb128 0xb
+ 939 00e3 49       		.uleb128 0x49
+ 940 00e4 13       		.uleb128 0x13
+ 941 00e5 02       		.uleb128 0x2
+ 942 00e6 17       		.uleb128 0x17
+ 943 00e7 00       		.byte	0
+ 944 00e8 00       		.byte	0
+ 945 00e9 11       		.uleb128 0x11
+ 946 00ea 898201   		.uleb128 0x4109
+ 947 00ed 00       		.byte	0
+ 948 00ee 11       		.uleb128 0x11
+ 949 00ef 01       		.uleb128 0x1
+ 950 00f0 31       		.uleb128 0x31
+ 951 00f1 13       		.uleb128 0x13
+ 952 00f2 00       		.byte	0
+ 953 00f3 00       		.byte	0
+ 954 00f4 12       		.uleb128 0x12
+ 955 00f5 898201   		.uleb128 0x4109
+ 956 00f8 01       		.byte	0x1
+ 957 00f9 11       		.uleb128 0x11
+ 958 00fa 01       		.uleb128 0x1
+ 959 00fb 31       		.uleb128 0x31
+ 960 00fc 13       		.uleb128 0x13
+ 961 00fd 01       		.uleb128 0x1
+ 962 00fe 13       		.uleb128 0x13
+ 963 00ff 00       		.byte	0
+ 964 0100 00       		.byte	0
+ 965 0101 13       		.uleb128 0x13
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 21
+
+
+ 966 0102 8A8201   		.uleb128 0x410a
+ 967 0105 00       		.byte	0
+ 968 0106 02       		.uleb128 0x2
+ 969 0107 18       		.uleb128 0x18
+ 970 0108 9142     		.uleb128 0x2111
+ 971 010a 18       		.uleb128 0x18
+ 972 010b 00       		.byte	0
+ 973 010c 00       		.byte	0
+ 974 010d 14       		.uleb128 0x14
+ 975 010e 898201   		.uleb128 0x4109
+ 976 0111 01       		.byte	0x1
+ 977 0112 11       		.uleb128 0x11
+ 978 0113 01       		.uleb128 0x1
+ 979 0114 9542     		.uleb128 0x2115
+ 980 0116 19       		.uleb128 0x19
+ 981 0117 31       		.uleb128 0x31
+ 982 0118 13       		.uleb128 0x13
+ 983 0119 00       		.byte	0
+ 984 011a 00       		.byte	0
+ 985 011b 15       		.uleb128 0x15
+ 986 011c 898201   		.uleb128 0x4109
+ 987 011f 00       		.byte	0
+ 988 0120 11       		.uleb128 0x11
+ 989 0121 01       		.uleb128 0x1
+ 990 0122 9542     		.uleb128 0x2115
+ 991 0124 19       		.uleb128 0x19
+ 992 0125 31       		.uleb128 0x31
+ 993 0126 13       		.uleb128 0x13
+ 994 0127 00       		.byte	0
+ 995 0128 00       		.byte	0
+ 996 0129 16       		.uleb128 0x16
+ 997 012a 34       		.uleb128 0x34
+ 998 012b 00       		.byte	0
+ 999 012c 03       		.uleb128 0x3
+ 1000 012d 0E       		.uleb128 0xe
+ 1001 012e 3A       		.uleb128 0x3a
+ 1002 012f 0B       		.uleb128 0xb
+ 1003 0130 3B       		.uleb128 0x3b
+ 1004 0131 0B       		.uleb128 0xb
+ 1005 0132 49       		.uleb128 0x49
+ 1006 0133 13       		.uleb128 0x13
+ 1007 0134 3F       		.uleb128 0x3f
+ 1008 0135 19       		.uleb128 0x19
+ 1009 0136 02       		.uleb128 0x2
+ 1010 0137 18       		.uleb128 0x18
+ 1011 0138 00       		.byte	0
+ 1012 0139 00       		.byte	0
+ 1013 013a 17       		.uleb128 0x17
+ 1014 013b 34       		.uleb128 0x34
+ 1015 013c 00       		.byte	0
+ 1016 013d 03       		.uleb128 0x3
+ 1017 013e 0E       		.uleb128 0xe
+ 1018 013f 3A       		.uleb128 0x3a
+ 1019 0140 0B       		.uleb128 0xb
+ 1020 0141 3B       		.uleb128 0x3b
+ 1021 0142 0B       		.uleb128 0xb
+ 1022 0143 49       		.uleb128 0x49
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 22
+
+
+ 1023 0144 13       		.uleb128 0x13
+ 1024 0145 3F       		.uleb128 0x3f
+ 1025 0146 19       		.uleb128 0x19
+ 1026 0147 3C       		.uleb128 0x3c
+ 1027 0148 19       		.uleb128 0x19
+ 1028 0149 00       		.byte	0
+ 1029 014a 00       		.byte	0
+ 1030 014b 18       		.uleb128 0x18
+ 1031 014c 34       		.uleb128 0x34
+ 1032 014d 00       		.byte	0
+ 1033 014e 03       		.uleb128 0x3
+ 1034 014f 0E       		.uleb128 0xe
+ 1035 0150 3A       		.uleb128 0x3a
+ 1036 0151 0B       		.uleb128 0xb
+ 1037 0152 3B       		.uleb128 0x3b
+ 1038 0153 05       		.uleb128 0x5
+ 1039 0154 49       		.uleb128 0x49
+ 1040 0155 13       		.uleb128 0x13
+ 1041 0156 3F       		.uleb128 0x3f
+ 1042 0157 19       		.uleb128 0x19
+ 1043 0158 3C       		.uleb128 0x3c
+ 1044 0159 19       		.uleb128 0x19
+ 1045 015a 00       		.byte	0
+ 1046 015b 00       		.byte	0
+ 1047 015c 19       		.uleb128 0x19
+ 1048 015d 13       		.uleb128 0x13
+ 1049 015e 01       		.byte	0x1
+ 1050 015f 0B       		.uleb128 0xb
+ 1051 0160 0B       		.uleb128 0xb
+ 1052 0161 3A       		.uleb128 0x3a
+ 1053 0162 0B       		.uleb128 0xb
+ 1054 0163 3B       		.uleb128 0x3b
+ 1055 0164 0B       		.uleb128 0xb
+ 1056 0165 01       		.uleb128 0x1
+ 1057 0166 13       		.uleb128 0x13
+ 1058 0167 00       		.byte	0
+ 1059 0168 00       		.byte	0
+ 1060 0169 1A       		.uleb128 0x1a
+ 1061 016a 0D       		.uleb128 0xd
+ 1062 016b 00       		.byte	0
+ 1063 016c 03       		.uleb128 0x3
+ 1064 016d 0E       		.uleb128 0xe
+ 1065 016e 3A       		.uleb128 0x3a
+ 1066 016f 0B       		.uleb128 0xb
+ 1067 0170 3B       		.uleb128 0x3b
+ 1068 0171 0B       		.uleb128 0xb
+ 1069 0172 49       		.uleb128 0x49
+ 1070 0173 13       		.uleb128 0x13
+ 1071 0174 38       		.uleb128 0x38
+ 1072 0175 0B       		.uleb128 0xb
+ 1073 0176 00       		.byte	0
+ 1074 0177 00       		.byte	0
+ 1075 0178 1B       		.uleb128 0x1b
+ 1076 0179 0D       		.uleb128 0xd
+ 1077 017a 00       		.byte	0
+ 1078 017b 03       		.uleb128 0x3
+ 1079 017c 08       		.uleb128 0x8
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 23
+
+
+ 1080 017d 3A       		.uleb128 0x3a
+ 1081 017e 0B       		.uleb128 0xb
+ 1082 017f 3B       		.uleb128 0x3b
+ 1083 0180 0B       		.uleb128 0xb
+ 1084 0181 49       		.uleb128 0x49
+ 1085 0182 13       		.uleb128 0x13
+ 1086 0183 38       		.uleb128 0x38
+ 1087 0184 0B       		.uleb128 0xb
+ 1088 0185 00       		.byte	0
+ 1089 0186 00       		.byte	0
+ 1090 0187 1C       		.uleb128 0x1c
+ 1091 0188 2E       		.uleb128 0x2e
+ 1092 0189 00       		.byte	0
+ 1093 018a 3F       		.uleb128 0x3f
+ 1094 018b 19       		.uleb128 0x19
+ 1095 018c 03       		.uleb128 0x3
+ 1096 018d 0E       		.uleb128 0xe
+ 1097 018e 3A       		.uleb128 0x3a
+ 1098 018f 0B       		.uleb128 0xb
+ 1099 0190 3B       		.uleb128 0x3b
+ 1100 0191 0B       		.uleb128 0xb
+ 1101 0192 27       		.uleb128 0x27
+ 1102 0193 19       		.uleb128 0x19
+ 1103 0194 3C       		.uleb128 0x3c
+ 1104 0195 19       		.uleb128 0x19
+ 1105 0196 00       		.byte	0
+ 1106 0197 00       		.byte	0
+ 1107 0198 1D       		.uleb128 0x1d
+ 1108 0199 2E       		.uleb128 0x2e
+ 1109 019a 01       		.byte	0x1
+ 1110 019b 3F       		.uleb128 0x3f
+ 1111 019c 19       		.uleb128 0x19
+ 1112 019d 03       		.uleb128 0x3
+ 1113 019e 0E       		.uleb128 0xe
+ 1114 019f 3A       		.uleb128 0x3a
+ 1115 01a0 0B       		.uleb128 0xb
+ 1116 01a1 3B       		.uleb128 0x3b
+ 1117 01a2 0B       		.uleb128 0xb
+ 1118 01a3 27       		.uleb128 0x27
+ 1119 01a4 19       		.uleb128 0x19
+ 1120 01a5 49       		.uleb128 0x49
+ 1121 01a6 13       		.uleb128 0x13
+ 1122 01a7 3C       		.uleb128 0x3c
+ 1123 01a8 19       		.uleb128 0x19
+ 1124 01a9 01       		.uleb128 0x1
+ 1125 01aa 13       		.uleb128 0x13
+ 1126 01ab 00       		.byte	0
+ 1127 01ac 00       		.byte	0
+ 1128 01ad 1E       		.uleb128 0x1e
+ 1129 01ae 05       		.uleb128 0x5
+ 1130 01af 00       		.byte	0
+ 1131 01b0 49       		.uleb128 0x49
+ 1132 01b1 13       		.uleb128 0x13
+ 1133 01b2 00       		.byte	0
+ 1134 01b3 00       		.byte	0
+ 1135 01b4 1F       		.uleb128 0x1f
+ 1136 01b5 2E       		.uleb128 0x2e
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 24
+
+
+ 1137 01b6 01       		.byte	0x1
+ 1138 01b7 3F       		.uleb128 0x3f
+ 1139 01b8 19       		.uleb128 0x19
+ 1140 01b9 03       		.uleb128 0x3
+ 1141 01ba 0E       		.uleb128 0xe
+ 1142 01bb 3A       		.uleb128 0x3a
+ 1143 01bc 0B       		.uleb128 0xb
+ 1144 01bd 3B       		.uleb128 0x3b
+ 1145 01be 0B       		.uleb128 0xb
+ 1146 01bf 27       		.uleb128 0x27
+ 1147 01c0 19       		.uleb128 0x19
+ 1148 01c1 49       		.uleb128 0x49
+ 1149 01c2 13       		.uleb128 0x13
+ 1150 01c3 3C       		.uleb128 0x3c
+ 1151 01c4 19       		.uleb128 0x19
+ 1152 01c5 00       		.byte	0
+ 1153 01c6 00       		.byte	0
+ 1154 01c7 00       		.byte	0
+ 1155              		.section	.debug_loc,"",%progbits
+ 1156              	.Ldebug_loc0:
+ 1157              	.LLST0:
+ 1158 0000 00000000 		.4byte	.LVL0
+ 1159 0004 06000000 		.4byte	.LVL1
+ 1160 0008 0100     		.2byte	0x1
+ 1161 000a 50       		.byte	0x50
+ 1162 000b 06000000 		.4byte	.LVL1
+ 1163 000f 14000000 		.4byte	.LFE68
+ 1164 0013 0400     		.2byte	0x4
+ 1165 0015 F3       		.byte	0xf3
+ 1166 0016 01       		.uleb128 0x1
+ 1167 0017 50       		.byte	0x50
+ 1168 0018 9F       		.byte	0x9f
+ 1169 0019 00000000 		.4byte	0
+ 1170 001d 00000000 		.4byte	0
+ 1171              	.LLST1:
+ 1172 0021 06000000 		.4byte	.LVL5
+ 1173 0025 08000000 		.4byte	.LVL6
+ 1174 0029 0200     		.2byte	0x2
+ 1175 002b 30       		.byte	0x30
+ 1176 002c 9F       		.byte	0x9f
+ 1177 002d 08000000 		.4byte	.LVL6
+ 1178 0031 16000000 		.4byte	.LVL8
+ 1179 0035 0100     		.2byte	0x1
+ 1180 0037 54       		.byte	0x54
+ 1181 0038 16000000 		.4byte	.LVL8
+ 1182 003c 1B000000 		.4byte	.LVL9-1
+ 1183 0040 0100     		.2byte	0x1
+ 1184 0042 50       		.byte	0x50
+ 1185 0043 1C000000 		.4byte	.LVL9
+ 1186 0047 24000000 		.4byte	.LVL11
+ 1187 004b 0100     		.2byte	0x1
+ 1188 004d 54       		.byte	0x54
+ 1189 004e 00000000 		.4byte	0
+ 1190 0052 00000000 		.4byte	0
+ 1191              		.section	.debug_aranges,"",%progbits
+ 1192 0000 5C000000 		.4byte	0x5c
+ 1193 0004 0200     		.2byte	0x2
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 25
+
+
+ 1194 0006 00000000 		.4byte	.Ldebug_info0
+ 1195 000a 04       		.byte	0x4
+ 1196 000b 00       		.byte	0
+ 1197 000c 0000     		.2byte	0
+ 1198 000e 0000     		.2byte	0
+ 1199 0010 00000000 		.4byte	.LFB74
+ 1200 0014 10000000 		.4byte	.LFE74-.LFB74
+ 1201 0018 00000000 		.4byte	.LFB67
+ 1202 001c 0C000000 		.4byte	.LFE67-.LFB67
+ 1203 0020 00000000 		.4byte	.LFB68
+ 1204 0024 14000000 		.4byte	.LFE68-.LFB68
+ 1205 0028 00000000 		.4byte	.LFB70
+ 1206 002c 02000000 		.4byte	.LFE70-.LFB70
+ 1207 0030 00000000 		.4byte	.LFB71
+ 1208 0034 02000000 		.4byte	.LFE71-.LFB71
+ 1209 0038 00000000 		.4byte	.LFB72
+ 1210 003c 02000000 		.4byte	.LFE72-.LFB72
+ 1211 0040 00000000 		.4byte	.LFB73
+ 1212 0044 02000000 		.4byte	.LFE73-.LFB73
+ 1213 0048 00000000 		.4byte	.LFB75
+ 1214 004c 28000000 		.4byte	.LFE75-.LFB75
+ 1215 0050 00000000 		.4byte	.LFB69
+ 1216 0054 04000000 		.4byte	.LFE69-.LFB69
+ 1217 0058 00000000 		.4byte	0
+ 1218 005c 00000000 		.4byte	0
+ 1219              		.section	.debug_ranges,"",%progbits
+ 1220              	.Ldebug_ranges0:
+ 1221 0000 00000000 		.4byte	.LFB74
+ 1222 0004 10000000 		.4byte	.LFE74
+ 1223 0008 00000000 		.4byte	.LFB67
+ 1224 000c 0C000000 		.4byte	.LFE67
+ 1225 0010 00000000 		.4byte	.LFB68
+ 1226 0014 14000000 		.4byte	.LFE68
+ 1227 0018 00000000 		.4byte	.LFB70
+ 1228 001c 02000000 		.4byte	.LFE70
+ 1229 0020 00000000 		.4byte	.LFB71
+ 1230 0024 02000000 		.4byte	.LFE71
+ 1231 0028 00000000 		.4byte	.LFB72
+ 1232 002c 02000000 		.4byte	.LFE72
+ 1233 0030 00000000 		.4byte	.LFB73
+ 1234 0034 02000000 		.4byte	.LFE73
+ 1235 0038 00000000 		.4byte	.LFB75
+ 1236 003c 28000000 		.4byte	.LFE75
+ 1237 0040 00000000 		.4byte	.LFB69
+ 1238 0044 04000000 		.4byte	.LFE69
+ 1239 0048 00000000 		.4byte	0
+ 1240 004c 00000000 		.4byte	0
+ 1241              		.section	.debug_line,"",%progbits
+ 1242              	.Ldebug_line0:
+ 1243 0000 33020000 		.section	.debug_str,"MS",%progbits,1
+ 1243      02008101 
+ 1243      00000201 
+ 1243      FB0E0D00 
+ 1243      01010101 
+ 1244              	.LASF40:
+ 1245 0000 5F5F7A65 		.ascii	"__zero_table_end__\000"
+ 1245      726F5F74 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 26
+
+
+ 1245      61626C65 
+ 1245      5F656E64 
+ 1245      5F5F00
+ 1246              	.LASF35:
+ 1247 0013 5F5F636F 		.ascii	"__copy_table_t\000"
+ 1247      70795F74 
+ 1247      61626C65 
+ 1247      5F7400
+ 1248              	.LASF51:
+ 1249 0022 43795379 		.ascii	"CySysTickSetCallback\000"
+ 1249      73546963 
+ 1249      6B536574 
+ 1249      43616C6C 
+ 1249      6261636B 
+ 1250              	.LASF20:
+ 1251 0037 4755495F 		.ascii	"GUI_X_Systick_Intr\000"
+ 1251      585F5379 
+ 1251      73746963 
+ 1251      6B5F496E 
+ 1251      747200
+ 1252              	.LASF23:
+ 1253 004a 4755495F 		.ascii	"GUI_X_Log\000"
+ 1253      585F4C6F 
+ 1253      6700
+ 1254              	.LASF5:
+ 1255 0054 6C6F6E67 		.ascii	"long int\000"
+ 1255      20696E74 
+ 1255      00
+ 1256              	.LASF6:
+ 1257 005d 73686F72 		.ascii	"short unsigned int\000"
+ 1257      7420756E 
+ 1257      7369676E 
+ 1257      65642069 
+ 1257      6E7400
+ 1258              	.LASF9:
+ 1259 0070 5F5F696E 		.ascii	"__int32_t\000"
+ 1259      7433325F 
+ 1259      7400
+ 1260              	.LASF37:
+ 1261 007a 5F5F636F 		.ascii	"__copy_table_end__\000"
+ 1261      70795F74 
+ 1261      61626C65 
+ 1261      5F656E64 
+ 1261      5F5F00
+ 1262              	.LASF2:
+ 1263 008d 73686F72 		.ascii	"short int\000"
+ 1263      7420696E 
+ 1263      7400
+ 1264              	.LASF38:
+ 1265 0097 5F5F7A65 		.ascii	"__zero_table_t\000"
+ 1265      726F5F74 
+ 1265      61626C65 
+ 1265      5F7400
+ 1266              	.LASF28:
+ 1267 00a6 4755495F 		.ascii	"GUI_X_Init\000"
+ 1267      585F496E 
+ 1267      697400
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 27
+
+
+ 1268              	.LASF17:
+ 1269 00b1 666C6F61 		.ascii	"float\000"
+ 1269      7400
+ 1270              	.LASF24:
+ 1271 00b7 4755495F 		.ascii	"GUI_X_Warn\000"
+ 1271      585F5761 
+ 1271      726E00
+ 1272              	.LASF12:
+ 1273 00c2 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1273      206C6F6E 
+ 1273      6720756E 
+ 1273      7369676E 
+ 1273      65642069 
+ 1274              	.LASF4:
+ 1275 00d9 756E7369 		.ascii	"unsigned char\000"
+ 1275      676E6564 
+ 1275      20636861 
+ 1275      7200
+ 1276              	.LASF45:
+ 1277 00e7 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 1277      4320342E 
+ 1277      392E3320 
+ 1277      32303135 
+ 1277      30333033 
+ 1278 011a 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 1278      20726576 
+ 1278      6973696F 
+ 1278      6E203232 
+ 1278      31323230 
+ 1279 014d 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 1279      74643D67 
+ 1279      6E753939 
+ 1279      202D6666 
+ 1279      756E6374 
+ 1280              	.LASF33:
+ 1281 0180 4E505F67 		.ascii	"NP_g_pFrameBuffer\000"
+ 1281      5F704672 
+ 1281      616D6542 
+ 1281      75666665 
+ 1281      7200
+ 1282              	.LASF49:
+ 1283 0192 43795379 		.ascii	"CySysTickStart\000"
+ 1283      73546963 
+ 1283      6B537461 
+ 1283      727400
+ 1284              	.LASF1:
+ 1285 01a1 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1285      20756E73 
+ 1285      69676E65 
+ 1285      6420696E 
+ 1285      7400
+ 1286              	.LASF34:
+ 1287 01b3 4E505F67 		.ascii	"NP_g_nFrameBufferSize\000"
+ 1287      5F6E4672 
+ 1287      616D6542 
+ 1287      75666665 
+ 1287      7253697A 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 28
+
+
+ 1288              	.LASF46:
+ 1289 01c9 2E5C4755 		.ascii	".\\GUI_X.c\000"
+ 1289      495F582E 
+ 1289      6300
+ 1290              	.LASF32:
+ 1291 01d3 4E505F67 		.ascii	"NP_g_bOwnsBuffer\000"
+ 1291      5F624F77 
+ 1291      6E734275 
+ 1291      66666572 
+ 1291      00
+ 1292              	.LASF26:
+ 1293 01e4 4755495F 		.ascii	"GUI_X_Systick_Init\000"
+ 1293      585F5379 
+ 1293      73746963 
+ 1293      6B5F496E 
+ 1293      697400
+ 1294              	.LASF18:
+ 1295 01f7 646F7562 		.ascii	"double\000"
+ 1295      6C6500
+ 1296              	.LASF31:
+ 1297 01fe 4E505F67 		.ascii	"NP_g_nDMA_TD\000"
+ 1297      5F6E444D 
+ 1297      415F5444 
+ 1297      00
+ 1298              	.LASF10:
+ 1299 020b 5F5F7569 		.ascii	"__uint32_t\000"
+ 1299      6E743332 
+ 1299      5F7400
+ 1300              	.LASF16:
+ 1301 0216 75696E74 		.ascii	"uint32\000"
+ 1301      333200
+ 1302              	.LASF25:
+ 1303 021d 4755495F 		.ascii	"GUI_X_ErrorOut\000"
+ 1303      585F4572 
+ 1303      726F724F 
+ 1303      757400
+ 1304              	.LASF0:
+ 1305 022c 756E7369 		.ascii	"unsigned int\000"
+ 1305      676E6564 
+ 1305      20696E74 
+ 1305      00
+ 1306              	.LASF47:
+ 1307 0239 5C5C766D 		.ascii	"\\\\vmware-host\\Shared Folders\\Documents\\PSoC Cr"
+ 1307      77617265 
+ 1307      2D686F73 
+ 1307      745C5368 
+ 1307      61726564 
+ 1308 0267 6561746F 		.ascii	"eator\\FinalProject\\FinalV2.cydsn\000"
+ 1308      725C4669 
+ 1308      6E616C50 
+ 1308      726F6A65 
+ 1308      63745C46 
+ 1309              	.LASF3:
+ 1310 0288 63686172 		.ascii	"char\000"
+ 1310      00
+ 1311              	.LASF43:
+ 1312 028d 64657374 		.ascii	"dest\000"
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 29
+
+
+ 1312      00
+ 1313              	.LASF41:
+ 1314 0292 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1314      52784275 
+ 1314      66666572 
+ 1314      00
+ 1315              	.LASF42:
+ 1316 029f 4F535F54 		.ascii	"OS_TimeMS\000"
+ 1316      696D654D 
+ 1316      5300
+ 1317              	.LASF13:
+ 1318 02a9 696E7433 		.ascii	"int32_t\000"
+ 1318      325F7400 
+ 1319              	.LASF8:
+ 1320 02b1 73697A65 		.ascii	"sizetype\000"
+ 1320      74797065 
+ 1320      00
+ 1321              	.LASF27:
+ 1322 02ba 74456E64 		.ascii	"tEnd\000"
+ 1322      00
+ 1323              	.LASF11:
+ 1324 02bf 6C6F6E67 		.ascii	"long long int\000"
+ 1324      206C6F6E 
+ 1324      6720696E 
+ 1324      7400
+ 1325              	.LASF19:
+ 1326 02cd 63795379 		.ascii	"cySysTickCallback\000"
+ 1326      73546963 
+ 1326      6B43616C 
+ 1326      6C626163 
+ 1326      6B00
+ 1327              	.LASF22:
+ 1328 02df 4755495F 		.ascii	"GUI_X_Delay\000"
+ 1328      585F4465 
+ 1328      6C617900 
+ 1329              	.LASF21:
+ 1330 02eb 4755495F 		.ascii	"GUI_X_ExecIdle\000"
+ 1330      585F4578 
+ 1330      65634964 
+ 1330      6C6500
+ 1331              	.LASF30:
+ 1332 02fa 4E505F67 		.ascii	"NP_g_nDMA_Chan\000"
+ 1332      5F6E444D 
+ 1332      415F4368 
+ 1332      616E00
+ 1333              	.LASF44:
+ 1334 0309 776C656E 		.ascii	"wlen\000"
+ 1334      00
+ 1335              	.LASF50:
+ 1336 030e 43795379 		.ascii	"CySysTickGetCallback\000"
+ 1336      73546963 
+ 1336      6B476574 
+ 1336      43616C6C 
+ 1336      6261636B 
+ 1337              	.LASF15:
+ 1338 0323 75696E74 		.ascii	"uint8\000"
+ 1338      3800
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccBFVka2.s 			page 30
+
+
+ 1339              	.LASF48:
+ 1340 0329 4755495F 		.ascii	"GUI_X_GetTime\000"
+ 1340      585F4765 
+ 1340      7454696D 
+ 1340      6500
+ 1341              	.LASF14:
+ 1342 0337 75696E74 		.ascii	"uint32_t\000"
+ 1342      33325F74 
+ 1342      00
+ 1343              	.LASF36:
+ 1344 0340 5F5F636F 		.ascii	"__copy_table_start__\000"
+ 1344      70795F74 
+ 1344      61626C65 
+ 1344      5F737461 
+ 1344      72745F5F 
+ 1345              	.LASF39:
+ 1346 0355 5F5F7A65 		.ascii	"__zero_table_start__\000"
+ 1346      726F5F74 
+ 1346      61626C65 
+ 1346      5F737461 
+ 1346      72745F5F 
+ 1347              	.LASF7:
+ 1348 036a 7369676E 		.ascii	"signed char\000"
+ 1348      65642063 
+ 1348      68617200 
+ 1349              	.LASF29:
+ 1350 0376 4E505F67 		.ascii	"NP_g_nNumberOfPixels\000"
+ 1350      5F6E4E75 
+ 1350      6D626572 
+ 1350      4F665069 
+ 1350      78656C73 
+ 1351              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

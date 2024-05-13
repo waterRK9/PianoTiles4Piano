@@ -1,0 +1,1326 @@
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"arm_max_f32.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.global	__aeabi_fcmplt
+  19              		.section	.text.arm_max_f32,"ax",%progbits
+  20              		.align	1
+  21              		.global	arm_max_f32
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	arm_max_f32, %function
+  25              	arm_max_f32:
+  26              	.LFB84:
+  27              		.file 1 ".\\DSP\\Source\\StatisticsFunctions\\arm_max_f32.c"
+   1:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** /* ----------------------------------------------------------------------
+   2:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * Project:      CMSIS DSP Library
+   3:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * Title:        arm_max_f32.c
+   4:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * Description:  Maximum value of a floating-point vector
+   5:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  *
+   6:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * $Date:        23 April 2021
+   7:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * $Revision:    V1.9.0
+   8:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  *
+   9:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * Target Processor: Cortex-M and Cortex-A cores
+  10:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * -------------------------------------------------------------------- */
+  11:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** /*
+  12:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * Copyright (C) 2010-2021 ARM Limited or its affiliates. All rights reserved.
+  13:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  *
+  14:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * SPDX-License-Identifier: Apache-2.0
+  15:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  *
+  16:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * Licensed under the Apache License, Version 2.0 (the License); you may
+  17:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * not use this file except in compliance with the License.
+  18:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * You may obtain a copy of the License at
+  19:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  *
+  20:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * www.apache.org/licenses/LICENSE-2.0
+  21:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  *
+  22:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * Unless required by applicable law or agreed to in writing, software
+  23:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+  24:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  25:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * See the License for the specific language governing permissions and
+  26:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  * limitations under the License.
+  27:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  */
+  28:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+  29:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** #include "dsp/statistics_functions.h"
+  30:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** #if (defined(ARM_MATH_NEON) || defined(ARM_MATH_MVEF)) && !defined(ARM_MATH_AUTOVECTORIZE)
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 2
+
+
+  31:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** #include <limits.h>
+  32:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** #endif
+  33:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+  34:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** /**
+  35:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   @ingroup groupStats
+  36:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  */
+  37:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+  38:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** /**
+  39:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   @defgroup Max Maximum
+  40:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+  41:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   Computes the maximum value of an array of data.
+  42:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   The function returns both the maximum value and its position within the array.
+  43:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   There are separate functions for floating-point, Q31, Q15, and Q7 data types.
+  44:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  */
+  45:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+  46:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** /**
+  47:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   @addtogroup Max
+  48:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   @{
+  49:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  */
+  50:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+  51:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** /**
+  52:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   @brief         Maximum value of a floating-point vector.
+  53:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   @param[in]     pSrc       points to the input vector
+  54:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   @param[in]     blockSize  number of samples in input vector
+  55:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   @param[out]    pResult    maximum value returned here
+  56:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   @param[out]    pIndex     index of maximum value returned here
+  57:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   @return        none
+  58:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  */
+  59:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+  60:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** #if defined(ARM_MATH_MVEF) && !defined(ARM_MATH_AUTOVECTORIZE)
+  61:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** void arm_max_f32(
+  62:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   const float32_t * pSrc,
+  63:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   uint32_t blockSize,
+  64:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   float32_t * pResult,
+  65:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   uint32_t * pIndex)
+  66:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** {
+  67:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     uint32_t blkCnt; 
+  68:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     f32x4_t vecSrc;
+  69:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     f32x4_t curExtremValVec = vdupq_n_f32(F32_MIN);
+  70:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     float32_t maxValue = F32_MIN;
+  71:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     uint32_t idx = blockSize;
+  72:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     uint32x4_t indexVec;
+  73:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     uint32x4_t curExtremIdxVec;
+  74:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     uint32_t curIdx = 0;
+  75:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     mve_pred16_t p0;
+  76:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     float32_t tmp;
+  77:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+  78:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+  79:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     indexVec = vidupq_wb_u32(&curIdx, 1);
+  80:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     curExtremIdxVec = vdupq_n_u32(0);
+  81:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+  82:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     /* Compute 4 outputs at a time */
+  83:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     blkCnt = blockSize >> 2U;
+  84:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     while (blkCnt > 0U)
+  85:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     {
+  86:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         vecSrc = vldrwq_f32(pSrc);
+  87:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         /*
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 3
+
+
+  88:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****          * Get current max per lane and current index per lane
+  89:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****          * when a max is selected
+  90:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****          */
+  91:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         p0 = vcmpgeq(vecSrc, curExtremValVec);
+  92:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         curExtremValVec = vpselq(vecSrc, curExtremValVec, p0);
+  93:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         curExtremIdxVec = vpselq(indexVec, curExtremIdxVec, p0);
+  94:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+  95:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         indexVec = vidupq_wb_u32(&curIdx, 1);
+  96:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+  97:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         pSrc += 4;
+  98:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         /* Decrement the loop counter */
+  99:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         blkCnt--;
+ 100:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     }
+ 101:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 102:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 103:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     /*
+ 104:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****      * Get max value across the vector
+ 105:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****      */
+ 106:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     maxValue = vmaxnmvq(maxValue, curExtremValVec);
+ 107:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     /*
+ 108:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****      * set index for lower values to max possible index
+ 109:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****      */
+ 110:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     p0 = vcmpgeq(curExtremValVec, maxValue);
+ 111:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     indexVec = vpselq(curExtremIdxVec, vdupq_n_u32(blockSize), p0);
+ 112:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     /*
+ 113:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****      * Get min index which is thus for a max value
+ 114:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****      */
+ 115:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     idx = vminvq(idx, indexVec);
+ 116:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 117:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     /* Tail */
+ 118:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     blkCnt = blockSize & 0x3;
+ 119:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 120:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     while (blkCnt > 0U)
+ 121:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     {
+ 122:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       /* Initialize tmp to the next consecutive values one by one */
+ 123:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       tmp = *pSrc++;
+ 124:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 125:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       /* compare for the maximum value */
+ 126:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       if (maxValue < tmp)
+ 127:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       {
+ 128:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         /* Update the maximum value and it's index */
+ 129:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         maxValue = tmp;
+ 130:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         idx = blockSize - blkCnt;
+ 131:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       }
+ 132:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 133:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       /* Decrement loop counter */
+ 134:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       blkCnt--;
+ 135:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     }
+ 136:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 137:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     /*
+ 138:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****      * Save result
+ 139:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****      */
+ 140:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     *pIndex = idx;
+ 141:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     *pResult = maxValue;
+ 142:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** }
+ 143:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 144:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** #else
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 4
+
+
+ 145:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** #if defined(ARM_MATH_NEON) && !defined(ARM_MATH_AUTOVECTORIZE)
+ 146:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** void arm_max_f32(
+ 147:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   const float32_t * pSrc,
+ 148:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   uint32_t blockSize,
+ 149:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   float32_t * pResult,
+ 150:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   uint32_t * pIndex)
+ 151:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** {
+ 152:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   float32_t maxVal1, out;               /* Temporary variables to store the output value. */
+ 153:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   uint32_t blkCnt, outIndex;              /* loop counter */
+ 154:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 155:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   float32x4_t outV, srcV;
+ 156:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   float32x2_t outV2;
+ 157:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 158:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   uint32x4_t idxV;
+ 159:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   uint32x4_t maxIdx;
+ 160:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   static const uint32_t indexInit[4]={4,5,6,7};
+ 161:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   static const uint32_t countVInit[4]={0,1,2,3};
+ 162:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 163:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   uint32x4_t index;
+ 164:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   uint32x4_t delta;
+ 165:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   uint32x4_t countV;
+ 166:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   uint32x2_t countV2;
+ 167:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 168:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   maxIdx = vdupq_n_u32(ULONG_MAX);
+ 169:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   delta = vdupq_n_u32(4);
+ 170:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   index = vld1q_u32(indexInit);
+ 171:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   countV = vld1q_u32(countVInit);
+ 172:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 173:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 174:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   /* Initialise the index value to zero. */
+ 175:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   outIndex = 0U;
+ 176:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 177:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   /* Load first input value that act as reference value for comparison */
+ 178:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   if (blockSize <= 3)
+ 179:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   {
+ 180:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       out = *pSrc++;
+ 181:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 182:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       blkCnt = blockSize - 1;
+ 183:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 184:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       while (blkCnt > 0U)
+ 185:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       {
+ 186:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         /* Initialize maxVal to the next consecutive values one by one */
+ 187:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         maxVal1 = *pSrc++;
+ 188:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     
+ 189:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         /* compare for the maximum value */
+ 190:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         if (out < maxVal1)
+ 191:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         {
+ 192:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****           /* Update the maximum value and it's index */
+ 193:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****           out = maxVal1;
+ 194:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****           outIndex = blockSize - blkCnt;
+ 195:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         }
+ 196:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     
+ 197:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         /* Decrement the loop counter */
+ 198:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         blkCnt--;
+ 199:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       }
+ 200:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   }
+ 201:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   else
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 5
+
+
+ 202:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   {
+ 203:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       outV = vld1q_f32(pSrc);
+ 204:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       pSrc += 4;
+ 205:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****  
+ 206:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       /* Compute 4 outputs at a time */
+ 207:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       blkCnt = (blockSize - 4 ) >> 2U;
+ 208:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     
+ 209:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       while (blkCnt > 0U)
+ 210:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       {
+ 211:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         srcV = vld1q_f32(pSrc);
+ 212:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         pSrc += 4;
+ 213:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     
+ 214:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         idxV = vcgtq_f32(srcV, outV);
+ 215:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         outV = vbslq_f32(idxV, srcV, outV );
+ 216:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         countV = vbslq_u32(idxV, index,countV );
+ 217:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     
+ 218:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         index = vaddq_u32(index,delta);
+ 219:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     
+ 220:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         /* Decrement the loop counter */
+ 221:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         blkCnt--;
+ 222:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       }
+ 223:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     
+ 224:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       outV2 = vpmax_f32(vget_low_f32(outV),vget_high_f32(outV));
+ 225:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       outV2 = vpmax_f32(outV2,outV2);
+ 226:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       out = vget_lane_f32(outV2, 0);
+ 227:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     
+ 228:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       idxV = vceqq_f32(outV, vdupq_n_f32(out));
+ 229:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       countV = vbslq_u32(idxV, countV,maxIdx);
+ 230:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       
+ 231:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       countV2 = vpmin_u32(vget_low_u32(countV),vget_high_u32(countV));
+ 232:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       countV2 = vpmin_u32(countV2,countV2);
+ 233:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       outIndex = vget_lane_u32(countV2,0); 
+ 234:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     
+ 235:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       /* if (blockSize - 1U) is not multiple of 4 */
+ 236:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       blkCnt = (blockSize - 4 ) % 4U;
+ 237:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     
+ 238:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       while (blkCnt > 0U)
+ 239:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       {
+ 240:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         /* Initialize maxVal to the next consecutive values one by one */
+ 241:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         maxVal1 = *pSrc++;
+ 242:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     
+ 243:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         /* compare for the maximum value */
+ 244:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         if (out < maxVal1)
+ 245:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         {
+ 246:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****           /* Update the maximum value and it's index */
+ 247:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****           out = maxVal1;
+ 248:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****           outIndex = blockSize - blkCnt ;
+ 249:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         }
+ 250:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     
+ 251:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         /* Decrement the loop counter */
+ 252:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         blkCnt--;
+ 253:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       }
+ 254:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     
+ 255:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       
+ 256:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   }
+ 257:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 258:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   /* Store the maximum value and it's index into destination pointers */
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 6
+
+
+ 259:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   *pResult = out;
+ 260:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   *pIndex = outIndex;
+ 261:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** }
+ 262:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** #else
+ 263:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** void arm_max_f32(
+ 264:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   const float32_t * pSrc,
+ 265:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         uint32_t blockSize,
+ 266:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         float32_t * pResult,
+ 267:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         uint32_t * pIndex)
+ 268:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** {
+  28              		.loc 1 268 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 2DE9F84F 		push	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
+  34              		.cfi_def_cfa_offset 40
+  35              		.cfi_offset 3, -40
+  36              		.cfi_offset 4, -36
+  37              		.cfi_offset 5, -32
+  38              		.cfi_offset 6, -28
+  39              		.cfi_offset 7, -24
+  40              		.cfi_offset 8, -20
+  41              		.cfi_offset 9, -16
+  42              		.cfi_offset 10, -12
+  43              		.cfi_offset 11, -8
+  44              		.cfi_offset 14, -4
+  45              		.loc 1 268 0
+  46 0004 8046     		mov	r8, r0
+  47 0006 8B46     		mov	fp, r1
+  48 0008 9246     		mov	r10, r2
+  49 000a 9946     		mov	r9, r3
+ 269:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         float32_t maxVal, out;                         /* Temporary variables to store the output v
+ 270:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         uint32_t blkCnt, outIndex;                     /* Loop counter */
+ 271:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 272:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** #if defined (ARM_MATH_LOOPUNROLL) && !defined(ARM_MATH_AUTOVECTORIZE)
+ 273:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****         uint32_t index;                                /* index of maximum value */
+ 274:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** #endif
+ 275:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 276:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   /* Initialise index value to zero. */
+ 277:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   outIndex = 0U;
+ 278:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 279:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   /* Load first input value that act as reference value for comparision */
+ 280:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   out = *pSrc++;
+  50              		.loc 1 280 0
+  51 000c 0568     		ldr	r5, [r0]	@ float
+  52              	.LVL1:
+ 281:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 282:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** #if defined (ARM_MATH_LOOPUNROLL) && !defined(ARM_MATH_AUTOVECTORIZE)
+ 283:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   /* Initialise index of maximum value. */
+ 284:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   index = 0U;
+ 285:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 286:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   /* Loop unrolling: Compute 4 outputs at a time */
+ 287:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   blkCnt = (blockSize - 1U) >> 2U;
+ 288:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 289:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   while (blkCnt > 0U)
+ 290:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   {
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 7
+
+
+ 291:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     /* Initialize maxVal to next consecutive values one by one */
+ 292:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     maxVal = *pSrc++;
+ 293:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 294:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     /* compare for the maximum value */
+ 295:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     if (out < maxVal)
+ 296:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     {
+ 297:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       /* Update the maximum value and it's index */
+ 298:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       out = maxVal;
+ 299:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       outIndex = index + 1U;
+ 300:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     }
+ 301:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 302:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     maxVal = *pSrc++;
+ 303:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     if (out < maxVal)
+ 304:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     {
+ 305:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       out = maxVal;
+ 306:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       outIndex = index + 2U;
+ 307:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     }
+ 308:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 309:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     maxVal = *pSrc++;
+ 310:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     if (out < maxVal)
+ 311:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     {
+ 312:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       out = maxVal;
+ 313:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       outIndex = index + 3U;
+ 314:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     }
+ 315:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 316:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     maxVal = *pSrc++;
+ 317:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     if (out < maxVal)
+ 318:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     {
+ 319:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       out = maxVal;
+ 320:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       outIndex = index + 4U;
+ 321:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     }
+ 322:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 323:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     index += 4U;
+ 324:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 325:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     /* Decrement loop counter */
+ 326:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     blkCnt--;
+ 327:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   }
+ 328:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 329:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   /* Loop unrolling: Compute remaining outputs */
+ 330:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   blkCnt = (blockSize - 1U) % 4U;
+ 331:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 332:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** #else
+ 333:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 334:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   /* Initialize blkCnt with number of samples */
+ 335:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   blkCnt = (blockSize - 1U);
+ 336:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 337:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** #endif /* #if defined (ARM_MATH_LOOPUNROLL) */
+ 338:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 339:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   while (blkCnt > 0U)
+  53              		.loc 1 339 0
+  54 000e 0124     		movs	r4, #1
+ 277:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+  55              		.loc 1 277 0
+  56 0010 0027     		movs	r7, #0
+  57              	.LVL2:
+  58              	.L2:
+  59              		.loc 1 339 0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 8
+
+
+  60 0012 5C45     		cmp	r4, fp
+  61 0014 0CD0     		beq	.L7
+  62              	.LVL3:
+ 340:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   {
+ 341:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     /* Initialize maxVal to the next consecutive values one by one */
+ 342:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     maxVal = *pSrc++;
+  63              		.loc 1 342 0
+  64 0016 58F82460 		ldr	r6, [r8, r4, lsl #2]	@ float
+  65              	.LVL4:
+ 343:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 344:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     /* compare for the maximum value */
+ 345:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     if (out < maxVal)
+  66              		.loc 1 345 0
+  67 001a 2846     		mov	r0, r5
+  68 001c 3146     		mov	r1, r6
+  69 001e FFF7FEFF 		bl	__aeabi_fcmplt
+  70              	.LVL5:
+  71 0022 08B9     		cbnz	r0, .L5
+  72 0024 2E46     		mov	r6, r5
+  73              	.LVL6:
+  74 0026 00E0     		b	.L3
+  75              	.LVL7:
+  76              	.L5:
+  77 0028 2746     		mov	r7, r4
+  78              	.LVL8:
+  79              	.L3:
+  80 002a 0134     		adds	r4, r4, #1
+  81              	.LVL9:
+ 277:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+  82              		.loc 1 277 0
+  83 002c 3546     		mov	r5, r6
+  84 002e F0E7     		b	.L2
+  85              	.LVL10:
+  86              	.L7:
+ 346:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     {
+ 347:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       /* Update the maximum value and it's index */
+ 348:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       out = maxVal;
+ 349:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****       outIndex = blockSize - blkCnt;
+ 350:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     }
+ 351:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 352:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     /* Decrement loop counter */
+ 353:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****     blkCnt--;
+ 354:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   }
+ 355:.\DSP\Source\StatisticsFunctions/arm_max_f32.c **** 
+ 356:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   /* Store the maximum value and it's index into destination pointers */
+ 357:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   *pResult = out;
+  87              		.loc 1 357 0
+  88 0030 CAF80050 		str	r5, [r10]	@ float
+ 358:.\DSP\Source\StatisticsFunctions/arm_max_f32.c ****   *pIndex = outIndex;
+  89              		.loc 1 358 0
+  90 0034 C9F80070 		str	r7, [r9]
+  91 0038 BDE8F88F 		pop	{r3, r4, r5, r6, r7, r8, r9, r10, fp, pc}
+  92              		.cfi_endproc
+  93              	.LFE84:
+  94              		.size	arm_max_f32, .-arm_max_f32
+  95              		.text
+  96              	.Letext0:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 9
+
+
+  97              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+  98              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+  99              		.file 4 ".\\DSP\\Include/arm_math_types.h"
+ 100              		.file 5 ".\\Core\\Include/cmsis_gcc.h"
+ 101              		.section	.debug_info,"",%progbits
+ 102              	.Ldebug_info0:
+ 103 0000 FC010000 		.4byte	0x1fc
+ 104 0004 0400     		.2byte	0x4
+ 105 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 106 000a 04       		.byte	0x4
+ 107 000b 01       		.uleb128 0x1
+ 108 000c CB000000 		.4byte	.LASF32
+ 109 0010 01       		.byte	0x1
+ 110 0011 9C000000 		.4byte	.LASF33
+ 111 0015 95010000 		.4byte	.LASF34
+ 112 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 113 001d 00000000 		.4byte	0
+ 114 0021 00000000 		.4byte	.Ldebug_line0
+ 115 0025 02       		.uleb128 0x2
+ 116 0026 01       		.byte	0x1
+ 117 0027 06       		.byte	0x6
+ 118 0028 73020000 		.4byte	.LASF0
+ 119 002c 02       		.uleb128 0x2
+ 120 002d 01       		.byte	0x1
+ 121 002e 08       		.byte	0x8
+ 122 002f 4F000000 		.4byte	.LASF1
+ 123 0033 02       		.uleb128 0x2
+ 124 0034 02       		.byte	0x2
+ 125 0035 05       		.byte	0x5
+ 126 0036 36020000 		.4byte	.LASF2
+ 127 003a 02       		.uleb128 0x2
+ 128 003b 02       		.byte	0x2
+ 129 003c 07       		.byte	0x7
+ 130 003d 89000000 		.4byte	.LASF3
+ 131 0041 02       		.uleb128 0x2
+ 132 0042 04       		.byte	0x4
+ 133 0043 05       		.byte	0x5
+ 134 0044 49020000 		.4byte	.LASF4
+ 135 0048 03       		.uleb128 0x3
+ 136 0049 7D010000 		.4byte	.LASF9
+ 137 004d 02       		.byte	0x2
+ 138 004e 41       		.byte	0x41
+ 139 004f 53000000 		.4byte	0x53
+ 140 0053 02       		.uleb128 0x2
+ 141 0054 04       		.byte	0x4
+ 142 0055 07       		.byte	0x7
+ 143 0056 77000000 		.4byte	.LASF5
+ 144 005a 02       		.uleb128 0x2
+ 145 005b 08       		.byte	0x8
+ 146 005c 05       		.byte	0x5
+ 147 005d 14020000 		.4byte	.LASF6
+ 148 0061 02       		.uleb128 0x2
+ 149 0062 08       		.byte	0x8
+ 150 0063 07       		.byte	0x7
+ 151 0064 EB010000 		.4byte	.LASF7
+ 152 0068 04       		.uleb128 0x4
+ 153 0069 04       		.byte	0x4
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 10
+
+
+ 154 006a 05       		.byte	0x5
+ 155 006b 696E7400 		.ascii	"int\000"
+ 156 006f 02       		.uleb128 0x2
+ 157 0070 04       		.byte	0x4
+ 158 0071 07       		.byte	0x7
+ 159 0072 88010000 		.4byte	.LASF8
+ 160 0076 03       		.uleb128 0x3
+ 161 0077 40020000 		.4byte	.LASF10
+ 162 007b 03       		.byte	0x3
+ 163 007c 2D       		.byte	0x2d
+ 164 007d 48000000 		.4byte	0x48
+ 165 0081 02       		.uleb128 0x2
+ 166 0082 04       		.byte	0x4
+ 167 0083 07       		.byte	0x7
+ 168 0084 0B020000 		.4byte	.LASF11
+ 169 0088 02       		.uleb128 0x2
+ 170 0089 01       		.byte	0x1
+ 171 008a 08       		.byte	0x8
+ 172 008b 2C020000 		.4byte	.LASF12
+ 173 008f 02       		.uleb128 0x2
+ 174 0090 08       		.byte	0x8
+ 175 0091 04       		.byte	0x4
+ 176 0092 6C010000 		.4byte	.LASF13
+ 177 0096 02       		.uleb128 0x2
+ 178 0097 04       		.byte	0x4
+ 179 0098 04       		.byte	0x4
+ 180 0099 44000000 		.4byte	.LASF14
+ 181 009d 02       		.uleb128 0x2
+ 182 009e 08       		.byte	0x8
+ 183 009f 04       		.byte	0x4
+ 184 00a0 52020000 		.4byte	.LASF15
+ 185 00a4 05       		.uleb128 0x5
+ 186 00a5 73010000 		.4byte	.LASF16
+ 187 00a9 04       		.byte	0x4
+ 188 00aa 2F01     		.2byte	0x12f
+ 189 00ac 96000000 		.4byte	0x96
+ 190 00b0 06       		.uleb128 0x6
+ 191 00b1 22000000 		.4byte	.LASF35
+ 192 00b5 01       		.byte	0x1
+ 193 00b6 0701     		.2byte	0x107
+ 194 00b8 00000000 		.4byte	.LFB84
+ 195 00bc 3C000000 		.4byte	.LFE84-.LFB84
+ 196 00c0 01       		.uleb128 0x1
+ 197 00c1 9C       		.byte	0x9c
+ 198 00c2 47010000 		.4byte	0x147
+ 199 00c6 07       		.uleb128 0x7
+ 200 00c7 7F020000 		.4byte	.LASF17
+ 201 00cb 01       		.byte	0x1
+ 202 00cc 0801     		.2byte	0x108
+ 203 00ce 47010000 		.4byte	0x147
+ 204 00d2 00000000 		.4byte	.LLST0
+ 205 00d6 07       		.uleb128 0x7
+ 206 00d7 22020000 		.4byte	.LASF18
+ 207 00db 01       		.byte	0x1
+ 208 00dc 0901     		.2byte	0x109
+ 209 00de 76000000 		.4byte	0x76
+ 210 00e2 44000000 		.4byte	.LLST1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 11
+
+
+ 211 00e6 07       		.uleb128 0x7
+ 212 00e7 64010000 		.4byte	.LASF19
+ 213 00eb 01       		.byte	0x1
+ 214 00ec 0A01     		.2byte	0x10a
+ 215 00ee 52010000 		.4byte	0x152
+ 216 00f2 62000000 		.4byte	.LLST2
+ 217 00f6 07       		.uleb128 0x7
+ 218 00f7 E4010000 		.4byte	.LASF20
+ 219 00fb 01       		.byte	0x1
+ 220 00fc 0B01     		.2byte	0x10b
+ 221 00fe 58010000 		.4byte	0x158
+ 222 0102 80000000 		.4byte	.LLST3
+ 223 0106 08       		.uleb128 0x8
+ 224 0107 3D000000 		.4byte	.LASF21
+ 225 010b 01       		.byte	0x1
+ 226 010c 0D01     		.2byte	0x10d
+ 227 010e A4000000 		.4byte	0xa4
+ 228 0112 9E000000 		.4byte	.LLST4
+ 229 0116 09       		.uleb128 0x9
+ 230 0117 6F757400 		.ascii	"out\000"
+ 231 011b 01       		.byte	0x1
+ 232 011c 0D01     		.2byte	0x10d
+ 233 011e A4000000 		.4byte	0xa4
+ 234 0122 BC000000 		.4byte	.LLST5
+ 235 0126 08       		.uleb128 0x8
+ 236 0127 5D000000 		.4byte	.LASF22
+ 237 012b 01       		.byte	0x1
+ 238 012c 0E01     		.2byte	0x10e
+ 239 012e 76000000 		.4byte	0x76
+ 240 0132 E5000000 		.4byte	.LLST6
+ 241 0136 08       		.uleb128 0x8
+ 242 0137 02020000 		.4byte	.LASF23
+ 243 013b 01       		.byte	0x1
+ 244 013c 0E01     		.2byte	0x10e
+ 245 013e 76000000 		.4byte	0x76
+ 246 0142 1A010000 		.4byte	.LLST7
+ 247 0146 00       		.byte	0
+ 248 0147 0A       		.uleb128 0xa
+ 249 0148 04       		.byte	0x4
+ 250 0149 4D010000 		.4byte	0x14d
+ 251 014d 0B       		.uleb128 0xb
+ 252 014e A4000000 		.4byte	0xa4
+ 253 0152 0A       		.uleb128 0xa
+ 254 0153 04       		.byte	0x4
+ 255 0154 A4000000 		.4byte	0xa4
+ 256 0158 0A       		.uleb128 0xa
+ 257 0159 04       		.byte	0x4
+ 258 015a 76000000 		.4byte	0x76
+ 259 015e 03       		.uleb128 0x3
+ 260 015f 13000000 		.4byte	.LASF24
+ 261 0163 05       		.byte	0x5
+ 262 0164 8B       		.byte	0x8b
+ 263 0165 D6010000 		.4byte	0x1d6
+ 264 0169 0A       		.uleb128 0xa
+ 265 016a 04       		.byte	0x4
+ 266 016b 6F010000 		.4byte	0x16f
+ 267 016f 0B       		.uleb128 0xb
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 12
+
+
+ 268 0170 76000000 		.4byte	0x76
+ 269 0174 0C       		.uleb128 0xc
+ 270 0175 84020000 		.4byte	.LASF25
+ 271 0179 05       		.byte	0x5
+ 272 017a 92       		.byte	0x92
+ 273 017b 7F010000 		.4byte	0x17f
+ 274 017f 0B       		.uleb128 0xb
+ 275 0180 5E010000 		.4byte	0x15e
+ 276 0184 0C       		.uleb128 0xc
+ 277 0185 64000000 		.4byte	.LASF26
+ 278 0189 05       		.byte	0x5
+ 279 018a 93       		.byte	0x93
+ 280 018b 7F010000 		.4byte	0x17f
+ 281 018f 03       		.uleb128 0x3
+ 282 0190 2E000000 		.4byte	.LASF27
+ 283 0194 05       		.byte	0x5
+ 284 0195 90       		.byte	0x90
+ 285 0196 B5010000 		.4byte	0x1b5
+ 286 019a 0C       		.uleb128 0xc
+ 287 019b 5E020000 		.4byte	.LASF28
+ 288 019f 05       		.byte	0x5
+ 289 01a0 94       		.byte	0x94
+ 290 01a1 A5010000 		.4byte	0x1a5
+ 291 01a5 0B       		.uleb128 0xb
+ 292 01a6 8F010000 		.4byte	0x18f
+ 293 01aa 0C       		.uleb128 0xc
+ 294 01ab 00000000 		.4byte	.LASF29
+ 295 01af 05       		.byte	0x5
+ 296 01b0 95       		.byte	0x95
+ 297 01b1 A5010000 		.4byte	0x1a5
+ 298 01b5 0D       		.uleb128 0xd
+ 299 01b6 08       		.byte	0x8
+ 300 01b7 05       		.byte	0x5
+ 301 01b8 8D       		.byte	0x8d
+ 302 01b9 D6010000 		.4byte	0x1d6
+ 303 01bd 0E       		.uleb128 0xe
+ 304 01be 4A000000 		.4byte	.LASF30
+ 305 01c2 05       		.byte	0x5
+ 306 01c3 8E       		.byte	0x8e
+ 307 01c4 58010000 		.4byte	0x158
+ 308 01c8 00       		.byte	0
+ 309 01c9 0E       		.uleb128 0xe
+ 310 01ca 31020000 		.4byte	.LASF31
+ 311 01ce 05       		.byte	0x5
+ 312 01cf 8F       		.byte	0x8f
+ 313 01d0 76000000 		.4byte	0x76
+ 314 01d4 04       		.byte	0x4
+ 315 01d5 00       		.byte	0
+ 316 01d6 0F       		.uleb128 0xf
+ 317 01d7 0C       		.byte	0xc
+ 318 01d8 05       		.byte	0x5
+ 319 01d9 87       		.byte	0x87
+ 320 01da 10       		.uleb128 0x10
+ 321 01db 73726300 		.ascii	"src\000"
+ 322 01df 05       		.byte	0x5
+ 323 01e0 88       		.byte	0x88
+ 324 01e1 69010000 		.4byte	0x169
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 13
+
+
+ 325 01e5 00       		.byte	0
+ 326 01e6 0E       		.uleb128 0xe
+ 327 01e7 4A000000 		.4byte	.LASF30
+ 328 01eb 05       		.byte	0x5
+ 329 01ec 89       		.byte	0x89
+ 330 01ed 58010000 		.4byte	0x158
+ 331 01f1 04       		.byte	0x4
+ 332 01f2 0E       		.uleb128 0xe
+ 333 01f3 31020000 		.4byte	.LASF31
+ 334 01f7 05       		.byte	0x5
+ 335 01f8 8A       		.byte	0x8a
+ 336 01f9 76000000 		.4byte	0x76
+ 337 01fd 08       		.byte	0x8
+ 338 01fe 00       		.byte	0
+ 339 01ff 00       		.byte	0
+ 340              		.section	.debug_abbrev,"",%progbits
+ 341              	.Ldebug_abbrev0:
+ 342 0000 01       		.uleb128 0x1
+ 343 0001 11       		.uleb128 0x11
+ 344 0002 01       		.byte	0x1
+ 345 0003 25       		.uleb128 0x25
+ 346 0004 0E       		.uleb128 0xe
+ 347 0005 13       		.uleb128 0x13
+ 348 0006 0B       		.uleb128 0xb
+ 349 0007 03       		.uleb128 0x3
+ 350 0008 0E       		.uleb128 0xe
+ 351 0009 1B       		.uleb128 0x1b
+ 352 000a 0E       		.uleb128 0xe
+ 353 000b 55       		.uleb128 0x55
+ 354 000c 17       		.uleb128 0x17
+ 355 000d 11       		.uleb128 0x11
+ 356 000e 01       		.uleb128 0x1
+ 357 000f 10       		.uleb128 0x10
+ 358 0010 17       		.uleb128 0x17
+ 359 0011 00       		.byte	0
+ 360 0012 00       		.byte	0
+ 361 0013 02       		.uleb128 0x2
+ 362 0014 24       		.uleb128 0x24
+ 363 0015 00       		.byte	0
+ 364 0016 0B       		.uleb128 0xb
+ 365 0017 0B       		.uleb128 0xb
+ 366 0018 3E       		.uleb128 0x3e
+ 367 0019 0B       		.uleb128 0xb
+ 368 001a 03       		.uleb128 0x3
+ 369 001b 0E       		.uleb128 0xe
+ 370 001c 00       		.byte	0
+ 371 001d 00       		.byte	0
+ 372 001e 03       		.uleb128 0x3
+ 373 001f 16       		.uleb128 0x16
+ 374 0020 00       		.byte	0
+ 375 0021 03       		.uleb128 0x3
+ 376 0022 0E       		.uleb128 0xe
+ 377 0023 3A       		.uleb128 0x3a
+ 378 0024 0B       		.uleb128 0xb
+ 379 0025 3B       		.uleb128 0x3b
+ 380 0026 0B       		.uleb128 0xb
+ 381 0027 49       		.uleb128 0x49
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 14
+
+
+ 382 0028 13       		.uleb128 0x13
+ 383 0029 00       		.byte	0
+ 384 002a 00       		.byte	0
+ 385 002b 04       		.uleb128 0x4
+ 386 002c 24       		.uleb128 0x24
+ 387 002d 00       		.byte	0
+ 388 002e 0B       		.uleb128 0xb
+ 389 002f 0B       		.uleb128 0xb
+ 390 0030 3E       		.uleb128 0x3e
+ 391 0031 0B       		.uleb128 0xb
+ 392 0032 03       		.uleb128 0x3
+ 393 0033 08       		.uleb128 0x8
+ 394 0034 00       		.byte	0
+ 395 0035 00       		.byte	0
+ 396 0036 05       		.uleb128 0x5
+ 397 0037 16       		.uleb128 0x16
+ 398 0038 00       		.byte	0
+ 399 0039 03       		.uleb128 0x3
+ 400 003a 0E       		.uleb128 0xe
+ 401 003b 3A       		.uleb128 0x3a
+ 402 003c 0B       		.uleb128 0xb
+ 403 003d 3B       		.uleb128 0x3b
+ 404 003e 05       		.uleb128 0x5
+ 405 003f 49       		.uleb128 0x49
+ 406 0040 13       		.uleb128 0x13
+ 407 0041 00       		.byte	0
+ 408 0042 00       		.byte	0
+ 409 0043 06       		.uleb128 0x6
+ 410 0044 2E       		.uleb128 0x2e
+ 411 0045 01       		.byte	0x1
+ 412 0046 3F       		.uleb128 0x3f
+ 413 0047 19       		.uleb128 0x19
+ 414 0048 03       		.uleb128 0x3
+ 415 0049 0E       		.uleb128 0xe
+ 416 004a 3A       		.uleb128 0x3a
+ 417 004b 0B       		.uleb128 0xb
+ 418 004c 3B       		.uleb128 0x3b
+ 419 004d 05       		.uleb128 0x5
+ 420 004e 27       		.uleb128 0x27
+ 421 004f 19       		.uleb128 0x19
+ 422 0050 11       		.uleb128 0x11
+ 423 0051 01       		.uleb128 0x1
+ 424 0052 12       		.uleb128 0x12
+ 425 0053 06       		.uleb128 0x6
+ 426 0054 40       		.uleb128 0x40
+ 427 0055 18       		.uleb128 0x18
+ 428 0056 9642     		.uleb128 0x2116
+ 429 0058 19       		.uleb128 0x19
+ 430 0059 01       		.uleb128 0x1
+ 431 005a 13       		.uleb128 0x13
+ 432 005b 00       		.byte	0
+ 433 005c 00       		.byte	0
+ 434 005d 07       		.uleb128 0x7
+ 435 005e 05       		.uleb128 0x5
+ 436 005f 00       		.byte	0
+ 437 0060 03       		.uleb128 0x3
+ 438 0061 0E       		.uleb128 0xe
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 15
+
+
+ 439 0062 3A       		.uleb128 0x3a
+ 440 0063 0B       		.uleb128 0xb
+ 441 0064 3B       		.uleb128 0x3b
+ 442 0065 05       		.uleb128 0x5
+ 443 0066 49       		.uleb128 0x49
+ 444 0067 13       		.uleb128 0x13
+ 445 0068 02       		.uleb128 0x2
+ 446 0069 17       		.uleb128 0x17
+ 447 006a 00       		.byte	0
+ 448 006b 00       		.byte	0
+ 449 006c 08       		.uleb128 0x8
+ 450 006d 34       		.uleb128 0x34
+ 451 006e 00       		.byte	0
+ 452 006f 03       		.uleb128 0x3
+ 453 0070 0E       		.uleb128 0xe
+ 454 0071 3A       		.uleb128 0x3a
+ 455 0072 0B       		.uleb128 0xb
+ 456 0073 3B       		.uleb128 0x3b
+ 457 0074 05       		.uleb128 0x5
+ 458 0075 49       		.uleb128 0x49
+ 459 0076 13       		.uleb128 0x13
+ 460 0077 02       		.uleb128 0x2
+ 461 0078 17       		.uleb128 0x17
+ 462 0079 00       		.byte	0
+ 463 007a 00       		.byte	0
+ 464 007b 09       		.uleb128 0x9
+ 465 007c 34       		.uleb128 0x34
+ 466 007d 00       		.byte	0
+ 467 007e 03       		.uleb128 0x3
+ 468 007f 08       		.uleb128 0x8
+ 469 0080 3A       		.uleb128 0x3a
+ 470 0081 0B       		.uleb128 0xb
+ 471 0082 3B       		.uleb128 0x3b
+ 472 0083 05       		.uleb128 0x5
+ 473 0084 49       		.uleb128 0x49
+ 474 0085 13       		.uleb128 0x13
+ 475 0086 02       		.uleb128 0x2
+ 476 0087 17       		.uleb128 0x17
+ 477 0088 00       		.byte	0
+ 478 0089 00       		.byte	0
+ 479 008a 0A       		.uleb128 0xa
+ 480 008b 0F       		.uleb128 0xf
+ 481 008c 00       		.byte	0
+ 482 008d 0B       		.uleb128 0xb
+ 483 008e 0B       		.uleb128 0xb
+ 484 008f 49       		.uleb128 0x49
+ 485 0090 13       		.uleb128 0x13
+ 486 0091 00       		.byte	0
+ 487 0092 00       		.byte	0
+ 488 0093 0B       		.uleb128 0xb
+ 489 0094 26       		.uleb128 0x26
+ 490 0095 00       		.byte	0
+ 491 0096 49       		.uleb128 0x49
+ 492 0097 13       		.uleb128 0x13
+ 493 0098 00       		.byte	0
+ 494 0099 00       		.byte	0
+ 495 009a 0C       		.uleb128 0xc
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 16
+
+
+ 496 009b 34       		.uleb128 0x34
+ 497 009c 00       		.byte	0
+ 498 009d 03       		.uleb128 0x3
+ 499 009e 0E       		.uleb128 0xe
+ 500 009f 3A       		.uleb128 0x3a
+ 501 00a0 0B       		.uleb128 0xb
+ 502 00a1 3B       		.uleb128 0x3b
+ 503 00a2 0B       		.uleb128 0xb
+ 504 00a3 49       		.uleb128 0x49
+ 505 00a4 13       		.uleb128 0x13
+ 506 00a5 3F       		.uleb128 0x3f
+ 507 00a6 19       		.uleb128 0x19
+ 508 00a7 3C       		.uleb128 0x3c
+ 509 00a8 19       		.uleb128 0x19
+ 510 00a9 00       		.byte	0
+ 511 00aa 00       		.byte	0
+ 512 00ab 0D       		.uleb128 0xd
+ 513 00ac 13       		.uleb128 0x13
+ 514 00ad 01       		.byte	0x1
+ 515 00ae 0B       		.uleb128 0xb
+ 516 00af 0B       		.uleb128 0xb
+ 517 00b0 3A       		.uleb128 0x3a
+ 518 00b1 0B       		.uleb128 0xb
+ 519 00b2 3B       		.uleb128 0x3b
+ 520 00b3 0B       		.uleb128 0xb
+ 521 00b4 01       		.uleb128 0x1
+ 522 00b5 13       		.uleb128 0x13
+ 523 00b6 00       		.byte	0
+ 524 00b7 00       		.byte	0
+ 525 00b8 0E       		.uleb128 0xe
+ 526 00b9 0D       		.uleb128 0xd
+ 527 00ba 00       		.byte	0
+ 528 00bb 03       		.uleb128 0x3
+ 529 00bc 0E       		.uleb128 0xe
+ 530 00bd 3A       		.uleb128 0x3a
+ 531 00be 0B       		.uleb128 0xb
+ 532 00bf 3B       		.uleb128 0x3b
+ 533 00c0 0B       		.uleb128 0xb
+ 534 00c1 49       		.uleb128 0x49
+ 535 00c2 13       		.uleb128 0x13
+ 536 00c3 38       		.uleb128 0x38
+ 537 00c4 0B       		.uleb128 0xb
+ 538 00c5 00       		.byte	0
+ 539 00c6 00       		.byte	0
+ 540 00c7 0F       		.uleb128 0xf
+ 541 00c8 13       		.uleb128 0x13
+ 542 00c9 01       		.byte	0x1
+ 543 00ca 0B       		.uleb128 0xb
+ 544 00cb 0B       		.uleb128 0xb
+ 545 00cc 3A       		.uleb128 0x3a
+ 546 00cd 0B       		.uleb128 0xb
+ 547 00ce 3B       		.uleb128 0x3b
+ 548 00cf 0B       		.uleb128 0xb
+ 549 00d0 00       		.byte	0
+ 550 00d1 00       		.byte	0
+ 551 00d2 10       		.uleb128 0x10
+ 552 00d3 0D       		.uleb128 0xd
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 17
+
+
+ 553 00d4 00       		.byte	0
+ 554 00d5 03       		.uleb128 0x3
+ 555 00d6 08       		.uleb128 0x8
+ 556 00d7 3A       		.uleb128 0x3a
+ 557 00d8 0B       		.uleb128 0xb
+ 558 00d9 3B       		.uleb128 0x3b
+ 559 00da 0B       		.uleb128 0xb
+ 560 00db 49       		.uleb128 0x49
+ 561 00dc 13       		.uleb128 0x13
+ 562 00dd 38       		.uleb128 0x38
+ 563 00de 0B       		.uleb128 0xb
+ 564 00df 00       		.byte	0
+ 565 00e0 00       		.byte	0
+ 566 00e1 00       		.byte	0
+ 567              		.section	.debug_loc,"",%progbits
+ 568              	.Ldebug_loc0:
+ 569              	.LLST0:
+ 570 0000 00000000 		.4byte	.LVL0
+ 571 0004 00000000 		.4byte	.LVL0
+ 572 0008 0100     		.2byte	0x1
+ 573 000a 50       		.byte	0x50
+ 574 000b 00000000 		.4byte	.LVL0
+ 575 000f 12000000 		.4byte	.LVL2
+ 576 0013 0300     		.2byte	0x3
+ 577 0015 70       		.byte	0x70
+ 578 0016 04       		.sleb128 4
+ 579 0017 9F       		.byte	0x9f
+ 580 0018 16000000 		.4byte	.LVL3
+ 581 001c 2C000000 		.4byte	.LVL9
+ 582 0020 0800     		.2byte	0x8
+ 583 0022 74       		.byte	0x74
+ 584 0023 01       		.sleb128 1
+ 585 0024 32       		.byte	0x32
+ 586 0025 24       		.byte	0x24
+ 587 0026 78       		.byte	0x78
+ 588 0027 00       		.sleb128 0
+ 589 0028 22       		.byte	0x22
+ 590 0029 9F       		.byte	0x9f
+ 591 002a 2C000000 		.4byte	.LVL9
+ 592 002e 30000000 		.4byte	.LVL10
+ 593 0032 0800     		.2byte	0x8
+ 594 0034 74       		.byte	0x74
+ 595 0035 00       		.sleb128 0
+ 596 0036 32       		.byte	0x32
+ 597 0037 24       		.byte	0x24
+ 598 0038 78       		.byte	0x78
+ 599 0039 00       		.sleb128 0
+ 600 003a 22       		.byte	0x22
+ 601 003b 9F       		.byte	0x9f
+ 602 003c 00000000 		.4byte	0
+ 603 0040 00000000 		.4byte	0
+ 604              	.LLST1:
+ 605 0044 00000000 		.4byte	.LVL0
+ 606 0048 12000000 		.4byte	.LVL2
+ 607 004c 0100     		.2byte	0x1
+ 608 004e 51       		.byte	0x51
+ 609 004f 12000000 		.4byte	.LVL2
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 18
+
+
+ 610 0053 3C000000 		.4byte	.LFE84
+ 611 0057 0100     		.2byte	0x1
+ 612 0059 5B       		.byte	0x5b
+ 613 005a 00000000 		.4byte	0
+ 614 005e 00000000 		.4byte	0
+ 615              	.LLST2:
+ 616 0062 00000000 		.4byte	.LVL0
+ 617 0066 12000000 		.4byte	.LVL2
+ 618 006a 0100     		.2byte	0x1
+ 619 006c 52       		.byte	0x52
+ 620 006d 12000000 		.4byte	.LVL2
+ 621 0071 3C000000 		.4byte	.LFE84
+ 622 0075 0100     		.2byte	0x1
+ 623 0077 5A       		.byte	0x5a
+ 624 0078 00000000 		.4byte	0
+ 625 007c 00000000 		.4byte	0
+ 626              	.LLST3:
+ 627 0080 00000000 		.4byte	.LVL0
+ 628 0084 12000000 		.4byte	.LVL2
+ 629 0088 0100     		.2byte	0x1
+ 630 008a 53       		.byte	0x53
+ 631 008b 12000000 		.4byte	.LVL2
+ 632 008f 3C000000 		.4byte	.LFE84
+ 633 0093 0100     		.2byte	0x1
+ 634 0095 59       		.byte	0x59
+ 635 0096 00000000 		.4byte	0
+ 636 009a 00000000 		.4byte	0
+ 637              	.LLST4:
+ 638 009e 1A000000 		.4byte	.LVL4
+ 639 00a2 26000000 		.4byte	.LVL6
+ 640 00a6 0100     		.2byte	0x1
+ 641 00a8 56       		.byte	0x56
+ 642 00a9 28000000 		.4byte	.LVL7
+ 643 00ad 2A000000 		.4byte	.LVL8
+ 644 00b1 0100     		.2byte	0x1
+ 645 00b3 56       		.byte	0x56
+ 646 00b4 00000000 		.4byte	0
+ 647 00b8 00000000 		.4byte	0
+ 648              	.LLST5:
+ 649 00bc 0E000000 		.4byte	.LVL1
+ 650 00c0 2A000000 		.4byte	.LVL8
+ 651 00c4 0100     		.2byte	0x1
+ 652 00c6 55       		.byte	0x55
+ 653 00c7 2A000000 		.4byte	.LVL8
+ 654 00cb 30000000 		.4byte	.LVL10
+ 655 00cf 0100     		.2byte	0x1
+ 656 00d1 56       		.byte	0x56
+ 657 00d2 30000000 		.4byte	.LVL10
+ 658 00d6 3C000000 		.4byte	.LFE84
+ 659 00da 0100     		.2byte	0x1
+ 660 00dc 55       		.byte	0x55
+ 661 00dd 00000000 		.4byte	0
+ 662 00e1 00000000 		.4byte	0
+ 663              	.LLST6:
+ 664 00e5 0E000000 		.4byte	.LVL1
+ 665 00e9 12000000 		.4byte	.LVL2
+ 666 00ed 0300     		.2byte	0x3
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 19
+
+
+ 667 00ef 71       		.byte	0x71
+ 668 00f0 7F       		.sleb128 -1
+ 669 00f1 9F       		.byte	0x9f
+ 670 00f2 12000000 		.4byte	.LVL2
+ 671 00f6 2A000000 		.4byte	.LVL8
+ 672 00fa 0600     		.2byte	0x6
+ 673 00fc 7B       		.byte	0x7b
+ 674 00fd 00       		.sleb128 0
+ 675 00fe 74       		.byte	0x74
+ 676 00ff 00       		.sleb128 0
+ 677 0100 1C       		.byte	0x1c
+ 678 0101 9F       		.byte	0x9f
+ 679 0102 30000000 		.4byte	.LVL10
+ 680 0106 3C000000 		.4byte	.LFE84
+ 681 010a 0600     		.2byte	0x6
+ 682 010c 7B       		.byte	0x7b
+ 683 010d 00       		.sleb128 0
+ 684 010e 74       		.byte	0x74
+ 685 010f 00       		.sleb128 0
+ 686 0110 1C       		.byte	0x1c
+ 687 0111 9F       		.byte	0x9f
+ 688 0112 00000000 		.4byte	0
+ 689 0116 00000000 		.4byte	0
+ 690              	.LLST7:
+ 691 011a 00000000 		.4byte	.LVL0
+ 692 011e 12000000 		.4byte	.LVL2
+ 693 0122 0200     		.2byte	0x2
+ 694 0124 30       		.byte	0x30
+ 695 0125 9F       		.byte	0x9f
+ 696 0126 00000000 		.4byte	0
+ 697 012a 00000000 		.4byte	0
+ 698              		.section	.debug_aranges,"",%progbits
+ 699 0000 1C000000 		.4byte	0x1c
+ 700 0004 0200     		.2byte	0x2
+ 701 0006 00000000 		.4byte	.Ldebug_info0
+ 702 000a 04       		.byte	0x4
+ 703 000b 00       		.byte	0
+ 704 000c 0000     		.2byte	0
+ 705 000e 0000     		.2byte	0
+ 706 0010 00000000 		.4byte	.LFB84
+ 707 0014 3C000000 		.4byte	.LFE84-.LFB84
+ 708 0018 00000000 		.4byte	0
+ 709 001c 00000000 		.4byte	0
+ 710              		.section	.debug_ranges,"",%progbits
+ 711              	.Ldebug_ranges0:
+ 712 0000 00000000 		.4byte	.LFB84
+ 713 0004 3C000000 		.4byte	.LFE84
+ 714 0008 00000000 		.4byte	0
+ 715 000c 00000000 		.4byte	0
+ 716              		.section	.debug_line,"",%progbits
+ 717              	.Ldebug_line0:
+ 718 0000 AB010000 		.section	.debug_str,"MS",%progbits,1
+ 718      02007D01 
+ 718      00000201 
+ 718      FB0E0D00 
+ 718      01010101 
+ 719              	.LASF29:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 20
+
+
+ 720 0000 5F5F7A65 		.ascii	"__zero_table_end__\000"
+ 720      726F5F74 
+ 720      61626C65 
+ 720      5F656E64 
+ 720      5F5F00
+ 721              	.LASF24:
+ 722 0013 5F5F636F 		.ascii	"__copy_table_t\000"
+ 722      70795F74 
+ 722      61626C65 
+ 722      5F7400
+ 723              	.LASF35:
+ 724 0022 61726D5F 		.ascii	"arm_max_f32\000"
+ 724      6D61785F 
+ 724      66333200 
+ 725              	.LASF27:
+ 726 002e 5F5F7A65 		.ascii	"__zero_table_t\000"
+ 726      726F5F74 
+ 726      61626C65 
+ 726      5F7400
+ 727              	.LASF21:
+ 728 003d 6D617856 		.ascii	"maxVal\000"
+ 728      616C00
+ 729              	.LASF14:
+ 730 0044 666C6F61 		.ascii	"float\000"
+ 730      7400
+ 731              	.LASF30:
+ 732 004a 64657374 		.ascii	"dest\000"
+ 732      00
+ 733              	.LASF1:
+ 734 004f 756E7369 		.ascii	"unsigned char\000"
+ 734      676E6564 
+ 734      20636861 
+ 734      7200
+ 735              	.LASF22:
+ 736 005d 626C6B43 		.ascii	"blkCnt\000"
+ 736      6E7400
+ 737              	.LASF26:
+ 738 0064 5F5F636F 		.ascii	"__copy_table_end__\000"
+ 738      70795F74 
+ 738      61626C65 
+ 738      5F656E64 
+ 738      5F5F00
+ 739              	.LASF5:
+ 740 0077 6C6F6E67 		.ascii	"long unsigned int\000"
+ 740      20756E73 
+ 740      69676E65 
+ 740      6420696E 
+ 740      7400
+ 741              	.LASF3:
+ 742 0089 73686F72 		.ascii	"short unsigned int\000"
+ 742      7420756E 
+ 742      7369676E 
+ 742      65642069 
+ 742      6E7400
+ 743              	.LASF33:
+ 744 009c 2E5C4453 		.ascii	".\\DSP\\Source\\StatisticsFunctions\\arm_max_f32.c\000"
+ 744      505C536F 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 21
+
+
+ 744      75726365 
+ 744      5C537461 
+ 744      74697374 
+ 745              	.LASF32:
+ 746 00cb 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 746      4320342E 
+ 746      392E3320 
+ 746      32303135 
+ 746      30333033 
+ 747 00fe 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 747      20726576 
+ 747      6973696F 
+ 747      6E203232 
+ 747      31323230 
+ 748 0131 73202D73 		.ascii	"s -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 748      74643D67 
+ 748      6E753939 
+ 748      202D6666 
+ 748      756E6374 
+ 749              	.LASF19:
+ 750 0164 70526573 		.ascii	"pResult\000"
+ 750      756C7400 
+ 751              	.LASF13:
+ 752 016c 646F7562 		.ascii	"double\000"
+ 752      6C6500
+ 753              	.LASF16:
+ 754 0173 666C6F61 		.ascii	"float32_t\000"
+ 754      7433325F 
+ 754      7400
+ 755              	.LASF9:
+ 756 017d 5F5F7569 		.ascii	"__uint32_t\000"
+ 756      6E743332 
+ 756      5F7400
+ 757              	.LASF8:
+ 758 0188 756E7369 		.ascii	"unsigned int\000"
+ 758      676E6564 
+ 758      20696E74 
+ 758      00
+ 759              	.LASF34:
+ 760 0195 5C5C766D 		.ascii	"\\\\vmware-host\\Shared Folders\\Documents\\PSoC Cr"
+ 760      77617265 
+ 760      2D686F73 
+ 760      745C5368 
+ 760      61726564 
+ 761 01c3 6561746F 		.ascii	"eator\\FinalProject\\FinalV2.cydsn\000"
+ 761      725C4669 
+ 761      6E616C50 
+ 761      726F6A65 
+ 761      63745C46 
+ 762              	.LASF20:
+ 763 01e4 70496E64 		.ascii	"pIndex\000"
+ 763      657800
+ 764              	.LASF7:
+ 765 01eb 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 765      206C6F6E 
+ 765      6720756E 
+ 765      7369676E 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 22
+
+
+ 765      65642069 
+ 766              	.LASF23:
+ 767 0202 6F757449 		.ascii	"outIndex\000"
+ 767      6E646578 
+ 767      00
+ 768              	.LASF11:
+ 769 020b 73697A65 		.ascii	"sizetype\000"
+ 769      74797065 
+ 769      00
+ 770              	.LASF6:
+ 771 0214 6C6F6E67 		.ascii	"long long int\000"
+ 771      206C6F6E 
+ 771      6720696E 
+ 771      7400
+ 772              	.LASF18:
+ 773 0222 626C6F63 		.ascii	"blockSize\000"
+ 773      6B53697A 
+ 773      6500
+ 774              	.LASF12:
+ 775 022c 63686172 		.ascii	"char\000"
+ 775      00
+ 776              	.LASF31:
+ 777 0231 776C656E 		.ascii	"wlen\000"
+ 777      00
+ 778              	.LASF2:
+ 779 0236 73686F72 		.ascii	"short int\000"
+ 779      7420696E 
+ 779      7400
+ 780              	.LASF10:
+ 781 0240 75696E74 		.ascii	"uint32_t\000"
+ 781      33325F74 
+ 781      00
+ 782              	.LASF4:
+ 783 0249 6C6F6E67 		.ascii	"long int\000"
+ 783      20696E74 
+ 783      00
+ 784              	.LASF15:
+ 785 0252 6C6F6E67 		.ascii	"long double\000"
+ 785      20646F75 
+ 785      626C6500 
+ 786              	.LASF28:
+ 787 025e 5F5F7A65 		.ascii	"__zero_table_start__\000"
+ 787      726F5F74 
+ 787      61626C65 
+ 787      5F737461 
+ 787      72745F5F 
+ 788              	.LASF0:
+ 789 0273 7369676E 		.ascii	"signed char\000"
+ 789      65642063 
+ 789      68617200 
+ 790              	.LASF17:
+ 791 027f 70537263 		.ascii	"pSrc\000"
+ 791      00
+ 792              	.LASF25:
+ 793 0284 5F5F636F 		.ascii	"__copy_table_start__\000"
+ 793      70795F74 
+ 793      61626C65 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\ccJZ4Cfb.s 			page 23
+
+
+ 793      5F737461 
+ 793      72745F5F 
+ 794              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

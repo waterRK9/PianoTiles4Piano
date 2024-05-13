@@ -1,0 +1,3436 @@
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"arm_cfft_radix2_q15.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.text.arm_radix2_butterfly_q15,"ax",%progbits
+  19              		.align	2
+  20              		.global	arm_radix2_butterfly_q15
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	arm_radix2_butterfly_q15, %function
+  24              	arm_radix2_butterfly_q15:
+  25              	.LFB85:
+  26              		.file 1 ".\\DSP\\Source\\TransformFunctions\\arm_cfft_radix2_q15.c"
+   1:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** /* ----------------------------------------------------------------------
+   2:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * Project:      CMSIS DSP Library
+   3:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * Title:        arm_cfft_radix2_q15.c
+   4:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * Description:  Radix-2 Decimation in Frequency CFFT & CIFFT Fixed point processing function
+   5:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  *
+   6:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * $Date:        23 April 2021
+   7:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * $Revision:    V1.9.0
+   8:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  *
+   9:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * Target Processor: Cortex-M and Cortex-A cores
+  10:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * -------------------------------------------------------------------- */
+  11:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** /*
+  12:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * Copyright (C) 2010-2021 ARM Limited or its affiliates. All rights reserved.
+  13:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  *
+  14:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * SPDX-License-Identifier: Apache-2.0
+  15:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  *
+  16:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * Licensed under the Apache License, Version 2.0 (the License); you may
+  17:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * not use this file except in compliance with the License.
+  18:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * You may obtain a copy of the License at
+  19:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  *
+  20:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * www.apache.org/licenses/LICENSE-2.0
+  21:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  *
+  22:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * Unless required by applicable law or agreed to in writing, software
+  23:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+  24:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  25:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * See the License for the specific language governing permissions and
+  26:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  * limitations under the License.
+  27:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  */
+  28:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+  29:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #include "dsp/transform_functions.h"
+  30:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+  31:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** void arm_radix2_butterfly_q15(
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 2
+
+
+  32:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         q15_t * pSrc,
+  33:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         uint32_t fftLen,
+  34:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   const q15_t * pCoef,
+  35:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         uint16_t twidCoefModifier);
+  36:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+  37:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** void arm_radix2_butterfly_inverse_q15(
+  38:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         q15_t * pSrc,
+  39:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         uint32_t fftLen,
+  40:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   const q15_t * pCoef,
+  41:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         uint16_t twidCoefModifier);
+  42:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+  43:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** void arm_bitreversal_q15(
+  44:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         q15_t * pSrc,
+  45:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         uint32_t fftLen,
+  46:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         uint16_t bitRevFactor,
+  47:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   const uint16_t * pBitRevTab);
+  48:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+  49:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** /**
+  50:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   @ingroup groupTransforms
+  51:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  */
+  52:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+  53:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** /**
+  54:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   @addtogroup ComplexFFT
+  55:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   @{
+  56:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  */
+  57:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+  58:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** /**
+  59:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   @brief         Processing function for the fixed-point CFFT/CIFFT.
+  60:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   @deprecated    Do not use this function. It has been superseded by \ref arm_cfft_q15 and will be 
+  61:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   @param[in]     S    points to an instance of the fixed-point CFFT/CIFFT structure
+  62:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   @param[in,out] pSrc points to the complex data buffer of size <code>2*fftLen</code>. Processing o
+  63:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   @return        none
+  64:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  */
+  65:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+  66:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** void arm_cfft_radix2_q15(
+  67:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   const arm_cfft_radix2_instance_q15 * S,
+  68:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         q15_t * pSrc)
+  69:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** {
+  70:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+  71:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   if (S->ifftFlag == 1U)
+  72:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+  73:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     arm_radix2_butterfly_inverse_q15 (pSrc, S->fftLen, S->pTwiddle, S->twidCoefModifier);
+  74:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   }
+  75:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   else
+  76:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+  77:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     arm_radix2_butterfly_q15 (pSrc, S->fftLen, S->pTwiddle, S->twidCoefModifier);
+  78:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   }
+  79:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+  80:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   arm_bitreversal_q15(pSrc, S->fftLen, S->bitRevFactor, S->pBitRevTable);
+  81:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** }
+  82:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+  83:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** /**
+  84:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   @} end of ComplexFFT group
+  85:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****  */
+  86:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+  87:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** void arm_radix2_butterfly_q15(
+  88:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         q15_t * pSrc,
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 3
+
+
+  89:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         uint32_t fftLen,
+  90:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   const q15_t * pCoef,
+  91:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         uint16_t twidCoefModifier)
+  92:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** {
+  27              		.loc 1 92 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 24
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              	.LVL0:
+  32 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+  33              		.cfi_def_cfa_offset 36
+  34              		.cfi_offset 4, -36
+  35              		.cfi_offset 5, -32
+  36              		.cfi_offset 6, -28
+  37              		.cfi_offset 7, -24
+  38              		.cfi_offset 8, -20
+  39              		.cfi_offset 9, -16
+  40              		.cfi_offset 10, -12
+  41              		.cfi_offset 11, -8
+  42              		.cfi_offset 14, -4
+  43 0004 87B0     		sub	sp, sp, #28
+  44              		.cfi_def_cfa_offset 64
+  45 0006 8146     		mov	r9, r0
+  46 0008 8A46     		mov	r10, r1
+  47 000a 0492     		str	r2, [sp, #16]
+  48 000c 0293     		str	r3, [sp, #8]
+  49              	.LVL1:
+  93:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #if defined (ARM_MATH_DSP)
+  94:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+  95:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   uint32_t i, j, k, l;
+  96:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   uint32_t n1, n2, ia;
+  97:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   q15_t in;
+  98:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   q31_t T, S, R;
+  99:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   q31_t coeff, out1, out2;
+ 100:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 101:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   //N = fftLen;
+ 102:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n2 = fftLen;
+ 103:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 104:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n1 = n2;
+ 105:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n2 = n2 >> 1;
+ 106:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   ia = 0;
+ 107:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 108:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   // loop for groups
+ 109:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   for (i = 0; i < n2; i++)
+ 110:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 111:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     coeff = read_q15x2 ((q15_t *)pCoef + (ia * 2U));
+ 112:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 113:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     ia = ia + twidCoefModifier;
+ 114:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 115:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     l = i + n2;
+ 116:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 117:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     T = read_q15x2 (pSrc + (2 * i));
+ 118:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     in = ((int16_t) (T & 0xFFFF)) >> 1;
+ 119:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     T = ((T >> 1) & 0xFFFF0000) | (in & 0xFFFF);
+ 120:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 121:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     S = read_q15x2 (pSrc + (2 * l));
+ 122:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     in = ((int16_t) (S & 0xFFFF)) >> 1;
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 4
+
+
+ 123:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     S = ((S >> 1) & 0xFFFF0000) | (in & 0xFFFF);
+ 124:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 125:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     R = __QSUB16(T, S);
+ 126:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 127:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     write_q15x2 (pSrc + (2 * i), __SHADD16(T, S));
+ 128:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 129:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #ifndef ARM_MATH_BIG_ENDIAN
+ 130:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out1 = __SMUAD(coeff, R) >> 16;
+ 131:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out2 = __SMUSDX(coeff, R);
+ 132:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #else
+ 133:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out1 = __SMUSDX(R, coeff) >> 16U;
+ 134:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out2 = __SMUAD(coeff, R);
+ 135:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #endif /* #ifndef ARM_MATH_BIG_ENDIAN */
+ 136:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 137:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     write_q15x2 (pSrc + (2U * l), (q31_t) ((out2) & 0xFFFF0000) | (out1 & 0x0000FFFF));
+ 138:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 139:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     coeff = read_q15x2 ((q15_t *)pCoef + (ia * 2U));
+ 140:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 141:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     ia = ia + twidCoefModifier;
+ 142:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 143:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     /* loop for butterfly */
+ 144:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     i++;
+ 145:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     l++;
+ 146:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 147:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     T = read_q15x2 (pSrc + (2 * i));
+ 148:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     in = ((int16_t) (T & 0xFFFF)) >> 1;
+ 149:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     T = ((T >> 1) & 0xFFFF0000) | (in & 0xFFFF);
+ 150:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 151:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     S = read_q15x2 (pSrc + (2 * l));
+ 152:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     in = ((int16_t) (S & 0xFFFF)) >> 1;
+ 153:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     S = ((S >> 1) & 0xFFFF0000) | (in & 0xFFFF);
+ 154:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 155:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     R = __QSUB16(T, S);
+ 156:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 157:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     write_q15x2 (pSrc + (2 * i), __SHADD16(T, S));
+ 158:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 159:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #ifndef ARM_MATH_BIG_ENDIAN
+ 160:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out1 = __SMUAD(coeff, R) >> 16;
+ 161:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out2 = __SMUSDX(coeff, R);
+ 162:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #else
+ 163:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 164:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out1 = __SMUSDX(R, coeff) >> 16U;
+ 165:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out2 = __SMUAD(coeff, R);
+ 166:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #endif /* #ifndef ARM_MATH_BIG_ENDIAN */
+ 167:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 168:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     write_q15x2 (pSrc + (2U * l), (q31_t) ((out2) & 0xFFFF0000) | (out1 & 0x0000FFFF));
+ 169:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 170:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   } /* groups loop end */
+ 171:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 172:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   twidCoefModifier = twidCoefModifier << 1U;
+ 173:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 174:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   /* loop for stage */
+ 175:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   for (k = fftLen / 2; k > 2; k = k >> 1)
+ 176:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 177:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     n1 = n2;
+ 178:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     n2 = n2 >> 1;
+ 179:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     ia = 0;
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 5
+
+
+ 180:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 181:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     /* loop for groups */
+ 182:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     for (j = 0; j < n2; j++)
+ 183:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 184:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       coeff = read_q15x2 ((q15_t *)pCoef + (ia * 2U));
+ 185:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 186:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       ia = ia + twidCoefModifier;
+ 187:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 188:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       /* loop for butterfly */
+ 189:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       for (i = j; i < fftLen; i += n1)
+ 190:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       {
+ 191:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         l = i + n2;
+ 192:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 193:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         T = read_q15x2 (pSrc + (2 * i));
+ 194:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 195:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         S = read_q15x2 (pSrc + (2 * l));
+ 196:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 197:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         R = __QSUB16(T, S);
+ 198:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 199:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         write_q15x2 (pSrc + (2 * i), __SHADD16(T, S));
+ 200:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 201:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #ifndef ARM_MATH_BIG_ENDIAN
+ 202:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out1 = __SMUAD(coeff, R) >> 16;
+ 203:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out2 = __SMUSDX(coeff, R);
+ 204:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #else
+ 205:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out1 = __SMUSDX(R, coeff) >> 16U;
+ 206:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out2 = __SMUAD(coeff, R);
+ 207:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #endif /* #ifndef ARM_MATH_BIG_ENDIAN */
+ 208:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 209:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         write_q15x2 (pSrc + (2U * l), (q31_t) ((out2) & 0xFFFF0000) | (out1 & 0x0000FFFF));
+ 210:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 211:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         i += n1;
+ 212:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 213:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         l = i + n2;
+ 214:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 215:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         T = read_q15x2 (pSrc + (2 * i));
+ 216:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 217:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         S = read_q15x2 (pSrc + (2 * l));
+ 218:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 219:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         R = __QSUB16(T, S);
+ 220:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 221:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         write_q15x2 (pSrc + (2 * i), __SHADD16(T, S));
+ 222:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 223:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #ifndef ARM_MATH_BIG_ENDIAN
+ 224:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out1 = __SMUAD(coeff, R) >> 16;
+ 225:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out2 = __SMUSDX(coeff, R);
+ 226:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #else
+ 227:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out1 = __SMUSDX(R, coeff) >> 16U;
+ 228:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out2 = __SMUAD(coeff, R);
+ 229:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #endif /* #ifndef ARM_MATH_BIG_ENDIAN */
+ 230:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 231:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         write_q15x2 (pSrc + (2U * l), (q31_t) ((out2) & 0xFFFF0000) | (out1 & 0x0000FFFF));
+ 232:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 233:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       } /* butterfly loop end */
+ 234:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 235:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     } /* groups loop end */
+ 236:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 6
+
+
+ 237:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     twidCoefModifier = twidCoefModifier << 1U;
+ 238:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   } /* stages loop end */
+ 239:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 240:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n1 = n2;
+ 241:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n2 = n2 >> 1;
+ 242:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   ia = 0;
+ 243:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 244:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   coeff = read_q15x2 ((q15_t *)pCoef + (ia * 2U));
+ 245:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 246:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   ia = ia + twidCoefModifier;
+ 247:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 248:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   /* loop for butterfly */
+ 249:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   for (i = 0; i < fftLen; i += n1)
+ 250:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 251:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     l = i + n2;
+ 252:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 253:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     T = read_q15x2 (pSrc + (2 * i));
+ 254:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 255:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     S = read_q15x2 (pSrc + (2 * l));
+ 256:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 257:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     R = __QSUB16(T, S);
+ 258:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 259:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     write_q15x2 (pSrc + (2 * i), __QADD16(T, S));
+ 260:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 261:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     write_q15x2 (pSrc + (2 * l), R);
+ 262:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 263:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     i += n1;
+ 264:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     l = i + n2;
+ 265:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 266:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     T = read_q15x2 (pSrc + (2 * i));
+ 267:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 268:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     S = read_q15x2 (pSrc + (2 * l));
+ 269:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 270:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     R = __QSUB16(T, S);
+ 271:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 272:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     write_q15x2 (pSrc + (2 * i), __QADD16(T, S));
+ 273:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 274:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     write_q15x2 (pSrc + (2 * l), R);
+ 275:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 276:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   } /* groups loop end */
+ 277:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 278:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 279:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #else /* #if defined (ARM_MATH_DSP) */
+ 280:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 281:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   uint32_t i, j, k, l;
+ 282:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   uint32_t n1, n2, ia;
+ 283:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   q15_t xt, yt, cosVal, sinVal;
+ 284:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 285:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 286:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   // N = fftLen;
+ 287:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n2 = fftLen;
+ 288:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 289:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n1 = n2;
+ 290:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n2 = n2 >> 1;
+  50              		.loc 1 290 0
+  51 000e 4FEA5108 		lsr	r8, r1, #1
+  52              	.LVL2:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 7
+
+
+ 291:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   ia = 0;
+  53              		.loc 1 291 0
+  54 0012 4FF0000C 		mov	ip, #0
+ 292:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 293:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   /* loop for groups */
+ 294:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   for (j = 0; j < n2; j++)
+  55              		.loc 1 294 0
+  56 0016 E346     		mov	fp, ip
+  57 0018 4EE0     		b	.L2
+  58              	.LVL3:
+  59              	.L5:
+ 295:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 296:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     cosVal = pCoef[(ia * 2)];
+  60              		.loc 1 296 0
+  61 001a 049A     		ldr	r2, [sp, #16]
+  62 001c 32F82C30 		ldrh	r3, [r2, ip, lsl #2]
+  63 0020 0093     		str	r3, [sp]
+  64              	.LVL4:
+ 297:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     sinVal = pCoef[(ia * 2) + 1];
+  65              		.loc 1 297 0
+  66 0022 02EB8C03 		add	r3, r2, ip, lsl #2
+  67 0026 5B88     		ldrh	r3, [r3, #2]
+  68 0028 0193     		str	r3, [sp, #4]
+  69              	.LVL5:
+ 298:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     ia = ia + twidCoefModifier;
+  70              		.loc 1 298 0
+  71 002a 029B     		ldr	r3, [sp, #8]
+  72 002c 9C44     		add	ip, ip, r3
+  73              	.LVL6:
+ 299:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 300:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     /* loop for butterfly */
+ 301:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     for (i = j; i < fftLen; i += n1)
+  74              		.loc 1 301 0
+  75 002e 5E46     		mov	r6, fp
+  76 0030 3EE0     		b	.L3
+  77              	.LVL7:
+  78              	.L4:
+ 302:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 303:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       l = i + n2;
+  79              		.loc 1 303 0 discriminator 3
+  80 0032 06EB0805 		add	r5, r6, r8
+  81              	.LVL8:
+ 304:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       xt = (pSrc[2 * i] >> 1U) - (pSrc[2 * l] >> 1U);
+  82              		.loc 1 304 0 discriminator 3
+  83 0036 4FEA860E 		lsl	lr, r6, #2
+  84 003a 39F92620 		ldrsh	r2, [r9, r6, lsl #2]
+  85 003e C2F34F02 		ubfx	r2, r2, #1, #16
+  86 0042 A800     		lsls	r0, r5, #2
+  87 0044 39F92530 		ldrsh	r3, [r9, r5, lsl #2]
+  88 0048 C3F34F03 		ubfx	r3, r3, #1, #16
+  89 004c D41A     		subs	r4, r2, r3
+  90              	.LVL9:
+ 305:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * i] = ((pSrc[2 * i] >> 1U) + (pSrc[2 * l] >> 1U)) >> 1U;
+  91              		.loc 1 305 0 discriminator 3
+  92 004e 12B2     		sxth	r2, r2
+  93 0050 1BB2     		sxth	r3, r3
+  94 0052 1344     		add	r3, r3, r2
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 8
+
+
+  95 0054 5B10     		asrs	r3, r3, #1
+  96 0056 29F82630 		strh	r3, [r9, r6, lsl #2]	@ movhi
+ 306:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 307:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       yt = (pSrc[2 * i + 1] >> 1U) - (pSrc[2 * l + 1] >> 1U);
+  97              		.loc 1 307 0 discriminator 3
+  98 005a 0EF1020E 		add	lr, lr, #2
+  99 005e 39F90E10 		ldrsh	r1, [r9, lr]
+ 100 0062 C1F34F01 		ubfx	r1, r1, #1, #16
+ 101 0066 0230     		adds	r0, r0, #2
+ 102 0068 39F90070 		ldrsh	r7, [r9, r0]
+ 103 006c C7F34F07 		ubfx	r7, r7, #1, #16
+ 104 0070 CA1B     		subs	r2, r1, r7
+ 105              	.LVL10:
+ 308:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * i + 1] = ((pSrc[2 * l + 1] >> 1U) +
+ 106              		.loc 1 308 0 discriminator 3
+ 107 0072 3FB2     		sxth	r7, r7
+ 309:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                          (pSrc[2 * i + 1] >> 1U)  ) >> 1U;
+ 108              		.loc 1 309 0 discriminator 3
+ 109 0074 09B2     		sxth	r1, r1
+ 308:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * i + 1] = ((pSrc[2 * l + 1] >> 1U) +
+ 110              		.loc 1 308 0 discriminator 3
+ 111 0076 3944     		add	r1, r1, r7
+ 112              		.loc 1 309 0 discriminator 3
+ 113 0078 4910     		asrs	r1, r1, #1
+ 308:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * i + 1] = ((pSrc[2 * l + 1] >> 1U) +
+ 114              		.loc 1 308 0 discriminator 3
+ 115 007a 29F80E10 		strh	r1, [r9, lr]	@ movhi
+ 310:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 311:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * l] = (((int16_t) (((q31_t) xt * cosVal) >> 16)) +
+ 116              		.loc 1 311 0 discriminator 3
+ 117 007e 24B2     		sxth	r4, r4
+ 118 0080 BDF90070 		ldrsh	r7, [sp]
+ 119 0084 07FB04FE 		mul	lr, r7, r4
+ 312:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                      ((int16_t) (((q31_t) yt * sinVal) >> 16)));
+ 120              		.loc 1 312 0 discriminator 3
+ 121 0088 12B2     		sxth	r2, r2
+ 122 008a BDF90430 		ldrsh	r3, [sp, #4]
+ 123 008e 03FB02F1 		mul	r1, r3, r2
+ 124 0092 0914     		asrs	r1, r1, #16
+ 311:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                      ((int16_t) (((q31_t) yt * sinVal) >> 16)));
+ 125              		.loc 1 311 0 discriminator 3
+ 126 0094 01EB2E41 		add	r1, r1, lr, asr #16
+ 127 0098 29F82510 		strh	r1, [r9, r5, lsl #2]	@ movhi
+ 313:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 314:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2U * l + 1] = (((int16_t) (((q31_t) yt * cosVal) >> 16)) -
+ 128              		.loc 1 314 0 discriminator 3
+ 129 009c 02FB07F2 		mul	r2, r2, r7
+ 130              	.LVL11:
+ 315:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                           ((int16_t) (((q31_t) xt * sinVal) >> 16)));
+ 131              		.loc 1 315 0 discriminator 3
+ 132 00a0 03FB04F3 		mul	r3, r3, r4
+ 133 00a4 1B14     		asrs	r3, r3, #16
+ 314:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                           ((int16_t) (((q31_t) xt * sinVal) >> 16)));
+ 134              		.loc 1 314 0 discriminator 3
+ 135 00a6 C3EB2242 		rsb	r2, r3, r2, asr #16
+ 136 00aa 29F80020 		strh	r2, [r9, r0]	@ movhi
+ 301:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 9
+
+
+ 137              		.loc 1 301 0 discriminator 3
+ 138 00ae 5644     		add	r6, r6, r10
+ 139              	.LVL12:
+ 140              	.L3:
+ 301:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 141              		.loc 1 301 0 is_stmt 0 discriminator 1
+ 142 00b0 5645     		cmp	r6, r10
+ 143 00b2 BED3     		bcc	.L4
+ 294:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 144              		.loc 1 294 0 is_stmt 1 discriminator 2
+ 145 00b4 0BF1010B 		add	fp, fp, #1
+ 146              	.LVL13:
+ 147              	.L2:
+ 294:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 148              		.loc 1 294 0 is_stmt 0 discriminator 1
+ 149 00b8 C345     		cmp	fp, r8
+ 150 00ba AED3     		bcc	.L5
+ 316:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 317:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     } /* butterfly loop end */
+ 318:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 319:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   } /* groups loop end */
+ 320:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 321:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   twidCoefModifier = twidCoefModifier << 1U;
+ 151              		.loc 1 321 0 is_stmt 1
+ 152 00bc 029B     		ldr	r3, [sp, #8]
+ 153 00be 4FEA430B 		lsl	fp, r3, #1
+ 154              	.LVL14:
+ 155 00c2 1FFA8BF3 		uxth	r3, fp
+ 156 00c6 0393     		str	r3, [sp, #12]
+ 157              	.LVL15:
+ 322:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 323:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   /* loop for stage */
+ 324:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   for (k = fftLen / 2; k > 2; k = k >> 1)
+ 158              		.loc 1 324 0
+ 159 00c8 4FEA5A03 		lsr	r3, r10, #1
+ 160              	.LVL16:
+ 161 00cc 0593     		str	r3, [sp, #20]
+ 162              	.LVL17:
+ 163 00ce 59E0     		b	.L6
+ 164              	.LVL18:
+ 165              	.L11:
+ 325:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 326:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     n1 = n2;
+ 327:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     n2 = n2 >> 1;
+ 166              		.loc 1 327 0
+ 167 00d0 4FEA580C 		lsr	ip, r8, #1
+ 168              	.LVL19:
+ 328:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     ia = 0;
+ 169              		.loc 1 328 0
+ 170 00d4 4FF0000B 		mov	fp, #0
+ 329:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 330:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     /* loop for groups */
+ 331:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     for (j = 0; j < n2; j++)
+ 171              		.loc 1 331 0
+ 172 00d8 CDF808B0 		str	fp, [sp, #8]
+ 173 00dc 47E0     		b	.L7
+ 174              	.LVL20:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 10
+
+
+ 175              	.L10:
+ 332:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 333:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       cosVal = pCoef[ia * 2];
+ 176              		.loc 1 333 0
+ 177 00de 049A     		ldr	r2, [sp, #16]
+ 178 00e0 32F82B30 		ldrh	r3, [r2, fp, lsl #2]
+ 179              	.LVL21:
+ 180 00e4 0093     		str	r3, [sp]
+ 181              	.LVL22:
+ 334:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       sinVal = pCoef[(ia * 2) + 1];
+ 182              		.loc 1 334 0
+ 183 00e6 02EB8B03 		add	r3, r2, fp, lsl #2
+ 184 00ea 5B88     		ldrh	r3, [r3, #2]
+ 185 00ec 0193     		str	r3, [sp, #4]
+ 186              	.LVL23:
+ 335:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       ia = ia + twidCoefModifier;
+ 187              		.loc 1 335 0
+ 188 00ee 039B     		ldr	r3, [sp, #12]
+ 189 00f0 9B44     		add	fp, fp, r3
+ 190              	.LVL24:
+ 336:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 337:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       /* loop for butterfly */
+ 338:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       for (i = j; i < fftLen; i += n1)
+ 191              		.loc 1 338 0
+ 192 00f2 029E     		ldr	r6, [sp, #8]
+ 193 00f4 36E0     		b	.L8
+ 194              	.LVL25:
+ 195              	.L9:
+ 339:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       {
+ 340:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         l = i + n2;
+ 196              		.loc 1 340 0 discriminator 3
+ 197 00f6 06EB0C05 		add	r5, r6, ip
+ 198              	.LVL26:
+ 341:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         xt = pSrc[2 * i] - pSrc[2 * l];
+ 199              		.loc 1 341 0 discriminator 3
+ 200 00fa B700     		lsls	r7, r6, #2
+ 201 00fc 39F82620 		ldrh	r2, [r9, r6, lsl #2]
+ 202 0100 A800     		lsls	r0, r5, #2
+ 203 0102 39F82530 		ldrh	r3, [r9, r5, lsl #2]
+ 204 0106 D41A     		subs	r4, r2, r3
+ 205              	.LVL27:
+ 342:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         pSrc[2 * i] = (pSrc[2 * i] + pSrc[2 * l]) >> 1U;
+ 206              		.loc 1 342 0 discriminator 3
+ 207 0108 12B2     		sxth	r2, r2
+ 208 010a 1BB2     		sxth	r3, r3
+ 209 010c 1344     		add	r3, r3, r2
+ 210 010e 5B10     		asrs	r3, r3, #1
+ 211 0110 29F82630 		strh	r3, [r9, r6, lsl #2]	@ movhi
+ 343:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 344:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         yt = pSrc[2 * i + 1] - pSrc[2 * l + 1];
+ 212              		.loc 1 344 0 discriminator 3
+ 213 0114 0237     		adds	r7, r7, #2
+ 214 0116 39F80710 		ldrh	r1, [r9, r7]
+ 215 011a 0230     		adds	r0, r0, #2
+ 216 011c 39F800E0 		ldrh	lr, [r9, r0]
+ 217 0120 CEEB0102 		rsb	r2, lr, r1
+ 218              	.LVL28:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 11
+
+
+ 345:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         pSrc[2 * i + 1] = (pSrc[2 * l + 1] + pSrc[2 * i + 1]) >> 1U;
+ 219              		.loc 1 345 0 discriminator 3
+ 220 0124 0FFA8EFE 		sxth	lr, lr
+ 221 0128 09B2     		sxth	r1, r1
+ 222 012a 7144     		add	r1, r1, lr
+ 223 012c 4910     		asrs	r1, r1, #1
+ 224 012e 29F80710 		strh	r1, [r9, r7]	@ movhi
+ 346:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 347:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         pSrc[2 * l] = (((int16_t) (((q31_t) xt * cosVal) >> 16)) +
+ 225              		.loc 1 347 0 discriminator 3
+ 226 0132 24B2     		sxth	r4, r4
+ 227 0134 BDF90070 		ldrsh	r7, [sp]
+ 228 0138 07FB04FE 		mul	lr, r7, r4
+ 348:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                        ((int16_t) (((q31_t) yt * sinVal) >> 16)));
+ 229              		.loc 1 348 0 discriminator 3
+ 230 013c 12B2     		sxth	r2, r2
+ 231 013e BDF90430 		ldrsh	r3, [sp, #4]
+ 232 0142 03FB02F1 		mul	r1, r3, r2
+ 233 0146 0914     		asrs	r1, r1, #16
+ 347:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                        ((int16_t) (((q31_t) yt * sinVal) >> 16)));
+ 234              		.loc 1 347 0 discriminator 3
+ 235 0148 01EB2E41 		add	r1, r1, lr, asr #16
+ 236 014c 29F82510 		strh	r1, [r9, r5, lsl #2]	@ movhi
+ 349:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 350:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         pSrc[2U * l + 1] = (((int16_t) (((q31_t) yt * cosVal) >> 16)) -
+ 237              		.loc 1 350 0 discriminator 3
+ 238 0150 02FB07F2 		mul	r2, r2, r7
+ 239              	.LVL29:
+ 351:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                             ((int16_t) (((q31_t) xt * sinVal) >> 16)));
+ 240              		.loc 1 351 0 discriminator 3
+ 241 0154 03FB04F3 		mul	r3, r3, r4
+ 242 0158 1B14     		asrs	r3, r3, #16
+ 350:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                             ((int16_t) (((q31_t) xt * sinVal) >> 16)));
+ 243              		.loc 1 350 0 discriminator 3
+ 244 015a C3EB2242 		rsb	r2, r3, r2, asr #16
+ 245 015e 29F80020 		strh	r2, [r9, r0]	@ movhi
+ 338:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       {
+ 246              		.loc 1 338 0 discriminator 3
+ 247 0162 4644     		add	r6, r6, r8
+ 248              	.LVL30:
+ 249              	.L8:
+ 338:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       {
+ 250              		.loc 1 338 0 is_stmt 0 discriminator 1
+ 251 0164 5645     		cmp	r6, r10
+ 252 0166 C6D3     		bcc	.L9
+ 331:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 253              		.loc 1 331 0 is_stmt 1 discriminator 2
+ 254 0168 029B     		ldr	r3, [sp, #8]
+ 255 016a 0133     		adds	r3, r3, #1
+ 256 016c 0293     		str	r3, [sp, #8]
+ 257              	.LVL31:
+ 258              	.L7:
+ 331:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 259              		.loc 1 331 0 is_stmt 0 discriminator 1
+ 260 016e 029B     		ldr	r3, [sp, #8]
+ 261 0170 6345     		cmp	r3, ip
+ 262 0172 B4D3     		bcc	.L10
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 12
+
+
+ 352:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 353:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       } /* butterfly loop end */
+ 354:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 355:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     } /* groups loop end */
+ 356:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 357:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     twidCoefModifier = twidCoefModifier << 1U;
+ 263              		.loc 1 357 0 is_stmt 1 discriminator 2
+ 264 0174 039B     		ldr	r3, [sp, #12]
+ 265 0176 5B00     		lsls	r3, r3, #1
+ 266              	.LVL32:
+ 267 0178 9BB2     		uxth	r3, r3
+ 268 017a 0393     		str	r3, [sp, #12]
+ 324:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 269              		.loc 1 324 0 discriminator 2
+ 270 017c 059B     		ldr	r3, [sp, #20]
+ 271              	.LVL33:
+ 272 017e 5B08     		lsrs	r3, r3, #1
+ 273 0180 0593     		str	r3, [sp, #20]
+ 274              	.LVL34:
+ 327:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     ia = 0;
+ 275              		.loc 1 327 0 discriminator 2
+ 276 0182 E046     		mov	r8, ip
+ 277              	.LVL35:
+ 278              	.L6:
+ 324:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 279              		.loc 1 324 0 discriminator 1
+ 280 0184 059B     		ldr	r3, [sp, #20]
+ 281 0186 022B     		cmp	r3, #2
+ 282 0188 A2D8     		bhi	.L11
+ 283              	.LVL36:
+ 358:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   } /* stages loop end */
+ 359:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 360:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n1 = n2;
+ 361:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n2 = n2 >> 1;
+ 284              		.loc 1 361 0
+ 285 018a 4FEA5805 		lsr	r5, r8, #1
+ 286              	.LVL37:
+ 362:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   ia = 0;
+ 363:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 364:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   /* loop for groups */
+ 365:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   for (j = 0; j < n2; j++)
+ 287              		.loc 1 365 0
+ 288 018e 0026     		movs	r6, #0
+ 289 0190 20E0     		b	.L12
+ 290              	.LVL38:
+ 291              	.L13:
+ 366:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 367:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     cosVal = pCoef[ia * 2];
+ 368:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     sinVal = pCoef[(ia * 2) + 1];
+ 369:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 370:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     ia = ia + twidCoefModifier;
+ 371:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 372:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     /* loop for butterfly */
+ 373:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     for (i = j; i < fftLen; i += n1)
+ 374:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 375:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       l = i + n2;
+ 292              		.loc 1 375 0 discriminator 3
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 13
+
+
+ 293 0192 5C19     		adds	r4, r3, r5
+ 294              	.LVL39:
+ 376:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       xt = pSrc[2 * i] - pSrc[2 * l];
+ 295              		.loc 1 376 0 discriminator 3
+ 296 0194 9900     		lsls	r1, r3, #2
+ 297 0196 39F823E0 		ldrh	lr, [r9, r3, lsl #2]
+ 298 019a A200     		lsls	r2, r4, #2
+ 299 019c 39F82400 		ldrh	r0, [r9, r4, lsl #2]
+ 300 01a0 C0EB0E07 		rsb	r7, r0, lr
+ 301              	.LVL40:
+ 377:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * i] = (pSrc[2 * i] + pSrc[2 * l]);
+ 302              		.loc 1 377 0 discriminator 3
+ 303 01a4 7044     		add	r0, r0, lr
+ 304 01a6 29F82300 		strh	r0, [r9, r3, lsl #2]	@ movhi
+ 378:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 379:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       yt = pSrc[2 * i + 1] - pSrc[2 * l + 1];
+ 305              		.loc 1 379 0 discriminator 3
+ 306 01aa 0231     		adds	r1, r1, #2
+ 307 01ac 39F801E0 		ldrh	lr, [r9, r1]
+ 308 01b0 0232     		adds	r2, r2, #2
+ 309 01b2 39F80200 		ldrh	r0, [r9, r2]
+ 310 01b6 C0EB0E0C 		rsb	ip, r0, lr
+ 311              	.LVL41:
+ 380:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * i + 1] = (pSrc[2 * l + 1] + pSrc[2 * i + 1]);
+ 312              		.loc 1 380 0 discriminator 3
+ 313 01ba 7044     		add	r0, r0, lr
+ 314 01bc 29F80100 		strh	r0, [r9, r1]	@ movhi
+ 381:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 382:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * l] = xt;
+ 315              		.loc 1 382 0 discriminator 3
+ 316 01c0 29F82470 		strh	r7, [r9, r4, lsl #2]	@ movhi
+ 383:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 384:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * l + 1] = yt;
+ 317              		.loc 1 384 0 discriminator 3
+ 318 01c4 29F802C0 		strh	ip, [r9, r2]	@ movhi
+ 373:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 319              		.loc 1 373 0 discriminator 3
+ 320 01c8 4344     		add	r3, r3, r8
+ 321              	.LVL42:
+ 322 01ca 00E0     		b	.L14
+ 323              	.LVL43:
+ 324              	.L15:
+ 325 01cc 3346     		mov	r3, r6
+ 326              	.L14:
+ 327              	.LVL44:
+ 373:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 328              		.loc 1 373 0 is_stmt 0 discriminator 1
+ 329 01ce 5345     		cmp	r3, r10
+ 330 01d0 DFD3     		bcc	.L13
+ 365:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 331              		.loc 1 365 0 is_stmt 1 discriminator 2
+ 332 01d2 0136     		adds	r6, r6, #1
+ 333              	.LVL45:
+ 334              	.L12:
+ 365:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 335              		.loc 1 365 0 is_stmt 0 discriminator 1
+ 336 01d4 AE42     		cmp	r6, r5
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 14
+
+
+ 337 01d6 F9D3     		bcc	.L15
+ 385:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 386:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     } /* butterfly loop end */
+ 387:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 388:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   } /* groups loop end */
+ 389:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 390:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   twidCoefModifier = twidCoefModifier << 1U;
+ 391:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 392:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #endif /* #if defined (ARM_MATH_DSP) */
+ 393:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 394:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** }
+ 338              		.loc 1 394 0 is_stmt 1
+ 339 01d8 07B0     		add	sp, sp, #28
+ 340              		.cfi_def_cfa_offset 36
+ 341              		@ sp needed
+ 342 01da BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 343              		.cfi_endproc
+ 344              	.LFE85:
+ 345              		.size	arm_radix2_butterfly_q15, .-arm_radix2_butterfly_q15
+ 346 01de 00BF     		.section	.text.arm_radix2_butterfly_inverse_q15,"ax",%progbits
+ 347              		.align	2
+ 348              		.global	arm_radix2_butterfly_inverse_q15
+ 349              		.thumb
+ 350              		.thumb_func
+ 351              		.type	arm_radix2_butterfly_inverse_q15, %function
+ 352              	arm_radix2_butterfly_inverse_q15:
+ 353              	.LFB86:
+ 395:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 396:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 397:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** void arm_radix2_butterfly_inverse_q15(
+ 398:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         q15_t * pSrc,
+ 399:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         uint32_t fftLen,
+ 400:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   const q15_t * pCoef,
+ 401:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         uint16_t twidCoefModifier)
+ 402:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** {
+ 354              		.loc 1 402 0
+ 355              		.cfi_startproc
+ 356              		@ args = 0, pretend = 0, frame = 24
+ 357              		@ frame_needed = 0, uses_anonymous_args = 0
+ 358              	.LVL46:
+ 359 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 360              		.cfi_def_cfa_offset 36
+ 361              		.cfi_offset 4, -36
+ 362              		.cfi_offset 5, -32
+ 363              		.cfi_offset 6, -28
+ 364              		.cfi_offset 7, -24
+ 365              		.cfi_offset 8, -20
+ 366              		.cfi_offset 9, -16
+ 367              		.cfi_offset 10, -12
+ 368              		.cfi_offset 11, -8
+ 369              		.cfi_offset 14, -4
+ 370 0004 87B0     		sub	sp, sp, #28
+ 371              		.cfi_def_cfa_offset 64
+ 372 0006 8146     		mov	r9, r0
+ 373 0008 8A46     		mov	r10, r1
+ 374 000a 0492     		str	r2, [sp, #16]
+ 375 000c 0293     		str	r3, [sp, #8]
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 15
+
+
+ 376              	.LVL47:
+ 403:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #if defined (ARM_MATH_DSP)
+ 404:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 405:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         uint32_t i, j, k, l;
+ 406:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         uint32_t n1, n2, ia;
+ 407:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         q15_t in;
+ 408:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         q31_t T, S, R;
+ 409:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         q31_t coeff, out1, out2;
+ 410:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 411:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   // N = fftLen;
+ 412:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n2 = fftLen;
+ 413:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 414:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n1 = n2;
+ 415:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n2 = n2 >> 1;
+ 416:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   ia = 0;
+ 417:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 418:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   /* loop for groups */
+ 419:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   for (i = 0; i < n2; i++)
+ 420:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 421:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     coeff = read_q15x2 ((q15_t *)pCoef + (ia * 2U));
+ 422:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 423:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     ia = ia + twidCoefModifier;
+ 424:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 425:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     l = i + n2;
+ 426:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 427:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     T = read_q15x2 (pSrc + (2 * i));
+ 428:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     in = ((int16_t) (T & 0xFFFF)) >> 1;
+ 429:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     T = ((T >> 1) & 0xFFFF0000) | (in & 0xFFFF);
+ 430:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 431:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     S = read_q15x2 (pSrc + (2 * l));
+ 432:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     in = ((int16_t) (S & 0xFFFF)) >> 1;
+ 433:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     S = ((S >> 1) & 0xFFFF0000) | (in & 0xFFFF);
+ 434:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 435:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     R = __QSUB16(T, S);
+ 436:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 437:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     write_q15x2 (pSrc + (2 * i), __SHADD16(T, S));
+ 438:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 439:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #ifndef ARM_MATH_BIG_ENDIAN
+ 440:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out1 = __SMUSD(coeff, R) >> 16;
+ 441:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out2 = __SMUADX(coeff, R);
+ 442:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #else
+ 443:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out1 = __SMUADX(R, coeff) >> 16U;
+ 444:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out2 = __SMUSD(__QSUB(0, coeff), R);
+ 445:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #endif /* #ifndef ARM_MATH_BIG_ENDIAN */
+ 446:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 447:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     write_q15x2 (pSrc + (2 * l), (q31_t) ((out2) & 0xFFFF0000) | (out1 & 0x0000FFFF));
+ 448:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 449:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     coeff = read_q15x2 ((q15_t *)pCoef + (ia * 2U));
+ 450:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 451:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     ia = ia + twidCoefModifier;
+ 452:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 453:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     /* loop for butterfly */
+ 454:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     i++;
+ 455:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     l++;
+ 456:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 457:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     T = read_q15x2 (pSrc + (2 * i));
+ 458:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     in = ((int16_t) (T & 0xFFFF)) >> 1;
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 16
+
+
+ 459:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     T = ((T >> 1) & 0xFFFF0000) | (in & 0xFFFF);
+ 460:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 461:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     S = read_q15x2 (pSrc + (2 * l));
+ 462:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     in = ((int16_t) (S & 0xFFFF)) >> 1;
+ 463:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     S = ((S >> 1) & 0xFFFF0000) | (in & 0xFFFF);
+ 464:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 465:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     R = __QSUB16(T, S);
+ 466:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 467:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     write_q15x2 (pSrc + (2 * i), __SHADD16(T, S));
+ 468:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 469:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #ifndef ARM_MATH_BIG_ENDIAN
+ 470:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out1 = __SMUSD(coeff, R) >> 16;
+ 471:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out2 = __SMUADX(coeff, R);
+ 472:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #else
+ 473:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out1 = __SMUADX(R, coeff) >> 16U;
+ 474:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     out2 = __SMUSD(__QSUB(0, coeff), R);
+ 475:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #endif /* #ifndef ARM_MATH_BIG_ENDIAN */
+ 476:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 477:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     write_q15x2 (pSrc + (2 * l), (q31_t) ((out2) & 0xFFFF0000) | (out1 & 0x0000FFFF));
+ 478:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 479:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   } /* groups loop end */
+ 480:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 481:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   twidCoefModifier = twidCoefModifier << 1U;
+ 482:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 483:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   /* loop for stage */
+ 484:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   for (k = fftLen / 2; k > 2; k = k >> 1)
+ 485:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 486:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     n1 = n2;
+ 487:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     n2 = n2 >> 1;
+ 488:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     ia = 0;
+ 489:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 490:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     /* loop for groups */
+ 491:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     for (j = 0; j < n2; j++)
+ 492:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 493:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       coeff = read_q15x2 ((q15_t *)pCoef + (ia * 2U));
+ 494:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 495:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       ia = ia + twidCoefModifier;
+ 496:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 497:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       /* loop for butterfly */
+ 498:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       for (i = j; i < fftLen; i += n1)
+ 499:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       {
+ 500:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         l = i + n2;
+ 501:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 502:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         T = read_q15x2 (pSrc + (2 * i));
+ 503:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 504:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         S = read_q15x2 (pSrc + (2 * l));
+ 505:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 506:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         R = __QSUB16(T, S);
+ 507:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 508:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         write_q15x2 (pSrc + (2 * i), __SHADD16(T, S));
+ 509:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 510:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #ifndef ARM_MATH_BIG_ENDIAN
+ 511:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out1 = __SMUSD(coeff, R) >> 16;
+ 512:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out2 = __SMUADX(coeff, R);
+ 513:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #else
+ 514:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out1 = __SMUADX(R, coeff) >> 16U;
+ 515:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out2 = __SMUSD(__QSUB(0, coeff), R);
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 17
+
+
+ 516:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #endif /* #ifndef ARM_MATH_BIG_ENDIAN */
+ 517:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 518:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         write_q15x2 (pSrc + (2 * l), (q31_t) ((out2) & 0xFFFF0000) | (out1 & 0x0000FFFF));
+ 519:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 520:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         i += n1;
+ 521:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 522:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         l = i + n2;
+ 523:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 524:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         T = read_q15x2 (pSrc + (2 * i));
+ 525:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 526:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         S = read_q15x2 (pSrc + (2 * l));
+ 527:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 528:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         R = __QSUB16(T, S);
+ 529:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 530:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         write_q15x2 (pSrc + (2 * i), __SHADD16(T, S));
+ 531:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 532:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #ifndef ARM_MATH_BIG_ENDIAN
+ 533:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out1 = __SMUSD(coeff, R) >> 16;
+ 534:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out2 = __SMUADX(coeff, R);
+ 535:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #else
+ 536:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out1 = __SMUADX(R, coeff) >> 16U;
+ 537:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         out2 = __SMUSD(__QSUB(0, coeff), R);
+ 538:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #endif /* #ifndef ARM_MATH_BIG_ENDIAN */
+ 539:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 540:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         write_q15x2 (pSrc + (2 * l), (q31_t) ((out2) & 0xFFFF0000) | (out1 & 0x0000FFFF));
+ 541:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 542:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       } /* butterfly loop end */
+ 543:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 544:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     } /* groups loop end */
+ 545:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 546:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     twidCoefModifier = twidCoefModifier << 1U;
+ 547:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   } /* stages loop end */
+ 548:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 549:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n1 = n2;
+ 550:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n2 = n2 >> 1;
+ 551:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   ia = 0;
+ 552:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 553:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   /* loop for groups */
+ 554:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   for (j = 0; j < n2; j++)
+ 555:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 556:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     coeff = read_q15x2 ((q15_t *)pCoef + (ia * 2U));
+ 557:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 558:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     ia = ia + twidCoefModifier;
+ 559:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 560:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     /* loop for butterfly */
+ 561:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     for (i = j; i < fftLen; i += n1)
+ 562:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 563:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       l = i + n2;
+ 564:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 565:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       T = read_q15x2 (pSrc + (2 * i));
+ 566:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 567:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       S = read_q15x2 (pSrc + (2 * l));
+ 568:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 569:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       R = __QSUB16(T, S);
+ 570:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 571:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       write_q15x2 (pSrc + (2 * i), __QADD16(T, S));
+ 572:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 18
+
+
+ 573:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       write_q15x2 (pSrc + (2 * l), R);
+ 574:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 575:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     } /* butterfly loop end */
+ 576:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 577:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   } /* groups loop end */
+ 578:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 579:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   twidCoefModifier = twidCoefModifier << 1U;
+ 580:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 581:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #else /* #if defined (ARM_MATH_DSP) */
+ 582:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 583:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         uint32_t i, j, k, l;
+ 584:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         uint32_t n1, n2, ia;
+ 585:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         q15_t xt, yt, cosVal, sinVal;
+ 586:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 587:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   // N = fftLen;
+ 588:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n2 = fftLen;
+ 589:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 590:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n1 = n2;
+ 591:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n2 = n2 >> 1;
+ 377              		.loc 1 591 0
+ 378 000e 4FEA5108 		lsr	r8, r1, #1
+ 379              	.LVL48:
+ 592:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   ia = 0;
+ 380              		.loc 1 592 0
+ 381 0012 4FF0000C 		mov	ip, #0
+ 593:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 594:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   /* loop for groups */
+ 595:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   for (j = 0; j < n2; j++)
+ 382              		.loc 1 595 0
+ 383 0016 E346     		mov	fp, ip
+ 384 0018 4EE0     		b	.L18
+ 385              	.LVL49:
+ 386              	.L21:
+ 596:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 597:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     cosVal = pCoef[(ia * 2)];
+ 387              		.loc 1 597 0
+ 388 001a 049A     		ldr	r2, [sp, #16]
+ 389 001c 32F82C30 		ldrh	r3, [r2, ip, lsl #2]
+ 390 0020 0093     		str	r3, [sp]
+ 391              	.LVL50:
+ 598:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     sinVal = pCoef[(ia * 2) + 1];
+ 392              		.loc 1 598 0
+ 393 0022 02EB8C03 		add	r3, r2, ip, lsl #2
+ 394 0026 5B88     		ldrh	r3, [r3, #2]
+ 395 0028 0193     		str	r3, [sp, #4]
+ 396              	.LVL51:
+ 599:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     ia = ia + twidCoefModifier;
+ 397              		.loc 1 599 0
+ 398 002a 029B     		ldr	r3, [sp, #8]
+ 399 002c 9C44     		add	ip, ip, r3
+ 400              	.LVL52:
+ 600:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 601:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     /* loop for butterfly */
+ 602:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     for (i = j; i < fftLen; i += n1)
+ 401              		.loc 1 602 0
+ 402 002e 5E46     		mov	r6, fp
+ 403 0030 3EE0     		b	.L19
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 19
+
+
+ 404              	.LVL53:
+ 405              	.L20:
+ 603:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 604:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       l = i + n2;
+ 406              		.loc 1 604 0 discriminator 3
+ 407 0032 06EB0805 		add	r5, r6, r8
+ 408              	.LVL54:
+ 605:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       xt = (pSrc[2 * i] >> 1U) - (pSrc[2 * l] >> 1U);
+ 409              		.loc 1 605 0 discriminator 3
+ 410 0036 4FEA860E 		lsl	lr, r6, #2
+ 411 003a 39F92620 		ldrsh	r2, [r9, r6, lsl #2]
+ 412 003e C2F34F02 		ubfx	r2, r2, #1, #16
+ 413 0042 A800     		lsls	r0, r5, #2
+ 414 0044 39F92530 		ldrsh	r3, [r9, r5, lsl #2]
+ 415 0048 C3F34F03 		ubfx	r3, r3, #1, #16
+ 416 004c D41A     		subs	r4, r2, r3
+ 417              	.LVL55:
+ 606:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * i] = ((pSrc[2 * i] >> 1U) + (pSrc[2 * l] >> 1U)) >> 1U;
+ 418              		.loc 1 606 0 discriminator 3
+ 419 004e 12B2     		sxth	r2, r2
+ 420 0050 1BB2     		sxth	r3, r3
+ 421 0052 1344     		add	r3, r3, r2
+ 422 0054 5B10     		asrs	r3, r3, #1
+ 423 0056 29F82630 		strh	r3, [r9, r6, lsl #2]	@ movhi
+ 607:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 608:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       yt = (pSrc[2 * i + 1] >> 1U) - (pSrc[2 * l + 1] >> 1U);
+ 424              		.loc 1 608 0 discriminator 3
+ 425 005a 0EF1020E 		add	lr, lr, #2
+ 426 005e 39F90E10 		ldrsh	r1, [r9, lr]
+ 427 0062 C1F34F01 		ubfx	r1, r1, #1, #16
+ 428 0066 0230     		adds	r0, r0, #2
+ 429 0068 39F90070 		ldrsh	r7, [r9, r0]
+ 430 006c C7F34F07 		ubfx	r7, r7, #1, #16
+ 431 0070 CA1B     		subs	r2, r1, r7
+ 432              	.LVL56:
+ 609:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * i + 1] = ((pSrc[2 * l + 1] >> 1U) +
+ 433              		.loc 1 609 0 discriminator 3
+ 434 0072 3FB2     		sxth	r7, r7
+ 610:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                          (pSrc[2 * i + 1] >> 1U)  ) >> 1U;
+ 435              		.loc 1 610 0 discriminator 3
+ 436 0074 09B2     		sxth	r1, r1
+ 609:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * i + 1] = ((pSrc[2 * l + 1] >> 1U) +
+ 437              		.loc 1 609 0 discriminator 3
+ 438 0076 3944     		add	r1, r1, r7
+ 439              		.loc 1 610 0 discriminator 3
+ 440 0078 4910     		asrs	r1, r1, #1
+ 609:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * i + 1] = ((pSrc[2 * l + 1] >> 1U) +
+ 441              		.loc 1 609 0 discriminator 3
+ 442 007a 29F80E10 		strh	r1, [r9, lr]	@ movhi
+ 611:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 612:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * l] = (((int16_t) (((q31_t) xt * cosVal) >> 16)) -
+ 443              		.loc 1 612 0 discriminator 3
+ 444 007e 24B2     		sxth	r4, r4
+ 445 0080 BDF90070 		ldrsh	r7, [sp]
+ 446 0084 07FB04FE 		mul	lr, r7, r4
+ 613:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                      ((int16_t) (((q31_t) yt * sinVal) >> 16)));
+ 447              		.loc 1 613 0 discriminator 3
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 20
+
+
+ 448 0088 12B2     		sxth	r2, r2
+ 449 008a BDF90430 		ldrsh	r3, [sp, #4]
+ 450 008e 03FB02F1 		mul	r1, r3, r2
+ 451 0092 0914     		asrs	r1, r1, #16
+ 612:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                      ((int16_t) (((q31_t) yt * sinVal) >> 16)));
+ 452              		.loc 1 612 0 discriminator 3
+ 453 0094 C1EB2E41 		rsb	r1, r1, lr, asr #16
+ 454 0098 29F82510 		strh	r1, [r9, r5, lsl #2]	@ movhi
+ 614:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 615:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       pSrc[2 * l + 1] = (((int16_t) (((q31_t) yt * cosVal) >> 16)) +
+ 455              		.loc 1 615 0 discriminator 3
+ 456 009c 02FB07F2 		mul	r2, r2, r7
+ 457              	.LVL57:
+ 616:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                          ((int16_t) (((q31_t) xt * sinVal) >> 16)));
+ 458              		.loc 1 616 0 discriminator 3
+ 459 00a0 03FB04F3 		mul	r3, r3, r4
+ 460 00a4 1B14     		asrs	r3, r3, #16
+ 615:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                          ((int16_t) (((q31_t) xt * sinVal) >> 16)));
+ 461              		.loc 1 615 0 discriminator 3
+ 462 00a6 03EB2242 		add	r2, r3, r2, asr #16
+ 463 00aa 29F80020 		strh	r2, [r9, r0]	@ movhi
+ 602:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 464              		.loc 1 602 0 discriminator 3
+ 465 00ae 5644     		add	r6, r6, r10
+ 466              	.LVL58:
+ 467              	.L19:
+ 602:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 468              		.loc 1 602 0 is_stmt 0 discriminator 1
+ 469 00b0 5645     		cmp	r6, r10
+ 470 00b2 BED3     		bcc	.L20
+ 595:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 471              		.loc 1 595 0 is_stmt 1 discriminator 2
+ 472 00b4 0BF1010B 		add	fp, fp, #1
+ 473              	.LVL59:
+ 474              	.L18:
+ 595:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 475              		.loc 1 595 0 is_stmt 0 discriminator 1
+ 476 00b8 C345     		cmp	fp, r8
+ 477 00ba AED3     		bcc	.L21
+ 617:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 618:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     } /* butterfly loop end */
+ 619:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 620:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   } /* groups loop end */
+ 621:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 622:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   twidCoefModifier = twidCoefModifier << 1U;
+ 478              		.loc 1 622 0 is_stmt 1
+ 479 00bc 029B     		ldr	r3, [sp, #8]
+ 480 00be 4FEA430B 		lsl	fp, r3, #1
+ 481              	.LVL60:
+ 482 00c2 1FFA8BF3 		uxth	r3, fp
+ 483 00c6 0393     		str	r3, [sp, #12]
+ 484              	.LVL61:
+ 623:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 624:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   /* loop for stage */
+ 625:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   for (k = fftLen / 2; k > 2; k = k >> 1)
+ 485              		.loc 1 625 0
+ 486 00c8 4FEA5A03 		lsr	r3, r10, #1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 21
+
+
+ 487              	.LVL62:
+ 488 00cc 0593     		str	r3, [sp, #20]
+ 489              	.LVL63:
+ 490 00ce 59E0     		b	.L22
+ 491              	.LVL64:
+ 492              	.L27:
+ 626:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 627:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     n1 = n2;
+ 628:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     n2 = n2 >> 1;
+ 493              		.loc 1 628 0
+ 494 00d0 4FEA580C 		lsr	ip, r8, #1
+ 495              	.LVL65:
+ 629:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     ia = 0;
+ 496              		.loc 1 629 0
+ 497 00d4 4FF0000B 		mov	fp, #0
+ 630:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 631:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     /* loop for groups */
+ 632:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     for (j = 0; j < n2; j++)
+ 498              		.loc 1 632 0
+ 499 00d8 CDF808B0 		str	fp, [sp, #8]
+ 500 00dc 47E0     		b	.L23
+ 501              	.LVL66:
+ 502              	.L26:
+ 633:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 634:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       cosVal = pCoef[(ia * 2)];
+ 503              		.loc 1 634 0
+ 504 00de 049A     		ldr	r2, [sp, #16]
+ 505 00e0 32F82B30 		ldrh	r3, [r2, fp, lsl #2]
+ 506              	.LVL67:
+ 507 00e4 0093     		str	r3, [sp]
+ 508              	.LVL68:
+ 635:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       sinVal = pCoef[(ia * 2) + 1];
+ 509              		.loc 1 635 0
+ 510 00e6 02EB8B03 		add	r3, r2, fp, lsl #2
+ 511 00ea 5B88     		ldrh	r3, [r3, #2]
+ 512 00ec 0193     		str	r3, [sp, #4]
+ 513              	.LVL69:
+ 636:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       ia = ia + twidCoefModifier;
+ 514              		.loc 1 636 0
+ 515 00ee 039B     		ldr	r3, [sp, #12]
+ 516 00f0 9B44     		add	fp, fp, r3
+ 517              	.LVL70:
+ 637:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 638:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       /* loop for butterfly */
+ 639:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       for (i = j; i < fftLen; i += n1)
+ 518              		.loc 1 639 0
+ 519 00f2 029E     		ldr	r6, [sp, #8]
+ 520 00f4 36E0     		b	.L24
+ 521              	.LVL71:
+ 522              	.L25:
+ 640:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       {
+ 641:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         l = i + n2;
+ 523              		.loc 1 641 0 discriminator 3
+ 524 00f6 06EB0C05 		add	r5, r6, ip
+ 525              	.LVL72:
+ 642:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         xt = pSrc[2 * i] - pSrc[2 * l];
+ 526              		.loc 1 642 0 discriminator 3
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 22
+
+
+ 527 00fa B700     		lsls	r7, r6, #2
+ 528 00fc 39F82620 		ldrh	r2, [r9, r6, lsl #2]
+ 529 0100 A800     		lsls	r0, r5, #2
+ 530 0102 39F82530 		ldrh	r3, [r9, r5, lsl #2]
+ 531 0106 D41A     		subs	r4, r2, r3
+ 532              	.LVL73:
+ 643:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         pSrc[2 * i] = (pSrc[2 * i] + pSrc[2 * l]) >> 1U;
+ 533              		.loc 1 643 0 discriminator 3
+ 534 0108 12B2     		sxth	r2, r2
+ 535 010a 1BB2     		sxth	r3, r3
+ 536 010c 1344     		add	r3, r3, r2
+ 537 010e 5B10     		asrs	r3, r3, #1
+ 538 0110 29F82630 		strh	r3, [r9, r6, lsl #2]	@ movhi
+ 644:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 645:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         yt = pSrc[2 * i + 1] - pSrc[2 * l + 1];
+ 539              		.loc 1 645 0 discriminator 3
+ 540 0114 0237     		adds	r7, r7, #2
+ 541 0116 39F80710 		ldrh	r1, [r9, r7]
+ 542 011a 0230     		adds	r0, r0, #2
+ 543 011c 39F800E0 		ldrh	lr, [r9, r0]
+ 544 0120 CEEB0102 		rsb	r2, lr, r1
+ 545              	.LVL74:
+ 646:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         pSrc[2 * i + 1] = (pSrc[2 * l + 1] + pSrc[2 * i + 1]) >> 1U;
+ 546              		.loc 1 646 0 discriminator 3
+ 547 0124 0FFA8EFE 		sxth	lr, lr
+ 548 0128 09B2     		sxth	r1, r1
+ 549 012a 7144     		add	r1, r1, lr
+ 550 012c 4910     		asrs	r1, r1, #1
+ 551 012e 29F80710 		strh	r1, [r9, r7]	@ movhi
+ 647:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 648:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         pSrc[2 * l] = (((int16_t) (((q31_t) xt * cosVal) >> 16)) -
+ 552              		.loc 1 648 0 discriminator 3
+ 553 0132 24B2     		sxth	r4, r4
+ 554 0134 BDF90070 		ldrsh	r7, [sp]
+ 555 0138 07FB04FE 		mul	lr, r7, r4
+ 649:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                        ((int16_t) (((q31_t) yt * sinVal) >> 16))  );
+ 556              		.loc 1 649 0 discriminator 3
+ 557 013c 12B2     		sxth	r2, r2
+ 558 013e BDF90430 		ldrsh	r3, [sp, #4]
+ 559 0142 03FB02F1 		mul	r1, r3, r2
+ 560 0146 0914     		asrs	r1, r1, #16
+ 648:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                        ((int16_t) (((q31_t) yt * sinVal) >> 16))  );
+ 561              		.loc 1 648 0 discriminator 3
+ 562 0148 C1EB2E41 		rsb	r1, r1, lr, asr #16
+ 563 014c 29F82510 		strh	r1, [r9, r5, lsl #2]	@ movhi
+ 650:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 651:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****         pSrc[2 * l + 1] = (((int16_t) (((q31_t) yt * cosVal) >> 16)) +
+ 564              		.loc 1 651 0 discriminator 3
+ 565 0150 02FB07F2 		mul	r2, r2, r7
+ 566              	.LVL75:
+ 652:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                            ((int16_t) (((q31_t) xt * sinVal) >> 16))  );
+ 567              		.loc 1 652 0 discriminator 3
+ 568 0154 03FB04F3 		mul	r3, r3, r4
+ 569 0158 1B14     		asrs	r3, r3, #16
+ 651:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****                            ((int16_t) (((q31_t) xt * sinVal) >> 16))  );
+ 570              		.loc 1 651 0 discriminator 3
+ 571 015a 03EB2242 		add	r2, r3, r2, asr #16
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 23
+
+
+ 572 015e 29F80020 		strh	r2, [r9, r0]	@ movhi
+ 639:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       {
+ 573              		.loc 1 639 0 discriminator 3
+ 574 0162 4644     		add	r6, r6, r8
+ 575              	.LVL76:
+ 576              	.L24:
+ 639:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       {
+ 577              		.loc 1 639 0 is_stmt 0 discriminator 1
+ 578 0164 5645     		cmp	r6, r10
+ 579 0166 C6D3     		bcc	.L25
+ 632:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 580              		.loc 1 632 0 is_stmt 1 discriminator 2
+ 581 0168 029B     		ldr	r3, [sp, #8]
+ 582 016a 0133     		adds	r3, r3, #1
+ 583 016c 0293     		str	r3, [sp, #8]
+ 584              	.LVL77:
+ 585              	.L23:
+ 632:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     {
+ 586              		.loc 1 632 0 is_stmt 0 discriminator 1
+ 587 016e 029B     		ldr	r3, [sp, #8]
+ 588 0170 6345     		cmp	r3, ip
+ 589 0172 B4D3     		bcc	.L26
+ 653:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 654:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****       } /* butterfly loop end */
+ 655:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 656:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     } /* groups loop end */
+ 657:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 658:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     twidCoefModifier = twidCoefModifier << 1U;
+ 590              		.loc 1 658 0 is_stmt 1 discriminator 2
+ 591 0174 039B     		ldr	r3, [sp, #12]
+ 592 0176 5B00     		lsls	r3, r3, #1
+ 593              	.LVL78:
+ 594 0178 9BB2     		uxth	r3, r3
+ 595 017a 0393     		str	r3, [sp, #12]
+ 625:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 596              		.loc 1 625 0 discriminator 2
+ 597 017c 059B     		ldr	r3, [sp, #20]
+ 598              	.LVL79:
+ 599 017e 5B08     		lsrs	r3, r3, #1
+ 600 0180 0593     		str	r3, [sp, #20]
+ 601              	.LVL80:
+ 628:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     ia = 0;
+ 602              		.loc 1 628 0 discriminator 2
+ 603 0182 E046     		mov	r8, ip
+ 604              	.LVL81:
+ 605              	.L22:
+ 625:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 606              		.loc 1 625 0 discriminator 1
+ 607 0184 059B     		ldr	r3, [sp, #20]
+ 608 0186 022B     		cmp	r3, #2
+ 609 0188 A2D8     		bhi	.L27
+ 610              	.LVL82:
+ 659:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   } /* stages loop end */
+ 660:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 661:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n1 = n2;
+ 662:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   n2 = n2 >> 1;
+ 611              		.loc 1 662 0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 24
+
+
+ 612 018a 4FEA5806 		lsr	r6, r8, #1
+ 613              	.LVL83:
+ 663:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   ia = 0;
+ 664:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 665:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   cosVal = pCoef[(ia * 2)];
+ 666:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   sinVal = pCoef[(ia * 2) + 1];
+ 667:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 668:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   ia = ia + twidCoefModifier;
+ 669:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 670:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   /* loop for butterfly */
+ 671:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   for (i = 0; i < fftLen; i += n1)
+ 614              		.loc 1 671 0
+ 615 018e 0021     		movs	r1, #0
+ 616 0190 1AE0     		b	.L28
+ 617              	.LVL84:
+ 618              	.L29:
+ 672:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 673:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     l = i + n2;
+ 619              		.loc 1 673 0 discriminator 3
+ 620 0192 8C19     		adds	r4, r1, r6
+ 621              	.LVL85:
+ 674:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     xt = pSrc[2 * i] - pSrc[2 * l];
+ 622              		.loc 1 674 0 discriminator 3
+ 623 0194 8A00     		lsls	r2, r1, #2
+ 624 0196 39F82170 		ldrh	r7, [r9, r1, lsl #2]
+ 625 019a A300     		lsls	r3, r4, #2
+ 626 019c 39F82400 		ldrh	r0, [r9, r4, lsl #2]
+ 627 01a0 3D1A     		subs	r5, r7, r0
+ 628              	.LVL86:
+ 675:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     pSrc[2 * i] = (pSrc[2 * i] + pSrc[2 * l]);
+ 629              		.loc 1 675 0 discriminator 3
+ 630 01a2 3844     		add	r0, r0, r7
+ 631 01a4 29F82100 		strh	r0, [r9, r1, lsl #2]	@ movhi
+ 676:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 677:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     yt = pSrc[2 * i + 1] - pSrc[2 * l + 1];
+ 632              		.loc 1 677 0 discriminator 3
+ 633 01a8 0232     		adds	r2, r2, #2
+ 634 01aa 39F80270 		ldrh	r7, [r9, r2]
+ 635 01ae 0233     		adds	r3, r3, #2
+ 636 01b0 39F80300 		ldrh	r0, [r9, r3]
+ 637 01b4 C0EB070E 		rsb	lr, r0, r7
+ 638              	.LVL87:
+ 678:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     pSrc[2 * i + 1] = (pSrc[2 * l + 1] + pSrc[2 * i + 1]);
+ 639              		.loc 1 678 0 discriminator 3
+ 640 01b8 3844     		add	r0, r0, r7
+ 641 01ba 29F80200 		strh	r0, [r9, r2]	@ movhi
+ 679:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 680:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     pSrc[2 * l] = xt;
+ 642              		.loc 1 680 0 discriminator 3
+ 643 01be 29F82450 		strh	r5, [r9, r4, lsl #2]	@ movhi
+ 681:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 682:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****     pSrc[2 * l + 1] = yt;
+ 644              		.loc 1 682 0 discriminator 3
+ 645 01c2 29F803E0 		strh	lr, [r9, r3]	@ movhi
+ 671:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 646              		.loc 1 671 0 discriminator 3
+ 647 01c6 4144     		add	r1, r1, r8
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 25
+
+
+ 648              	.LVL88:
+ 649              	.L28:
+ 671:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 650              		.loc 1 671 0 is_stmt 0 discriminator 1
+ 651 01c8 5145     		cmp	r1, r10
+ 652 01ca E2D3     		bcc	.L29
+ 683:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 684:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   } /* groups loop end */
+ 685:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 686:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 687:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** #endif /* #if defined (ARM_MATH_DSP) */
+ 688:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 689:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** }
+ 653              		.loc 1 689 0 is_stmt 1
+ 654 01cc 07B0     		add	sp, sp, #28
+ 655              		.cfi_def_cfa_offset 36
+ 656              		@ sp needed
+ 657 01ce BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 658              		.cfi_endproc
+ 659              	.LFE86:
+ 660              		.size	arm_radix2_butterfly_inverse_q15, .-arm_radix2_butterfly_inverse_q15
+ 661 01d2 00BF     		.section	.text.arm_cfft_radix2_q15,"ax",%progbits
+ 662              		.align	2
+ 663              		.global	arm_cfft_radix2_q15
+ 664              		.thumb
+ 665              		.thumb_func
+ 666              		.type	arm_cfft_radix2_q15, %function
+ 667              	arm_cfft_radix2_q15:
+ 668              	.LFB84:
+  69:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** 
+ 669              		.loc 1 69 0
+ 670              		.cfi_startproc
+ 671              		@ args = 0, pretend = 0, frame = 0
+ 672              		@ frame_needed = 0, uses_anonymous_args = 0
+ 673              	.LVL89:
+ 674 0000 38B5     		push	{r3, r4, r5, lr}
+ 675              		.cfi_def_cfa_offset 16
+ 676              		.cfi_offset 3, -16
+ 677              		.cfi_offset 4, -12
+ 678              		.cfi_offset 5, -8
+ 679              		.cfi_offset 14, -4
+ 680 0002 0446     		mov	r4, r0
+ 681 0004 0D46     		mov	r5, r1
+  71:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   {
+ 682              		.loc 1 71 0
+ 683 0006 8378     		ldrb	r3, [r0, #2]	@ zero_extendqisi2
+ 684 0008 012B     		cmp	r3, #1
+ 685 000a 06D1     		bne	.L32
+  73:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   }
+ 686              		.loc 1 73 0
+ 687 000c 0846     		mov	r0, r1
+ 688              	.LVL90:
+ 689 000e 2188     		ldrh	r1, [r4]
+ 690              	.LVL91:
+ 691 0010 6268     		ldr	r2, [r4, #4]
+ 692 0012 A389     		ldrh	r3, [r4, #12]
+ 693 0014 FFF7FEFF 		bl	arm_radix2_butterfly_inverse_q15
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 26
+
+
+ 694              	.LVL92:
+ 695 0018 05E0     		b	.L33
+ 696              	.LVL93:
+ 697              	.L32:
+  77:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c ****   }
+ 698              		.loc 1 77 0
+ 699 001a 0846     		mov	r0, r1
+ 700              	.LVL94:
+ 701 001c 2188     		ldrh	r1, [r4]
+ 702              	.LVL95:
+ 703 001e 6268     		ldr	r2, [r4, #4]
+ 704 0020 A389     		ldrh	r3, [r4, #12]
+ 705 0022 FFF7FEFF 		bl	arm_radix2_butterfly_q15
+ 706              	.LVL96:
+ 707              	.L33:
+  80:.\DSP\Source\TransformFunctions/arm_cfft_radix2_q15.c **** }
+ 708              		.loc 1 80 0
+ 709 0026 2846     		mov	r0, r5
+ 710 0028 2188     		ldrh	r1, [r4]
+ 711 002a E289     		ldrh	r2, [r4, #14]
+ 712 002c A368     		ldr	r3, [r4, #8]
+ 713 002e FFF7FEFF 		bl	arm_bitreversal_q15
+ 714              	.LVL97:
+ 715 0032 38BD     		pop	{r3, r4, r5, pc}
+ 716              		.cfi_endproc
+ 717              	.LFE84:
+ 718              		.size	arm_cfft_radix2_q15, .-arm_cfft_radix2_q15
+ 719              		.text
+ 720              	.Letext0:
+ 721              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+ 722              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\3.3\\psoc creator\\import\\gnu\\arm\\4.9.
+ 723              		.file 4 ".\\DSP\\Include/arm_math_types.h"
+ 724              		.file 5 ".\\DSP\\Include/dsp/transform_functions.h"
+ 725              		.file 6 ".\\Core\\Include/cmsis_gcc.h"
+ 726              		.section	.debug_info,"",%progbits
+ 727              	.Ldebug_info0:
+ 728 0000 C0040000 		.4byte	0x4c0
+ 729 0004 0400     		.2byte	0x4
+ 730 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 731 000a 04       		.byte	0x4
+ 732 000b 01       		.uleb128 0x1
+ 733 000c FB020000 		.4byte	.LASF49
+ 734 0010 01       		.byte	0x1
+ 735 0011 C0000000 		.4byte	.LASF50
+ 736 0015 1A020000 		.4byte	.LASF51
+ 737 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 738 001d 00000000 		.4byte	0
+ 739 0021 00000000 		.4byte	.Ldebug_line0
+ 740 0025 02       		.uleb128 0x2
+ 741 0026 01       		.byte	0x1
+ 742 0027 06       		.byte	0x6
+ 743 0028 83000000 		.4byte	.LASF0
+ 744 002c 03       		.uleb128 0x3
+ 745 002d 1E000000 		.4byte	.LASF2
+ 746 0031 02       		.byte	0x2
+ 747 0032 1D       		.byte	0x1d
+ 748 0033 37000000 		.4byte	0x37
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 27
+
+
+ 749 0037 02       		.uleb128 0x2
+ 750 0038 01       		.byte	0x1
+ 751 0039 08       		.byte	0x8
+ 752 003a D5010000 		.4byte	.LASF1
+ 753 003e 03       		.uleb128 0x3
+ 754 003f 2D010000 		.4byte	.LASF3
+ 755 0043 02       		.byte	0x2
+ 756 0044 29       		.byte	0x29
+ 757 0045 49000000 		.4byte	0x49
+ 758 0049 02       		.uleb128 0x2
+ 759 004a 02       		.byte	0x2
+ 760 004b 05       		.byte	0x5
+ 761 004c 01020000 		.4byte	.LASF4
+ 762 0050 03       		.uleb128 0x3
+ 763 0051 8A020000 		.4byte	.LASF5
+ 764 0055 02       		.byte	0x2
+ 765 0056 2B       		.byte	0x2b
+ 766 0057 5B000000 		.4byte	0x5b
+ 767 005b 02       		.uleb128 0x2
+ 768 005c 02       		.byte	0x2
+ 769 005d 07       		.byte	0x7
+ 770 005e 69010000 		.4byte	.LASF6
+ 771 0062 03       		.uleb128 0x3
+ 772 0063 95020000 		.4byte	.LASF7
+ 773 0067 02       		.byte	0x2
+ 774 0068 3F       		.byte	0x3f
+ 775 0069 6D000000 		.4byte	0x6d
+ 776 006d 02       		.uleb128 0x2
+ 777 006e 04       		.byte	0x4
+ 778 006f 05       		.byte	0x5
+ 779 0070 F6000000 		.4byte	.LASF8
+ 780 0074 03       		.uleb128 0x3
+ 781 0075 22010000 		.4byte	.LASF9
+ 782 0079 02       		.byte	0x2
+ 783 007a 41       		.byte	0x41
+ 784 007b 7F000000 		.4byte	0x7f
+ 785 007f 02       		.uleb128 0x2
+ 786 0080 04       		.byte	0x4
+ 787 0081 07       		.byte	0x7
+ 788 0082 57010000 		.4byte	.LASF10
+ 789 0086 02       		.uleb128 0x2
+ 790 0087 08       		.byte	0x8
+ 791 0088 05       		.byte	0x5
+ 792 0089 75000000 		.4byte	.LASF11
+ 793 008d 02       		.uleb128 0x2
+ 794 008e 08       		.byte	0x8
+ 795 008f 07       		.byte	0x7
+ 796 0090 2F000000 		.4byte	.LASF12
+ 797 0094 04       		.uleb128 0x4
+ 798 0095 04       		.byte	0x4
+ 799 0096 05       		.byte	0x5
+ 800 0097 696E7400 		.ascii	"int\000"
+ 801 009b 02       		.uleb128 0x2
+ 802 009c 04       		.byte	0x4
+ 803 009d 07       		.byte	0x7
+ 804 009e 45010000 		.4byte	.LASF13
+ 805 00a2 03       		.uleb128 0x3
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 28
+
+
+ 806 00a3 E2020000 		.4byte	.LASF14
+ 807 00a7 03       		.byte	0x3
+ 808 00a8 15       		.byte	0x15
+ 809 00a9 2C000000 		.4byte	0x2c
+ 810 00ad 03       		.uleb128 0x3
+ 811 00ae 6D000000 		.4byte	.LASF15
+ 812 00b2 03       		.byte	0x3
+ 813 00b3 20       		.byte	0x20
+ 814 00b4 3E000000 		.4byte	0x3e
+ 815 00b8 03       		.uleb128 0x3
+ 816 00b9 12010000 		.4byte	.LASF16
+ 817 00bd 03       		.byte	0x3
+ 818 00be 21       		.byte	0x21
+ 819 00bf 50000000 		.4byte	0x50
+ 820 00c3 03       		.uleb128 0x3
+ 821 00c4 CD010000 		.4byte	.LASF17
+ 822 00c8 03       		.byte	0x3
+ 823 00c9 2C       		.byte	0x2c
+ 824 00ca 62000000 		.4byte	0x62
+ 825 00ce 03       		.uleb128 0x3
+ 826 00cf 11020000 		.4byte	.LASF18
+ 827 00d3 03       		.byte	0x3
+ 828 00d4 2D       		.byte	0x2d
+ 829 00d5 74000000 		.4byte	0x74
+ 830 00d9 02       		.uleb128 0x2
+ 831 00da 04       		.byte	0x4
+ 832 00db 07       		.byte	0x7
+ 833 00dc 89010000 		.4byte	.LASF19
+ 834 00e0 02       		.uleb128 0x2
+ 835 00e1 01       		.byte	0x1
+ 836 00e2 08       		.byte	0x8
+ 837 00e3 70020000 		.4byte	.LASF20
+ 838 00e7 02       		.uleb128 0x2
+ 839 00e8 08       		.byte	0x8
+ 840 00e9 04       		.byte	0x4
+ 841 00ea 1B010000 		.4byte	.LASF21
+ 842 00ee 02       		.uleb128 0x2
+ 843 00ef 04       		.byte	0x4
+ 844 00f0 04       		.byte	0x4
+ 845 00f1 B2010000 		.4byte	.LASF22
+ 846 00f5 02       		.uleb128 0x2
+ 847 00f6 08       		.byte	0x8
+ 848 00f7 04       		.byte	0x4
+ 849 00f8 92010000 		.4byte	.LASF23
+ 850 00fc 05       		.uleb128 0x5
+ 851 00fd FF000000 		.4byte	.LASF24
+ 852 0101 04       		.byte	0x4
+ 853 0102 1F01     		.2byte	0x11f
+ 854 0104 AD000000 		.4byte	0xad
+ 855 0108 05       		.uleb128 0x5
+ 856 0109 0B020000 		.4byte	.LASF25
+ 857 010d 04       		.byte	0x4
+ 858 010e 2401     		.2byte	0x124
+ 859 0110 C3000000 		.4byte	0xc3
+ 860 0114 06       		.uleb128 0x6
+ 861 0115 10       		.byte	0x10
+ 862 0116 05       		.byte	0x5
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 29
+
+
+ 863 0117 35       		.byte	0x35
+ 864 0118 71010000 		.4byte	0x171
+ 865 011c 07       		.uleb128 0x7
+ 866 011d 37010000 		.4byte	.LASF26
+ 867 0121 05       		.byte	0x5
+ 868 0122 37       		.byte	0x37
+ 869 0123 B8000000 		.4byte	0xb8
+ 870 0127 00       		.byte	0
+ 871 0128 07       		.uleb128 0x7
+ 872 0129 94030000 		.4byte	.LASF27
+ 873 012d 05       		.byte	0x5
+ 874 012e 38       		.byte	0x38
+ 875 012f A2000000 		.4byte	0xa2
+ 876 0133 02       		.byte	0x2
+ 877 0134 07       		.uleb128 0x7
+ 878 0135 9E010000 		.4byte	.LASF28
+ 879 0139 05       		.byte	0x5
+ 880 013a 39       		.byte	0x39
+ 881 013b A2000000 		.4byte	0xa2
+ 882 013f 03       		.byte	0x3
+ 883 0140 07       		.uleb128 0x7
+ 884 0141 D3020000 		.4byte	.LASF29
+ 885 0145 05       		.byte	0x5
+ 886 0146 3A       		.byte	0x3a
+ 887 0147 71010000 		.4byte	0x171
+ 888 014b 04       		.byte	0x4
+ 889 014c 07       		.uleb128 0x7
+ 890 014d 05010000 		.4byte	.LASF30
+ 891 0151 05       		.byte	0x5
+ 892 0152 3B       		.byte	0x3b
+ 893 0153 7C010000 		.4byte	0x17c
+ 894 0157 08       		.byte	0x8
+ 895 0158 07       		.uleb128 0x7
+ 896 0159 EA020000 		.4byte	.LASF31
+ 897 015d 05       		.byte	0x5
+ 898 015e 3C       		.byte	0x3c
+ 899 015f B8000000 		.4byte	0xb8
+ 900 0163 0C       		.byte	0xc
+ 901 0164 07       		.uleb128 0x7
+ 902 0165 7C010000 		.4byte	.LASF32
+ 903 0169 05       		.byte	0x5
+ 904 016a 3D       		.byte	0x3d
+ 905 016b B8000000 		.4byte	0xb8
+ 906 016f 0E       		.byte	0xe
+ 907 0170 00       		.byte	0
+ 908 0171 08       		.uleb128 0x8
+ 909 0172 04       		.byte	0x4
+ 910 0173 77010000 		.4byte	0x177
+ 911 0177 09       		.uleb128 0x9
+ 912 0178 FC000000 		.4byte	0xfc
+ 913 017c 08       		.uleb128 0x8
+ 914 017d 04       		.byte	0x4
+ 915 017e 82010000 		.4byte	0x182
+ 916 0182 09       		.uleb128 0x9
+ 917 0183 B8000000 		.4byte	0xb8
+ 918 0187 03       		.uleb128 0x3
+ 919 0188 8F000000 		.4byte	.LASF33
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 30
+
+
+ 920 018c 05       		.byte	0x5
+ 921 018d 3E       		.byte	0x3e
+ 922 018e 14010000 		.4byte	0x114
+ 923 0192 08       		.uleb128 0x8
+ 924 0193 04       		.byte	0x4
+ 925 0194 98010000 		.4byte	0x198
+ 926 0198 09       		.uleb128 0x9
+ 927 0199 CE000000 		.4byte	0xce
+ 928 019d 0A       		.uleb128 0xa
+ 929 019e E3010000 		.4byte	.LASF38
+ 930 01a2 01       		.byte	0x1
+ 931 01a3 57       		.byte	0x57
+ 932 01a4 00000000 		.4byte	.LFB85
+ 933 01a8 DE010000 		.4byte	.LFE85-.LFB85
+ 934 01ac 01       		.uleb128 0x1
+ 935 01ad 9C       		.byte	0x9c
+ 936 01ae 92020000 		.4byte	0x292
+ 937 01b2 0B       		.uleb128 0xb
+ 938 01b3 52010000 		.4byte	.LASF34
+ 939 01b7 01       		.byte	0x1
+ 940 01b8 58       		.byte	0x58
+ 941 01b9 92020000 		.4byte	0x292
+ 942 01bd 00000000 		.4byte	.LLST0
+ 943 01c1 0B       		.uleb128 0xb
+ 944 01c2 37010000 		.4byte	.LASF26
+ 945 01c6 01       		.byte	0x1
+ 946 01c7 59       		.byte	0x59
+ 947 01c8 CE000000 		.4byte	0xce
+ 948 01cc 1E000000 		.4byte	.LLST1
+ 949 01d0 0B       		.uleb128 0xb
+ 950 01d1 DC020000 		.4byte	.LASF35
+ 951 01d5 01       		.byte	0x1
+ 952 01d6 5A       		.byte	0x5a
+ 953 01d7 71010000 		.4byte	0x171
+ 954 01db 3C000000 		.4byte	.LLST2
+ 955 01df 0B       		.uleb128 0xb
+ 956 01e0 EA020000 		.4byte	.LASF31
+ 957 01e4 01       		.byte	0x1
+ 958 01e5 5B       		.byte	0x5b
+ 959 01e6 B8000000 		.4byte	0xb8
+ 960 01ea 5B000000 		.4byte	.LLST3
+ 961 01ee 0C       		.uleb128 0xc
+ 962 01ef 6900     		.ascii	"i\000"
+ 963 01f1 01       		.byte	0x1
+ 964 01f2 1901     		.2byte	0x119
+ 965 01f4 CE000000 		.4byte	0xce
+ 966 01f8 AA000000 		.4byte	.LLST4
+ 967 01fc 0C       		.uleb128 0xc
+ 968 01fd 6A00     		.ascii	"j\000"
+ 969 01ff 01       		.byte	0x1
+ 970 0200 1901     		.2byte	0x119
+ 971 0202 CE000000 		.4byte	0xce
+ 972 0206 F5000000 		.4byte	.LLST5
+ 973 020a 0C       		.uleb128 0xc
+ 974 020b 6B00     		.ascii	"k\000"
+ 975 020d 01       		.byte	0x1
+ 976 020e 1901     		.2byte	0x119
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 31
+
+
+ 977 0210 CE000000 		.4byte	0xce
+ 978 0214 4E010000 		.4byte	.LLST6
+ 979 0218 0C       		.uleb128 0xc
+ 980 0219 6C00     		.ascii	"l\000"
+ 981 021b 01       		.byte	0x1
+ 982 021c 1901     		.2byte	0x119
+ 983 021e CE000000 		.4byte	0xce
+ 984 0222 84010000 		.4byte	.LLST7
+ 985 0226 0C       		.uleb128 0xc
+ 986 0227 6E3100   		.ascii	"n1\000"
+ 987 022a 01       		.byte	0x1
+ 988 022b 1A01     		.2byte	0x11a
+ 989 022d CE000000 		.4byte	0xce
+ 990 0231 AD010000 		.4byte	.LLST8
+ 991 0235 0C       		.uleb128 0xc
+ 992 0236 6E3200   		.ascii	"n2\000"
+ 993 0239 01       		.byte	0x1
+ 994 023a 1A01     		.2byte	0x11a
+ 995 023c CE000000 		.4byte	0xce
+ 996 0240 E1010000 		.4byte	.LLST9
+ 997 0244 0C       		.uleb128 0xc
+ 998 0245 696100   		.ascii	"ia\000"
+ 999 0248 01       		.byte	0x1
+ 1000 0249 1A01     		.2byte	0x11a
+ 1001 024b CE000000 		.4byte	0xce
+ 1002 024f 20020000 		.4byte	.LLST10
+ 1003 0253 0C       		.uleb128 0xc
+ 1004 0254 787400   		.ascii	"xt\000"
+ 1005 0257 01       		.byte	0x1
+ 1006 0258 1B01     		.2byte	0x11b
+ 1007 025a FC000000 		.4byte	0xfc
+ 1008 025e 62020000 		.4byte	.LLST11
+ 1009 0262 0C       		.uleb128 0xc
+ 1010 0263 797400   		.ascii	"yt\000"
+ 1011 0266 01       		.byte	0x1
+ 1012 0267 1B01     		.2byte	0x11b
+ 1013 0269 FC000000 		.4byte	0xfc
+ 1014 026d 8B020000 		.4byte	.LLST12
+ 1015 0271 0D       		.uleb128 0xd
+ 1016 0272 28000000 		.4byte	.LASF36
+ 1017 0276 01       		.byte	0x1
+ 1018 0277 1B01     		.2byte	0x11b
+ 1019 0279 FC000000 		.4byte	0xfc
+ 1020 027d B4020000 		.4byte	.LLST13
+ 1021 0281 0D       		.uleb128 0xd
+ 1022 0282 3E010000 		.4byte	.LASF37
+ 1023 0286 01       		.byte	0x1
+ 1024 0287 1B01     		.2byte	0x11b
+ 1025 0289 FC000000 		.4byte	0xfc
+ 1026 028d D4020000 		.4byte	.LLST14
+ 1027 0291 00       		.byte	0
+ 1028 0292 08       		.uleb128 0x8
+ 1029 0293 04       		.byte	0x4
+ 1030 0294 FC000000 		.4byte	0xfc
+ 1031 0298 0E       		.uleb128 0xe
+ 1032 0299 9F020000 		.4byte	.LASF39
+ 1033 029d 01       		.byte	0x1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 32
+
+
+ 1034 029e 8D01     		.2byte	0x18d
+ 1035 02a0 00000000 		.4byte	.LFB86
+ 1036 02a4 D2010000 		.4byte	.LFE86-.LFB86
+ 1037 02a8 01       		.uleb128 0x1
+ 1038 02a9 9C       		.byte	0x9c
+ 1039 02aa 92030000 		.4byte	0x392
+ 1040 02ae 0F       		.uleb128 0xf
+ 1041 02af 52010000 		.4byte	.LASF34
+ 1042 02b3 01       		.byte	0x1
+ 1043 02b4 8E01     		.2byte	0x18e
+ 1044 02b6 92020000 		.4byte	0x292
+ 1045 02ba F4020000 		.4byte	.LLST15
+ 1046 02be 0F       		.uleb128 0xf
+ 1047 02bf 37010000 		.4byte	.LASF26
+ 1048 02c3 01       		.byte	0x1
+ 1049 02c4 8F01     		.2byte	0x18f
+ 1050 02c6 CE000000 		.4byte	0xce
+ 1051 02ca 12030000 		.4byte	.LLST16
+ 1052 02ce 0F       		.uleb128 0xf
+ 1053 02cf DC020000 		.4byte	.LASF35
+ 1054 02d3 01       		.byte	0x1
+ 1055 02d4 9001     		.2byte	0x190
+ 1056 02d6 71010000 		.4byte	0x171
+ 1057 02da 30030000 		.4byte	.LLST17
+ 1058 02de 0F       		.uleb128 0xf
+ 1059 02df EA020000 		.4byte	.LASF31
+ 1060 02e3 01       		.byte	0x1
+ 1061 02e4 9101     		.2byte	0x191
+ 1062 02e6 B8000000 		.4byte	0xb8
+ 1063 02ea 4F030000 		.4byte	.LLST18
+ 1064 02ee 0C       		.uleb128 0xc
+ 1065 02ef 6900     		.ascii	"i\000"
+ 1066 02f1 01       		.byte	0x1
+ 1067 02f2 4702     		.2byte	0x247
+ 1068 02f4 CE000000 		.4byte	0xce
+ 1069 02f8 9E030000 		.4byte	.LLST19
+ 1070 02fc 0C       		.uleb128 0xc
+ 1071 02fd 6A00     		.ascii	"j\000"
+ 1072 02ff 01       		.byte	0x1
+ 1073 0300 4702     		.2byte	0x247
+ 1074 0302 CE000000 		.4byte	0xce
+ 1075 0306 EA030000 		.4byte	.LLST20
+ 1076 030a 0C       		.uleb128 0xc
+ 1077 030b 6B00     		.ascii	"k\000"
+ 1078 030d 01       		.byte	0x1
+ 1079 030e 4702     		.2byte	0x247
+ 1080 0310 CE000000 		.4byte	0xce
+ 1081 0314 2C040000 		.4byte	.LLST21
+ 1082 0318 0C       		.uleb128 0xc
+ 1083 0319 6C00     		.ascii	"l\000"
+ 1084 031b 01       		.byte	0x1
+ 1085 031c 4702     		.2byte	0x247
+ 1086 031e CE000000 		.4byte	0xce
+ 1087 0322 62040000 		.4byte	.LLST22
+ 1088 0326 0C       		.uleb128 0xc
+ 1089 0327 6E3100   		.ascii	"n1\000"
+ 1090 032a 01       		.byte	0x1
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 33
+
+
+ 1091 032b 4802     		.2byte	0x248
+ 1092 032d CE000000 		.4byte	0xce
+ 1093 0331 8B040000 		.4byte	.LLST23
+ 1094 0335 0C       		.uleb128 0xc
+ 1095 0336 6E3200   		.ascii	"n2\000"
+ 1096 0339 01       		.byte	0x1
+ 1097 033a 4802     		.2byte	0x248
+ 1098 033c CE000000 		.4byte	0xce
+ 1099 0340 BF040000 		.4byte	.LLST24
+ 1100 0344 0C       		.uleb128 0xc
+ 1101 0345 696100   		.ascii	"ia\000"
+ 1102 0348 01       		.byte	0x1
+ 1103 0349 4802     		.2byte	0x248
+ 1104 034b CE000000 		.4byte	0xce
+ 1105 034f FE040000 		.4byte	.LLST25
+ 1106 0353 0C       		.uleb128 0xc
+ 1107 0354 787400   		.ascii	"xt\000"
+ 1108 0357 01       		.byte	0x1
+ 1109 0358 4902     		.2byte	0x249
+ 1110 035a FC000000 		.4byte	0xfc
+ 1111 035e 47050000 		.4byte	.LLST26
+ 1112 0362 0C       		.uleb128 0xc
+ 1113 0363 797400   		.ascii	"yt\000"
+ 1114 0366 01       		.byte	0x1
+ 1115 0367 4902     		.2byte	0x249
+ 1116 0369 FC000000 		.4byte	0xfc
+ 1117 036d 70050000 		.4byte	.LLST27
+ 1118 0371 0D       		.uleb128 0xd
+ 1119 0372 28000000 		.4byte	.LASF36
+ 1120 0376 01       		.byte	0x1
+ 1121 0377 4902     		.2byte	0x249
+ 1122 0379 FC000000 		.4byte	0xfc
+ 1123 037d 99050000 		.4byte	.LLST28
+ 1124 0381 0D       		.uleb128 0xd
+ 1125 0382 3E010000 		.4byte	.LASF37
+ 1126 0386 01       		.byte	0x1
+ 1127 0387 4902     		.2byte	0x249
+ 1128 0389 FC000000 		.4byte	0xfc
+ 1129 038d C6050000 		.4byte	.LLST29
+ 1130 0391 00       		.byte	0
+ 1131 0392 0A       		.uleb128 0xa
+ 1132 0393 AC000000 		.4byte	.LASF40
+ 1133 0397 01       		.byte	0x1
+ 1134 0398 42       		.byte	0x42
+ 1135 0399 00000000 		.4byte	.LFB84
+ 1136 039d 34000000 		.4byte	.LFE84-.LFB84
+ 1137 03a1 01       		.uleb128 0x1
+ 1138 03a2 9C       		.byte	0x9c
+ 1139 03a3 FC030000 		.4byte	0x3fc
+ 1140 03a7 10       		.uleb128 0x10
+ 1141 03a8 5300     		.ascii	"S\000"
+ 1142 03aa 01       		.byte	0x1
+ 1143 03ab 43       		.byte	0x43
+ 1144 03ac FC030000 		.4byte	0x3fc
+ 1145 03b0 F5050000 		.4byte	.LLST30
+ 1146 03b4 0B       		.uleb128 0xb
+ 1147 03b5 52010000 		.4byte	.LASF34
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 34
+
+
+ 1148 03b9 01       		.byte	0x1
+ 1149 03ba 44       		.byte	0x44
+ 1150 03bb 92020000 		.4byte	0x292
+ 1151 03bf 29060000 		.4byte	.LLST31
+ 1152 03c3 11       		.uleb128 0x11
+ 1153 03c4 18000000 		.4byte	.LVL92
+ 1154 03c8 98020000 		.4byte	0x298
+ 1155 03cc D7030000 		.4byte	0x3d7
+ 1156 03d0 12       		.uleb128 0x12
+ 1157 03d1 01       		.uleb128 0x1
+ 1158 03d2 50       		.byte	0x50
+ 1159 03d3 02       		.uleb128 0x2
+ 1160 03d4 75       		.byte	0x75
+ 1161 03d5 00       		.sleb128 0
+ 1162 03d6 00       		.byte	0
+ 1163 03d7 11       		.uleb128 0x11
+ 1164 03d8 26000000 		.4byte	.LVL96
+ 1165 03dc 9D010000 		.4byte	0x19d
+ 1166 03e0 EB030000 		.4byte	0x3eb
+ 1167 03e4 12       		.uleb128 0x12
+ 1168 03e5 01       		.uleb128 0x1
+ 1169 03e6 50       		.byte	0x50
+ 1170 03e7 02       		.uleb128 0x2
+ 1171 03e8 75       		.byte	0x75
+ 1172 03e9 00       		.sleb128 0
+ 1173 03ea 00       		.byte	0
+ 1174 03eb 13       		.uleb128 0x13
+ 1175 03ec 32000000 		.4byte	.LVL97
+ 1176 03f0 A7040000 		.4byte	0x4a7
+ 1177 03f4 12       		.uleb128 0x12
+ 1178 03f5 01       		.uleb128 0x1
+ 1179 03f6 50       		.byte	0x50
+ 1180 03f7 02       		.uleb128 0x2
+ 1181 03f8 75       		.byte	0x75
+ 1182 03f9 00       		.sleb128 0
+ 1183 03fa 00       		.byte	0
+ 1184 03fb 00       		.byte	0
+ 1185 03fc 08       		.uleb128 0x8
+ 1186 03fd 04       		.byte	0x4
+ 1187 03fe 02040000 		.4byte	0x402
+ 1188 0402 09       		.uleb128 0x9
+ 1189 0403 87010000 		.4byte	0x187
+ 1190 0407 03       		.uleb128 0x3
+ 1191 0408 00000000 		.4byte	.LASF41
+ 1192 040c 06       		.byte	0x6
+ 1193 040d 8B       		.byte	0x8b
+ 1194 040e 7A040000 		.4byte	0x47a
+ 1195 0412 08       		.uleb128 0x8
+ 1196 0413 04       		.byte	0x4
+ 1197 0414 CE000000 		.4byte	0xce
+ 1198 0418 14       		.uleb128 0x14
+ 1199 0419 75020000 		.4byte	.LASF42
+ 1200 041d 06       		.byte	0x6
+ 1201 041e 92       		.byte	0x92
+ 1202 041f 23040000 		.4byte	0x423
+ 1203 0423 09       		.uleb128 0x9
+ 1204 0424 07040000 		.4byte	0x407
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 35
+
+
+ 1205 0428 14       		.uleb128 0x14
+ 1206 0429 46000000 		.4byte	.LASF43
+ 1207 042d 06       		.byte	0x6
+ 1208 042e 93       		.byte	0x93
+ 1209 042f 23040000 		.4byte	0x423
+ 1210 0433 03       		.uleb128 0x3
+ 1211 0434 0F000000 		.4byte	.LASF44
+ 1212 0438 06       		.byte	0x6
+ 1213 0439 90       		.byte	0x90
+ 1214 043a 59040000 		.4byte	0x459
+ 1215 043e 14       		.uleb128 0x14
+ 1216 043f B8010000 		.4byte	.LASF45
+ 1217 0443 06       		.byte	0x6
+ 1218 0444 94       		.byte	0x94
+ 1219 0445 49040000 		.4byte	0x449
+ 1220 0449 09       		.uleb128 0x9
+ 1221 044a 33040000 		.4byte	0x433
+ 1222 044e 14       		.uleb128 0x14
+ 1223 044f C0020000 		.4byte	.LASF46
+ 1224 0453 06       		.byte	0x6
+ 1225 0454 95       		.byte	0x95
+ 1226 0455 49040000 		.4byte	0x449
+ 1227 0459 06       		.uleb128 0x6
+ 1228 045a 08       		.byte	0x8
+ 1229 045b 06       		.byte	0x6
+ 1230 045c 8D       		.byte	0x8d
+ 1231 045d 7A040000 		.4byte	0x47a
+ 1232 0461 07       		.uleb128 0x7
+ 1233 0462 AD010000 		.4byte	.LASF47
+ 1234 0466 06       		.byte	0x6
+ 1235 0467 8E       		.byte	0x8e
+ 1236 0468 12040000 		.4byte	0x412
+ 1237 046c 00       		.byte	0
+ 1238 046d 07       		.uleb128 0x7
+ 1239 046e FC010000 		.4byte	.LASF48
+ 1240 0472 06       		.byte	0x6
+ 1241 0473 8F       		.byte	0x8f
+ 1242 0474 CE000000 		.4byte	0xce
+ 1243 0478 04       		.byte	0x4
+ 1244 0479 00       		.byte	0
+ 1245 047a 06       		.uleb128 0x6
+ 1246 047b 0C       		.byte	0xc
+ 1247 047c 06       		.byte	0x6
+ 1248 047d 87       		.byte	0x87
+ 1249 047e A7040000 		.4byte	0x4a7
+ 1250 0482 15       		.uleb128 0x15
+ 1251 0483 73726300 		.ascii	"src\000"
+ 1252 0487 06       		.byte	0x6
+ 1253 0488 88       		.byte	0x88
+ 1254 0489 92010000 		.4byte	0x192
+ 1255 048d 00       		.byte	0
+ 1256 048e 07       		.uleb128 0x7
+ 1257 048f AD010000 		.4byte	.LASF47
+ 1258 0493 06       		.byte	0x6
+ 1259 0494 89       		.byte	0x89
+ 1260 0495 12040000 		.4byte	0x412
+ 1261 0499 04       		.byte	0x4
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 36
+
+
+ 1262 049a 07       		.uleb128 0x7
+ 1263 049b FC010000 		.4byte	.LASF48
+ 1264 049f 06       		.byte	0x6
+ 1265 04a0 8A       		.byte	0x8a
+ 1266 04a1 CE000000 		.4byte	0xce
+ 1267 04a5 08       		.byte	0x8
+ 1268 04a6 00       		.byte	0
+ 1269 04a7 16       		.uleb128 0x16
+ 1270 04a8 59000000 		.4byte	.LASF52
+ 1271 04ac 01       		.byte	0x1
+ 1272 04ad 2B       		.byte	0x2b
+ 1273 04ae 17       		.uleb128 0x17
+ 1274 04af 92020000 		.4byte	0x292
+ 1275 04b3 17       		.uleb128 0x17
+ 1276 04b4 CE000000 		.4byte	0xce
+ 1277 04b8 17       		.uleb128 0x17
+ 1278 04b9 B8000000 		.4byte	0xb8
+ 1279 04bd 17       		.uleb128 0x17
+ 1280 04be 7C010000 		.4byte	0x17c
+ 1281 04c2 00       		.byte	0
+ 1282 04c3 00       		.byte	0
+ 1283              		.section	.debug_abbrev,"",%progbits
+ 1284              	.Ldebug_abbrev0:
+ 1285 0000 01       		.uleb128 0x1
+ 1286 0001 11       		.uleb128 0x11
+ 1287 0002 01       		.byte	0x1
+ 1288 0003 25       		.uleb128 0x25
+ 1289 0004 0E       		.uleb128 0xe
+ 1290 0005 13       		.uleb128 0x13
+ 1291 0006 0B       		.uleb128 0xb
+ 1292 0007 03       		.uleb128 0x3
+ 1293 0008 0E       		.uleb128 0xe
+ 1294 0009 1B       		.uleb128 0x1b
+ 1295 000a 0E       		.uleb128 0xe
+ 1296 000b 55       		.uleb128 0x55
+ 1297 000c 17       		.uleb128 0x17
+ 1298 000d 11       		.uleb128 0x11
+ 1299 000e 01       		.uleb128 0x1
+ 1300 000f 10       		.uleb128 0x10
+ 1301 0010 17       		.uleb128 0x17
+ 1302 0011 00       		.byte	0
+ 1303 0012 00       		.byte	0
+ 1304 0013 02       		.uleb128 0x2
+ 1305 0014 24       		.uleb128 0x24
+ 1306 0015 00       		.byte	0
+ 1307 0016 0B       		.uleb128 0xb
+ 1308 0017 0B       		.uleb128 0xb
+ 1309 0018 3E       		.uleb128 0x3e
+ 1310 0019 0B       		.uleb128 0xb
+ 1311 001a 03       		.uleb128 0x3
+ 1312 001b 0E       		.uleb128 0xe
+ 1313 001c 00       		.byte	0
+ 1314 001d 00       		.byte	0
+ 1315 001e 03       		.uleb128 0x3
+ 1316 001f 16       		.uleb128 0x16
+ 1317 0020 00       		.byte	0
+ 1318 0021 03       		.uleb128 0x3
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 37
+
+
+ 1319 0022 0E       		.uleb128 0xe
+ 1320 0023 3A       		.uleb128 0x3a
+ 1321 0024 0B       		.uleb128 0xb
+ 1322 0025 3B       		.uleb128 0x3b
+ 1323 0026 0B       		.uleb128 0xb
+ 1324 0027 49       		.uleb128 0x49
+ 1325 0028 13       		.uleb128 0x13
+ 1326 0029 00       		.byte	0
+ 1327 002a 00       		.byte	0
+ 1328 002b 04       		.uleb128 0x4
+ 1329 002c 24       		.uleb128 0x24
+ 1330 002d 00       		.byte	0
+ 1331 002e 0B       		.uleb128 0xb
+ 1332 002f 0B       		.uleb128 0xb
+ 1333 0030 3E       		.uleb128 0x3e
+ 1334 0031 0B       		.uleb128 0xb
+ 1335 0032 03       		.uleb128 0x3
+ 1336 0033 08       		.uleb128 0x8
+ 1337 0034 00       		.byte	0
+ 1338 0035 00       		.byte	0
+ 1339 0036 05       		.uleb128 0x5
+ 1340 0037 16       		.uleb128 0x16
+ 1341 0038 00       		.byte	0
+ 1342 0039 03       		.uleb128 0x3
+ 1343 003a 0E       		.uleb128 0xe
+ 1344 003b 3A       		.uleb128 0x3a
+ 1345 003c 0B       		.uleb128 0xb
+ 1346 003d 3B       		.uleb128 0x3b
+ 1347 003e 05       		.uleb128 0x5
+ 1348 003f 49       		.uleb128 0x49
+ 1349 0040 13       		.uleb128 0x13
+ 1350 0041 00       		.byte	0
+ 1351 0042 00       		.byte	0
+ 1352 0043 06       		.uleb128 0x6
+ 1353 0044 13       		.uleb128 0x13
+ 1354 0045 01       		.byte	0x1
+ 1355 0046 0B       		.uleb128 0xb
+ 1356 0047 0B       		.uleb128 0xb
+ 1357 0048 3A       		.uleb128 0x3a
+ 1358 0049 0B       		.uleb128 0xb
+ 1359 004a 3B       		.uleb128 0x3b
+ 1360 004b 0B       		.uleb128 0xb
+ 1361 004c 01       		.uleb128 0x1
+ 1362 004d 13       		.uleb128 0x13
+ 1363 004e 00       		.byte	0
+ 1364 004f 00       		.byte	0
+ 1365 0050 07       		.uleb128 0x7
+ 1366 0051 0D       		.uleb128 0xd
+ 1367 0052 00       		.byte	0
+ 1368 0053 03       		.uleb128 0x3
+ 1369 0054 0E       		.uleb128 0xe
+ 1370 0055 3A       		.uleb128 0x3a
+ 1371 0056 0B       		.uleb128 0xb
+ 1372 0057 3B       		.uleb128 0x3b
+ 1373 0058 0B       		.uleb128 0xb
+ 1374 0059 49       		.uleb128 0x49
+ 1375 005a 13       		.uleb128 0x13
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 38
+
+
+ 1376 005b 38       		.uleb128 0x38
+ 1377 005c 0B       		.uleb128 0xb
+ 1378 005d 00       		.byte	0
+ 1379 005e 00       		.byte	0
+ 1380 005f 08       		.uleb128 0x8
+ 1381 0060 0F       		.uleb128 0xf
+ 1382 0061 00       		.byte	0
+ 1383 0062 0B       		.uleb128 0xb
+ 1384 0063 0B       		.uleb128 0xb
+ 1385 0064 49       		.uleb128 0x49
+ 1386 0065 13       		.uleb128 0x13
+ 1387 0066 00       		.byte	0
+ 1388 0067 00       		.byte	0
+ 1389 0068 09       		.uleb128 0x9
+ 1390 0069 26       		.uleb128 0x26
+ 1391 006a 00       		.byte	0
+ 1392 006b 49       		.uleb128 0x49
+ 1393 006c 13       		.uleb128 0x13
+ 1394 006d 00       		.byte	0
+ 1395 006e 00       		.byte	0
+ 1396 006f 0A       		.uleb128 0xa
+ 1397 0070 2E       		.uleb128 0x2e
+ 1398 0071 01       		.byte	0x1
+ 1399 0072 3F       		.uleb128 0x3f
+ 1400 0073 19       		.uleb128 0x19
+ 1401 0074 03       		.uleb128 0x3
+ 1402 0075 0E       		.uleb128 0xe
+ 1403 0076 3A       		.uleb128 0x3a
+ 1404 0077 0B       		.uleb128 0xb
+ 1405 0078 3B       		.uleb128 0x3b
+ 1406 0079 0B       		.uleb128 0xb
+ 1407 007a 27       		.uleb128 0x27
+ 1408 007b 19       		.uleb128 0x19
+ 1409 007c 11       		.uleb128 0x11
+ 1410 007d 01       		.uleb128 0x1
+ 1411 007e 12       		.uleb128 0x12
+ 1412 007f 06       		.uleb128 0x6
+ 1413 0080 40       		.uleb128 0x40
+ 1414 0081 18       		.uleb128 0x18
+ 1415 0082 9742     		.uleb128 0x2117
+ 1416 0084 19       		.uleb128 0x19
+ 1417 0085 01       		.uleb128 0x1
+ 1418 0086 13       		.uleb128 0x13
+ 1419 0087 00       		.byte	0
+ 1420 0088 00       		.byte	0
+ 1421 0089 0B       		.uleb128 0xb
+ 1422 008a 05       		.uleb128 0x5
+ 1423 008b 00       		.byte	0
+ 1424 008c 03       		.uleb128 0x3
+ 1425 008d 0E       		.uleb128 0xe
+ 1426 008e 3A       		.uleb128 0x3a
+ 1427 008f 0B       		.uleb128 0xb
+ 1428 0090 3B       		.uleb128 0x3b
+ 1429 0091 0B       		.uleb128 0xb
+ 1430 0092 49       		.uleb128 0x49
+ 1431 0093 13       		.uleb128 0x13
+ 1432 0094 02       		.uleb128 0x2
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 39
+
+
+ 1433 0095 17       		.uleb128 0x17
+ 1434 0096 00       		.byte	0
+ 1435 0097 00       		.byte	0
+ 1436 0098 0C       		.uleb128 0xc
+ 1437 0099 34       		.uleb128 0x34
+ 1438 009a 00       		.byte	0
+ 1439 009b 03       		.uleb128 0x3
+ 1440 009c 08       		.uleb128 0x8
+ 1441 009d 3A       		.uleb128 0x3a
+ 1442 009e 0B       		.uleb128 0xb
+ 1443 009f 3B       		.uleb128 0x3b
+ 1444 00a0 05       		.uleb128 0x5
+ 1445 00a1 49       		.uleb128 0x49
+ 1446 00a2 13       		.uleb128 0x13
+ 1447 00a3 02       		.uleb128 0x2
+ 1448 00a4 17       		.uleb128 0x17
+ 1449 00a5 00       		.byte	0
+ 1450 00a6 00       		.byte	0
+ 1451 00a7 0D       		.uleb128 0xd
+ 1452 00a8 34       		.uleb128 0x34
+ 1453 00a9 00       		.byte	0
+ 1454 00aa 03       		.uleb128 0x3
+ 1455 00ab 0E       		.uleb128 0xe
+ 1456 00ac 3A       		.uleb128 0x3a
+ 1457 00ad 0B       		.uleb128 0xb
+ 1458 00ae 3B       		.uleb128 0x3b
+ 1459 00af 05       		.uleb128 0x5
+ 1460 00b0 49       		.uleb128 0x49
+ 1461 00b1 13       		.uleb128 0x13
+ 1462 00b2 02       		.uleb128 0x2
+ 1463 00b3 17       		.uleb128 0x17
+ 1464 00b4 00       		.byte	0
+ 1465 00b5 00       		.byte	0
+ 1466 00b6 0E       		.uleb128 0xe
+ 1467 00b7 2E       		.uleb128 0x2e
+ 1468 00b8 01       		.byte	0x1
+ 1469 00b9 3F       		.uleb128 0x3f
+ 1470 00ba 19       		.uleb128 0x19
+ 1471 00bb 03       		.uleb128 0x3
+ 1472 00bc 0E       		.uleb128 0xe
+ 1473 00bd 3A       		.uleb128 0x3a
+ 1474 00be 0B       		.uleb128 0xb
+ 1475 00bf 3B       		.uleb128 0x3b
+ 1476 00c0 05       		.uleb128 0x5
+ 1477 00c1 27       		.uleb128 0x27
+ 1478 00c2 19       		.uleb128 0x19
+ 1479 00c3 11       		.uleb128 0x11
+ 1480 00c4 01       		.uleb128 0x1
+ 1481 00c5 12       		.uleb128 0x12
+ 1482 00c6 06       		.uleb128 0x6
+ 1483 00c7 40       		.uleb128 0x40
+ 1484 00c8 18       		.uleb128 0x18
+ 1485 00c9 9742     		.uleb128 0x2117
+ 1486 00cb 19       		.uleb128 0x19
+ 1487 00cc 01       		.uleb128 0x1
+ 1488 00cd 13       		.uleb128 0x13
+ 1489 00ce 00       		.byte	0
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 40
+
+
+ 1490 00cf 00       		.byte	0
+ 1491 00d0 0F       		.uleb128 0xf
+ 1492 00d1 05       		.uleb128 0x5
+ 1493 00d2 00       		.byte	0
+ 1494 00d3 03       		.uleb128 0x3
+ 1495 00d4 0E       		.uleb128 0xe
+ 1496 00d5 3A       		.uleb128 0x3a
+ 1497 00d6 0B       		.uleb128 0xb
+ 1498 00d7 3B       		.uleb128 0x3b
+ 1499 00d8 05       		.uleb128 0x5
+ 1500 00d9 49       		.uleb128 0x49
+ 1501 00da 13       		.uleb128 0x13
+ 1502 00db 02       		.uleb128 0x2
+ 1503 00dc 17       		.uleb128 0x17
+ 1504 00dd 00       		.byte	0
+ 1505 00de 00       		.byte	0
+ 1506 00df 10       		.uleb128 0x10
+ 1507 00e0 05       		.uleb128 0x5
+ 1508 00e1 00       		.byte	0
+ 1509 00e2 03       		.uleb128 0x3
+ 1510 00e3 08       		.uleb128 0x8
+ 1511 00e4 3A       		.uleb128 0x3a
+ 1512 00e5 0B       		.uleb128 0xb
+ 1513 00e6 3B       		.uleb128 0x3b
+ 1514 00e7 0B       		.uleb128 0xb
+ 1515 00e8 49       		.uleb128 0x49
+ 1516 00e9 13       		.uleb128 0x13
+ 1517 00ea 02       		.uleb128 0x2
+ 1518 00eb 17       		.uleb128 0x17
+ 1519 00ec 00       		.byte	0
+ 1520 00ed 00       		.byte	0
+ 1521 00ee 11       		.uleb128 0x11
+ 1522 00ef 898201   		.uleb128 0x4109
+ 1523 00f2 01       		.byte	0x1
+ 1524 00f3 11       		.uleb128 0x11
+ 1525 00f4 01       		.uleb128 0x1
+ 1526 00f5 31       		.uleb128 0x31
+ 1527 00f6 13       		.uleb128 0x13
+ 1528 00f7 01       		.uleb128 0x1
+ 1529 00f8 13       		.uleb128 0x13
+ 1530 00f9 00       		.byte	0
+ 1531 00fa 00       		.byte	0
+ 1532 00fb 12       		.uleb128 0x12
+ 1533 00fc 8A8201   		.uleb128 0x410a
+ 1534 00ff 00       		.byte	0
+ 1535 0100 02       		.uleb128 0x2
+ 1536 0101 18       		.uleb128 0x18
+ 1537 0102 9142     		.uleb128 0x2111
+ 1538 0104 18       		.uleb128 0x18
+ 1539 0105 00       		.byte	0
+ 1540 0106 00       		.byte	0
+ 1541 0107 13       		.uleb128 0x13
+ 1542 0108 898201   		.uleb128 0x4109
+ 1543 010b 01       		.byte	0x1
+ 1544 010c 11       		.uleb128 0x11
+ 1545 010d 01       		.uleb128 0x1
+ 1546 010e 31       		.uleb128 0x31
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 41
+
+
+ 1547 010f 13       		.uleb128 0x13
+ 1548 0110 00       		.byte	0
+ 1549 0111 00       		.byte	0
+ 1550 0112 14       		.uleb128 0x14
+ 1551 0113 34       		.uleb128 0x34
+ 1552 0114 00       		.byte	0
+ 1553 0115 03       		.uleb128 0x3
+ 1554 0116 0E       		.uleb128 0xe
+ 1555 0117 3A       		.uleb128 0x3a
+ 1556 0118 0B       		.uleb128 0xb
+ 1557 0119 3B       		.uleb128 0x3b
+ 1558 011a 0B       		.uleb128 0xb
+ 1559 011b 49       		.uleb128 0x49
+ 1560 011c 13       		.uleb128 0x13
+ 1561 011d 3F       		.uleb128 0x3f
+ 1562 011e 19       		.uleb128 0x19
+ 1563 011f 3C       		.uleb128 0x3c
+ 1564 0120 19       		.uleb128 0x19
+ 1565 0121 00       		.byte	0
+ 1566 0122 00       		.byte	0
+ 1567 0123 15       		.uleb128 0x15
+ 1568 0124 0D       		.uleb128 0xd
+ 1569 0125 00       		.byte	0
+ 1570 0126 03       		.uleb128 0x3
+ 1571 0127 08       		.uleb128 0x8
+ 1572 0128 3A       		.uleb128 0x3a
+ 1573 0129 0B       		.uleb128 0xb
+ 1574 012a 3B       		.uleb128 0x3b
+ 1575 012b 0B       		.uleb128 0xb
+ 1576 012c 49       		.uleb128 0x49
+ 1577 012d 13       		.uleb128 0x13
+ 1578 012e 38       		.uleb128 0x38
+ 1579 012f 0B       		.uleb128 0xb
+ 1580 0130 00       		.byte	0
+ 1581 0131 00       		.byte	0
+ 1582 0132 16       		.uleb128 0x16
+ 1583 0133 2E       		.uleb128 0x2e
+ 1584 0134 01       		.byte	0x1
+ 1585 0135 3F       		.uleb128 0x3f
+ 1586 0136 19       		.uleb128 0x19
+ 1587 0137 03       		.uleb128 0x3
+ 1588 0138 0E       		.uleb128 0xe
+ 1589 0139 3A       		.uleb128 0x3a
+ 1590 013a 0B       		.uleb128 0xb
+ 1591 013b 3B       		.uleb128 0x3b
+ 1592 013c 0B       		.uleb128 0xb
+ 1593 013d 27       		.uleb128 0x27
+ 1594 013e 19       		.uleb128 0x19
+ 1595 013f 3C       		.uleb128 0x3c
+ 1596 0140 19       		.uleb128 0x19
+ 1597 0141 00       		.byte	0
+ 1598 0142 00       		.byte	0
+ 1599 0143 17       		.uleb128 0x17
+ 1600 0144 05       		.uleb128 0x5
+ 1601 0145 00       		.byte	0
+ 1602 0146 49       		.uleb128 0x49
+ 1603 0147 13       		.uleb128 0x13
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 42
+
+
+ 1604 0148 00       		.byte	0
+ 1605 0149 00       		.byte	0
+ 1606 014a 00       		.byte	0
+ 1607              		.section	.debug_loc,"",%progbits
+ 1608              	.Ldebug_loc0:
+ 1609              	.LLST0:
+ 1610 0000 00000000 		.4byte	.LVL0
+ 1611 0004 1A000000 		.4byte	.LVL3
+ 1612 0008 0100     		.2byte	0x1
+ 1613 000a 50       		.byte	0x50
+ 1614 000b 1A000000 		.4byte	.LVL3
+ 1615 000f DE010000 		.4byte	.LFE85
+ 1616 0013 0100     		.2byte	0x1
+ 1617 0015 59       		.byte	0x59
+ 1618 0016 00000000 		.4byte	0
+ 1619 001a 00000000 		.4byte	0
+ 1620              	.LLST1:
+ 1621 001e 00000000 		.4byte	.LVL0
+ 1622 0022 1A000000 		.4byte	.LVL3
+ 1623 0026 0100     		.2byte	0x1
+ 1624 0028 51       		.byte	0x51
+ 1625 0029 1A000000 		.4byte	.LVL3
+ 1626 002d DE010000 		.4byte	.LFE85
+ 1627 0031 0100     		.2byte	0x1
+ 1628 0033 5A       		.byte	0x5a
+ 1629 0034 00000000 		.4byte	0
+ 1630 0038 00000000 		.4byte	0
+ 1631              	.LLST2:
+ 1632 003c 00000000 		.4byte	.LVL0
+ 1633 0040 1A000000 		.4byte	.LVL3
+ 1634 0044 0100     		.2byte	0x1
+ 1635 0046 52       		.byte	0x52
+ 1636 0047 1A000000 		.4byte	.LVL3
+ 1637 004b DE010000 		.4byte	.LFE85
+ 1638 004f 0200     		.2byte	0x2
+ 1639 0051 91       		.byte	0x91
+ 1640 0052 50       		.sleb128 -48
+ 1641 0053 00000000 		.4byte	0
+ 1642 0057 00000000 		.4byte	0
+ 1643              	.LLST3:
+ 1644 005b 00000000 		.4byte	.LVL0
+ 1645 005f 1A000000 		.4byte	.LVL3
+ 1646 0063 0100     		.2byte	0x1
+ 1647 0065 53       		.byte	0x53
+ 1648 0066 1A000000 		.4byte	.LVL3
+ 1649 006a C8000000 		.4byte	.LVL15
+ 1650 006e 0400     		.2byte	0x4
+ 1651 0070 F3       		.byte	0xf3
+ 1652 0071 01       		.uleb128 0x1
+ 1653 0072 53       		.byte	0x53
+ 1654 0073 9F       		.byte	0x9f
+ 1655 0074 C8000000 		.4byte	.LVL15
+ 1656 0078 CC000000 		.4byte	.LVL16
+ 1657 007c 0100     		.2byte	0x1
+ 1658 007e 53       		.byte	0x53
+ 1659 007f CC000000 		.4byte	.LVL16
+ 1660 0083 78010000 		.4byte	.LVL32
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 43
+
+
+ 1661 0087 0200     		.2byte	0x2
+ 1662 0089 91       		.byte	0x91
+ 1663 008a 4C       		.sleb128 -52
+ 1664 008b 78010000 		.4byte	.LVL32
+ 1665 008f 7E010000 		.4byte	.LVL33
+ 1666 0093 0100     		.2byte	0x1
+ 1667 0095 53       		.byte	0x53
+ 1668 0096 7E010000 		.4byte	.LVL33
+ 1669 009a DE010000 		.4byte	.LFE85
+ 1670 009e 0200     		.2byte	0x2
+ 1671 00a0 91       		.byte	0x91
+ 1672 00a1 4C       		.sleb128 -52
+ 1673 00a2 00000000 		.4byte	0
+ 1674 00a6 00000000 		.4byte	0
+ 1675              	.LLST4:
+ 1676 00aa 2E000000 		.4byte	.LVL6
+ 1677 00ae 32000000 		.4byte	.LVL7
+ 1678 00b2 0100     		.2byte	0x1
+ 1679 00b4 5B       		.byte	0x5b
+ 1680 00b5 32000000 		.4byte	.LVL7
+ 1681 00b9 B8000000 		.4byte	.LVL13
+ 1682 00bd 0100     		.2byte	0x1
+ 1683 00bf 56       		.byte	0x56
+ 1684 00c0 F2000000 		.4byte	.LVL24
+ 1685 00c4 F6000000 		.4byte	.LVL25
+ 1686 00c8 0200     		.2byte	0x2
+ 1687 00ca 91       		.byte	0x91
+ 1688 00cb 48       		.sleb128 -56
+ 1689 00cc F6000000 		.4byte	.LVL25
+ 1690 00d0 6E010000 		.4byte	.LVL31
+ 1691 00d4 0100     		.2byte	0x1
+ 1692 00d6 56       		.byte	0x56
+ 1693 00d7 92010000 		.4byte	.LVL38
+ 1694 00db CC010000 		.4byte	.LVL43
+ 1695 00df 0100     		.2byte	0x1
+ 1696 00e1 53       		.byte	0x53
+ 1697 00e2 CE010000 		.4byte	.LVL44
+ 1698 00e6 D4010000 		.4byte	.LVL45
+ 1699 00ea 0100     		.2byte	0x1
+ 1700 00ec 53       		.byte	0x53
+ 1701 00ed 00000000 		.4byte	0
+ 1702 00f1 00000000 		.4byte	0
+ 1703              	.LLST5:
+ 1704 00f5 12000000 		.4byte	.LVL2
+ 1705 00f9 1A000000 		.4byte	.LVL3
+ 1706 00fd 0200     		.2byte	0x2
+ 1707 00ff 30       		.byte	0x30
+ 1708 0100 9F       		.byte	0x9f
+ 1709 0101 1A000000 		.4byte	.LVL3
+ 1710 0105 C2000000 		.4byte	.LVL14
+ 1711 0109 0100     		.2byte	0x1
+ 1712 010b 5B       		.byte	0x5b
+ 1713 010c D4000000 		.4byte	.LVL19
+ 1714 0110 DE000000 		.4byte	.LVL20
+ 1715 0114 0200     		.2byte	0x2
+ 1716 0116 30       		.byte	0x30
+ 1717 0117 9F       		.byte	0x9f
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 44
+
+
+ 1718 0118 DE000000 		.4byte	.LVL20
+ 1719 011c E4000000 		.4byte	.LVL21
+ 1720 0120 0100     		.2byte	0x1
+ 1721 0122 53       		.byte	0x53
+ 1722 0123 E4000000 		.4byte	.LVL21
+ 1723 0127 84010000 		.4byte	.LVL35
+ 1724 012b 0200     		.2byte	0x2
+ 1725 012d 91       		.byte	0x91
+ 1726 012e 48       		.sleb128 -56
+ 1727 012f 8E010000 		.4byte	.LVL37
+ 1728 0133 92010000 		.4byte	.LVL38
+ 1729 0137 0200     		.2byte	0x2
+ 1730 0139 30       		.byte	0x30
+ 1731 013a 9F       		.byte	0x9f
+ 1732 013b 92010000 		.4byte	.LVL38
+ 1733 013f DE010000 		.4byte	.LFE85
+ 1734 0143 0100     		.2byte	0x1
+ 1735 0145 56       		.byte	0x56
+ 1736 0146 00000000 		.4byte	0
+ 1737 014a 00000000 		.4byte	0
+ 1738              	.LLST6:
+ 1739 014e CE000000 		.4byte	.LVL17
+ 1740 0152 DE000000 		.4byte	.LVL20
+ 1741 0156 0100     		.2byte	0x1
+ 1742 0158 53       		.byte	0x53
+ 1743 0159 DE000000 		.4byte	.LVL20
+ 1744 015d 82010000 		.4byte	.LVL34
+ 1745 0161 0200     		.2byte	0x2
+ 1746 0163 91       		.byte	0x91
+ 1747 0164 54       		.sleb128 -44
+ 1748 0165 82010000 		.4byte	.LVL34
+ 1749 0169 84010000 		.4byte	.LVL35
+ 1750 016d 0100     		.2byte	0x1
+ 1751 016f 53       		.byte	0x53
+ 1752 0170 84010000 		.4byte	.LVL35
+ 1753 0174 DE010000 		.4byte	.LFE85
+ 1754 0178 0200     		.2byte	0x2
+ 1755 017a 91       		.byte	0x91
+ 1756 017b 54       		.sleb128 -44
+ 1757 017c 00000000 		.4byte	0
+ 1758 0180 00000000 		.4byte	0
+ 1759              	.LLST7:
+ 1760 0184 36000000 		.4byte	.LVL8
+ 1761 0188 B0000000 		.4byte	.LVL12
+ 1762 018c 0100     		.2byte	0x1
+ 1763 018e 55       		.byte	0x55
+ 1764 018f FA000000 		.4byte	.LVL26
+ 1765 0193 64010000 		.4byte	.LVL30
+ 1766 0197 0100     		.2byte	0x1
+ 1767 0199 55       		.byte	0x55
+ 1768 019a 94010000 		.4byte	.LVL39
+ 1769 019e CC010000 		.4byte	.LVL43
+ 1770 01a2 0100     		.2byte	0x1
+ 1771 01a4 54       		.byte	0x54
+ 1772 01a5 00000000 		.4byte	0
+ 1773 01a9 00000000 		.4byte	0
+ 1774              	.LLST8:
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 45
+
+
+ 1775 01ad 0E000000 		.4byte	.LVL1
+ 1776 01b1 1A000000 		.4byte	.LVL3
+ 1777 01b5 0100     		.2byte	0x1
+ 1778 01b7 51       		.byte	0x51
+ 1779 01b8 1A000000 		.4byte	.LVL3
+ 1780 01bc D0000000 		.4byte	.LVL18
+ 1781 01c0 0100     		.2byte	0x1
+ 1782 01c2 5A       		.byte	0x5a
+ 1783 01c3 D0000000 		.4byte	.LVL18
+ 1784 01c7 84010000 		.4byte	.LVL35
+ 1785 01cb 0100     		.2byte	0x1
+ 1786 01cd 58       		.byte	0x58
+ 1787 01ce 8A010000 		.4byte	.LVL36
+ 1788 01d2 DE010000 		.4byte	.LFE85
+ 1789 01d6 0100     		.2byte	0x1
+ 1790 01d8 58       		.byte	0x58
+ 1791 01d9 00000000 		.4byte	0
+ 1792 01dd 00000000 		.4byte	0
+ 1793              	.LLST9:
+ 1794 01e1 0E000000 		.4byte	.LVL1
+ 1795 01e5 12000000 		.4byte	.LVL2
+ 1796 01e9 0100     		.2byte	0x1
+ 1797 01eb 51       		.byte	0x51
+ 1798 01ec 12000000 		.4byte	.LVL2
+ 1799 01f0 D4000000 		.4byte	.LVL19
+ 1800 01f4 0100     		.2byte	0x1
+ 1801 01f6 58       		.byte	0x58
+ 1802 01f7 D4000000 		.4byte	.LVL19
+ 1803 01fb 84010000 		.4byte	.LVL35
+ 1804 01ff 0100     		.2byte	0x1
+ 1805 0201 5C       		.byte	0x5c
+ 1806 0202 84010000 		.4byte	.LVL35
+ 1807 0206 8E010000 		.4byte	.LVL37
+ 1808 020a 0100     		.2byte	0x1
+ 1809 020c 58       		.byte	0x58
+ 1810 020d 8E010000 		.4byte	.LVL37
+ 1811 0211 DE010000 		.4byte	.LFE85
+ 1812 0215 0100     		.2byte	0x1
+ 1813 0217 55       		.byte	0x55
+ 1814 0218 00000000 		.4byte	0
+ 1815 021c 00000000 		.4byte	0
+ 1816              	.LLST10:
+ 1817 0220 12000000 		.4byte	.LVL2
+ 1818 0224 1A000000 		.4byte	.LVL3
+ 1819 0228 0200     		.2byte	0x2
+ 1820 022a 30       		.byte	0x30
+ 1821 022b 9F       		.byte	0x9f
+ 1822 022c 1A000000 		.4byte	.LVL3
+ 1823 0230 D0000000 		.4byte	.LVL18
+ 1824 0234 0100     		.2byte	0x1
+ 1825 0236 5C       		.byte	0x5c
+ 1826 0237 D4000000 		.4byte	.LVL19
+ 1827 023b DE000000 		.4byte	.LVL20
+ 1828 023f 0200     		.2byte	0x2
+ 1829 0241 30       		.byte	0x30
+ 1830 0242 9F       		.byte	0x9f
+ 1831 0243 DE000000 		.4byte	.LVL20
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 46
+
+
+ 1832 0247 84010000 		.4byte	.LVL35
+ 1833 024b 0100     		.2byte	0x1
+ 1834 024d 5B       		.byte	0x5b
+ 1835 024e 8E010000 		.4byte	.LVL37
+ 1836 0252 92010000 		.4byte	.LVL38
+ 1837 0256 0200     		.2byte	0x2
+ 1838 0258 30       		.byte	0x30
+ 1839 0259 9F       		.byte	0x9f
+ 1840 025a 00000000 		.4byte	0
+ 1841 025e 00000000 		.4byte	0
+ 1842              	.LLST11:
+ 1843 0262 4E000000 		.4byte	.LVL9
+ 1844 0266 B0000000 		.4byte	.LVL12
+ 1845 026a 0100     		.2byte	0x1
+ 1846 026c 54       		.byte	0x54
+ 1847 026d 08010000 		.4byte	.LVL27
+ 1848 0271 64010000 		.4byte	.LVL30
+ 1849 0275 0100     		.2byte	0x1
+ 1850 0277 54       		.byte	0x54
+ 1851 0278 A4010000 		.4byte	.LVL40
+ 1852 027c CC010000 		.4byte	.LVL43
+ 1853 0280 0100     		.2byte	0x1
+ 1854 0282 57       		.byte	0x57
+ 1855 0283 00000000 		.4byte	0
+ 1856 0287 00000000 		.4byte	0
+ 1857              	.LLST12:
+ 1858 028b 72000000 		.4byte	.LVL10
+ 1859 028f A0000000 		.4byte	.LVL11
+ 1860 0293 0100     		.2byte	0x1
+ 1861 0295 52       		.byte	0x52
+ 1862 0296 24010000 		.4byte	.LVL28
+ 1863 029a 54010000 		.4byte	.LVL29
+ 1864 029e 0100     		.2byte	0x1
+ 1865 02a0 52       		.byte	0x52
+ 1866 02a1 BA010000 		.4byte	.LVL41
+ 1867 02a5 CC010000 		.4byte	.LVL43
+ 1868 02a9 0100     		.2byte	0x1
+ 1869 02ab 5C       		.byte	0x5c
+ 1870 02ac 00000000 		.4byte	0
+ 1871 02b0 00000000 		.4byte	0
+ 1872              	.LLST13:
+ 1873 02b4 22000000 		.4byte	.LVL4
+ 1874 02b8 B8000000 		.4byte	.LVL13
+ 1875 02bc 0200     		.2byte	0x2
+ 1876 02be 7D       		.byte	0x7d
+ 1877 02bf 00       		.sleb128 0
+ 1878 02c0 E6000000 		.4byte	.LVL22
+ 1879 02c4 6E010000 		.4byte	.LVL31
+ 1880 02c8 0200     		.2byte	0x2
+ 1881 02ca 7D       		.byte	0x7d
+ 1882 02cb 00       		.sleb128 0
+ 1883 02cc 00000000 		.4byte	0
+ 1884 02d0 00000000 		.4byte	0
+ 1885              	.LLST14:
+ 1886 02d4 2A000000 		.4byte	.LVL5
+ 1887 02d8 B8000000 		.4byte	.LVL13
+ 1888 02dc 0200     		.2byte	0x2
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 47
+
+
+ 1889 02de 91       		.byte	0x91
+ 1890 02df 44       		.sleb128 -60
+ 1891 02e0 EE000000 		.4byte	.LVL23
+ 1892 02e4 6E010000 		.4byte	.LVL31
+ 1893 02e8 0200     		.2byte	0x2
+ 1894 02ea 91       		.byte	0x91
+ 1895 02eb 44       		.sleb128 -60
+ 1896 02ec 00000000 		.4byte	0
+ 1897 02f0 00000000 		.4byte	0
+ 1898              	.LLST15:
+ 1899 02f4 00000000 		.4byte	.LVL46
+ 1900 02f8 1A000000 		.4byte	.LVL49
+ 1901 02fc 0100     		.2byte	0x1
+ 1902 02fe 50       		.byte	0x50
+ 1903 02ff 1A000000 		.4byte	.LVL49
+ 1904 0303 D2010000 		.4byte	.LFE86
+ 1905 0307 0100     		.2byte	0x1
+ 1906 0309 59       		.byte	0x59
+ 1907 030a 00000000 		.4byte	0
+ 1908 030e 00000000 		.4byte	0
+ 1909              	.LLST16:
+ 1910 0312 00000000 		.4byte	.LVL46
+ 1911 0316 1A000000 		.4byte	.LVL49
+ 1912 031a 0100     		.2byte	0x1
+ 1913 031c 51       		.byte	0x51
+ 1914 031d 1A000000 		.4byte	.LVL49
+ 1915 0321 D2010000 		.4byte	.LFE86
+ 1916 0325 0100     		.2byte	0x1
+ 1917 0327 5A       		.byte	0x5a
+ 1918 0328 00000000 		.4byte	0
+ 1919 032c 00000000 		.4byte	0
+ 1920              	.LLST17:
+ 1921 0330 00000000 		.4byte	.LVL46
+ 1922 0334 1A000000 		.4byte	.LVL49
+ 1923 0338 0100     		.2byte	0x1
+ 1924 033a 52       		.byte	0x52
+ 1925 033b 1A000000 		.4byte	.LVL49
+ 1926 033f D2010000 		.4byte	.LFE86
+ 1927 0343 0200     		.2byte	0x2
+ 1928 0345 91       		.byte	0x91
+ 1929 0346 50       		.sleb128 -48
+ 1930 0347 00000000 		.4byte	0
+ 1931 034b 00000000 		.4byte	0
+ 1932              	.LLST18:
+ 1933 034f 00000000 		.4byte	.LVL46
+ 1934 0353 1A000000 		.4byte	.LVL49
+ 1935 0357 0100     		.2byte	0x1
+ 1936 0359 53       		.byte	0x53
+ 1937 035a 1A000000 		.4byte	.LVL49
+ 1938 035e C8000000 		.4byte	.LVL61
+ 1939 0362 0400     		.2byte	0x4
+ 1940 0364 F3       		.byte	0xf3
+ 1941 0365 01       		.uleb128 0x1
+ 1942 0366 53       		.byte	0x53
+ 1943 0367 9F       		.byte	0x9f
+ 1944 0368 C8000000 		.4byte	.LVL61
+ 1945 036c CC000000 		.4byte	.LVL62
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 48
+
+
+ 1946 0370 0100     		.2byte	0x1
+ 1947 0372 53       		.byte	0x53
+ 1948 0373 CC000000 		.4byte	.LVL62
+ 1949 0377 78010000 		.4byte	.LVL78
+ 1950 037b 0200     		.2byte	0x2
+ 1951 037d 91       		.byte	0x91
+ 1952 037e 4C       		.sleb128 -52
+ 1953 037f 78010000 		.4byte	.LVL78
+ 1954 0383 7E010000 		.4byte	.LVL79
+ 1955 0387 0100     		.2byte	0x1
+ 1956 0389 53       		.byte	0x53
+ 1957 038a 7E010000 		.4byte	.LVL79
+ 1958 038e D2010000 		.4byte	.LFE86
+ 1959 0392 0200     		.2byte	0x2
+ 1960 0394 91       		.byte	0x91
+ 1961 0395 4C       		.sleb128 -52
+ 1962 0396 00000000 		.4byte	0
+ 1963 039a 00000000 		.4byte	0
+ 1964              	.LLST19:
+ 1965 039e 2E000000 		.4byte	.LVL52
+ 1966 03a2 32000000 		.4byte	.LVL53
+ 1967 03a6 0100     		.2byte	0x1
+ 1968 03a8 5B       		.byte	0x5b
+ 1969 03a9 32000000 		.4byte	.LVL53
+ 1970 03ad B8000000 		.4byte	.LVL59
+ 1971 03b1 0100     		.2byte	0x1
+ 1972 03b3 56       		.byte	0x56
+ 1973 03b4 F2000000 		.4byte	.LVL70
+ 1974 03b8 F6000000 		.4byte	.LVL71
+ 1975 03bc 0200     		.2byte	0x2
+ 1976 03be 91       		.byte	0x91
+ 1977 03bf 48       		.sleb128 -56
+ 1978 03c0 F6000000 		.4byte	.LVL71
+ 1979 03c4 6E010000 		.4byte	.LVL77
+ 1980 03c8 0100     		.2byte	0x1
+ 1981 03ca 56       		.byte	0x56
+ 1982 03cb 8E010000 		.4byte	.LVL83
+ 1983 03cf 92010000 		.4byte	.LVL84
+ 1984 03d3 0200     		.2byte	0x2
+ 1985 03d5 30       		.byte	0x30
+ 1986 03d6 9F       		.byte	0x9f
+ 1987 03d7 92010000 		.4byte	.LVL84
+ 1988 03db D2010000 		.4byte	.LFE86
+ 1989 03df 0100     		.2byte	0x1
+ 1990 03e1 51       		.byte	0x51
+ 1991 03e2 00000000 		.4byte	0
+ 1992 03e6 00000000 		.4byte	0
+ 1993              	.LLST20:
+ 1994 03ea 12000000 		.4byte	.LVL48
+ 1995 03ee 1A000000 		.4byte	.LVL49
+ 1996 03f2 0200     		.2byte	0x2
+ 1997 03f4 30       		.byte	0x30
+ 1998 03f5 9F       		.byte	0x9f
+ 1999 03f6 1A000000 		.4byte	.LVL49
+ 2000 03fa C2000000 		.4byte	.LVL60
+ 2001 03fe 0100     		.2byte	0x1
+ 2002 0400 5B       		.byte	0x5b
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 49
+
+
+ 2003 0401 D4000000 		.4byte	.LVL65
+ 2004 0405 DE000000 		.4byte	.LVL66
+ 2005 0409 0200     		.2byte	0x2
+ 2006 040b 30       		.byte	0x30
+ 2007 040c 9F       		.byte	0x9f
+ 2008 040d DE000000 		.4byte	.LVL66
+ 2009 0411 E4000000 		.4byte	.LVL67
+ 2010 0415 0100     		.2byte	0x1
+ 2011 0417 53       		.byte	0x53
+ 2012 0418 E4000000 		.4byte	.LVL67
+ 2013 041c 84010000 		.4byte	.LVL81
+ 2014 0420 0200     		.2byte	0x2
+ 2015 0422 91       		.byte	0x91
+ 2016 0423 48       		.sleb128 -56
+ 2017 0424 00000000 		.4byte	0
+ 2018 0428 00000000 		.4byte	0
+ 2019              	.LLST21:
+ 2020 042c CE000000 		.4byte	.LVL63
+ 2021 0430 DE000000 		.4byte	.LVL66
+ 2022 0434 0100     		.2byte	0x1
+ 2023 0436 53       		.byte	0x53
+ 2024 0437 DE000000 		.4byte	.LVL66
+ 2025 043b 82010000 		.4byte	.LVL80
+ 2026 043f 0200     		.2byte	0x2
+ 2027 0441 91       		.byte	0x91
+ 2028 0442 54       		.sleb128 -44
+ 2029 0443 82010000 		.4byte	.LVL80
+ 2030 0447 84010000 		.4byte	.LVL81
+ 2031 044b 0100     		.2byte	0x1
+ 2032 044d 53       		.byte	0x53
+ 2033 044e 84010000 		.4byte	.LVL81
+ 2034 0452 D2010000 		.4byte	.LFE86
+ 2035 0456 0200     		.2byte	0x2
+ 2036 0458 91       		.byte	0x91
+ 2037 0459 54       		.sleb128 -44
+ 2038 045a 00000000 		.4byte	0
+ 2039 045e 00000000 		.4byte	0
+ 2040              	.LLST22:
+ 2041 0462 36000000 		.4byte	.LVL54
+ 2042 0466 B0000000 		.4byte	.LVL58
+ 2043 046a 0100     		.2byte	0x1
+ 2044 046c 55       		.byte	0x55
+ 2045 046d FA000000 		.4byte	.LVL72
+ 2046 0471 64010000 		.4byte	.LVL76
+ 2047 0475 0100     		.2byte	0x1
+ 2048 0477 55       		.byte	0x55
+ 2049 0478 94010000 		.4byte	.LVL85
+ 2050 047c C8010000 		.4byte	.LVL88
+ 2051 0480 0100     		.2byte	0x1
+ 2052 0482 54       		.byte	0x54
+ 2053 0483 00000000 		.4byte	0
+ 2054 0487 00000000 		.4byte	0
+ 2055              	.LLST23:
+ 2056 048b 0E000000 		.4byte	.LVL47
+ 2057 048f 1A000000 		.4byte	.LVL49
+ 2058 0493 0100     		.2byte	0x1
+ 2059 0495 51       		.byte	0x51
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 50
+
+
+ 2060 0496 1A000000 		.4byte	.LVL49
+ 2061 049a D0000000 		.4byte	.LVL64
+ 2062 049e 0100     		.2byte	0x1
+ 2063 04a0 5A       		.byte	0x5a
+ 2064 04a1 D0000000 		.4byte	.LVL64
+ 2065 04a5 84010000 		.4byte	.LVL81
+ 2066 04a9 0100     		.2byte	0x1
+ 2067 04ab 58       		.byte	0x58
+ 2068 04ac 8A010000 		.4byte	.LVL82
+ 2069 04b0 D2010000 		.4byte	.LFE86
+ 2070 04b4 0100     		.2byte	0x1
+ 2071 04b6 58       		.byte	0x58
+ 2072 04b7 00000000 		.4byte	0
+ 2073 04bb 00000000 		.4byte	0
+ 2074              	.LLST24:
+ 2075 04bf 0E000000 		.4byte	.LVL47
+ 2076 04c3 12000000 		.4byte	.LVL48
+ 2077 04c7 0100     		.2byte	0x1
+ 2078 04c9 51       		.byte	0x51
+ 2079 04ca 12000000 		.4byte	.LVL48
+ 2080 04ce D4000000 		.4byte	.LVL65
+ 2081 04d2 0100     		.2byte	0x1
+ 2082 04d4 58       		.byte	0x58
+ 2083 04d5 D4000000 		.4byte	.LVL65
+ 2084 04d9 84010000 		.4byte	.LVL81
+ 2085 04dd 0100     		.2byte	0x1
+ 2086 04df 5C       		.byte	0x5c
+ 2087 04e0 84010000 		.4byte	.LVL81
+ 2088 04e4 8E010000 		.4byte	.LVL83
+ 2089 04e8 0100     		.2byte	0x1
+ 2090 04ea 58       		.byte	0x58
+ 2091 04eb 8E010000 		.4byte	.LVL83
+ 2092 04ef D2010000 		.4byte	.LFE86
+ 2093 04f3 0100     		.2byte	0x1
+ 2094 04f5 56       		.byte	0x56
+ 2095 04f6 00000000 		.4byte	0
+ 2096 04fa 00000000 		.4byte	0
+ 2097              	.LLST25:
+ 2098 04fe 12000000 		.4byte	.LVL48
+ 2099 0502 1A000000 		.4byte	.LVL49
+ 2100 0506 0200     		.2byte	0x2
+ 2101 0508 30       		.byte	0x30
+ 2102 0509 9F       		.byte	0x9f
+ 2103 050a 1A000000 		.4byte	.LVL49
+ 2104 050e D0000000 		.4byte	.LVL64
+ 2105 0512 0100     		.2byte	0x1
+ 2106 0514 5C       		.byte	0x5c
+ 2107 0515 D4000000 		.4byte	.LVL65
+ 2108 0519 DE000000 		.4byte	.LVL66
+ 2109 051d 0200     		.2byte	0x2
+ 2110 051f 30       		.byte	0x30
+ 2111 0520 9F       		.byte	0x9f
+ 2112 0521 DE000000 		.4byte	.LVL66
+ 2113 0525 84010000 		.4byte	.LVL81
+ 2114 0529 0100     		.2byte	0x1
+ 2115 052b 5B       		.byte	0x5b
+ 2116 052c 8E010000 		.4byte	.LVL83
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 51
+
+
+ 2117 0530 D2010000 		.4byte	.LFE86
+ 2118 0534 0900     		.2byte	0x9
+ 2119 0536 91       		.byte	0x91
+ 2120 0537 4C       		.sleb128 -52
+ 2121 0538 94       		.byte	0x94
+ 2122 0539 02       		.byte	0x2
+ 2123 053a 0A       		.byte	0xa
+ 2124 053b FFFF     		.2byte	0xffff
+ 2125 053d 1A       		.byte	0x1a
+ 2126 053e 9F       		.byte	0x9f
+ 2127 053f 00000000 		.4byte	0
+ 2128 0543 00000000 		.4byte	0
+ 2129              	.LLST26:
+ 2130 0547 4E000000 		.4byte	.LVL55
+ 2131 054b B0000000 		.4byte	.LVL58
+ 2132 054f 0100     		.2byte	0x1
+ 2133 0551 54       		.byte	0x54
+ 2134 0552 08010000 		.4byte	.LVL73
+ 2135 0556 64010000 		.4byte	.LVL76
+ 2136 055a 0100     		.2byte	0x1
+ 2137 055c 54       		.byte	0x54
+ 2138 055d A2010000 		.4byte	.LVL86
+ 2139 0561 C8010000 		.4byte	.LVL88
+ 2140 0565 0100     		.2byte	0x1
+ 2141 0567 55       		.byte	0x55
+ 2142 0568 00000000 		.4byte	0
+ 2143 056c 00000000 		.4byte	0
+ 2144              	.LLST27:
+ 2145 0570 72000000 		.4byte	.LVL56
+ 2146 0574 A0000000 		.4byte	.LVL57
+ 2147 0578 0100     		.2byte	0x1
+ 2148 057a 52       		.byte	0x52
+ 2149 057b 24010000 		.4byte	.LVL74
+ 2150 057f 54010000 		.4byte	.LVL75
+ 2151 0583 0100     		.2byte	0x1
+ 2152 0585 52       		.byte	0x52
+ 2153 0586 B8010000 		.4byte	.LVL87
+ 2154 058a C8010000 		.4byte	.LVL88
+ 2155 058e 0100     		.2byte	0x1
+ 2156 0590 5E       		.byte	0x5e
+ 2157 0591 00000000 		.4byte	0
+ 2158 0595 00000000 		.4byte	0
+ 2159              	.LLST28:
+ 2160 0599 22000000 		.4byte	.LVL50
+ 2161 059d B8000000 		.4byte	.LVL59
+ 2162 05a1 0200     		.2byte	0x2
+ 2163 05a3 7D       		.byte	0x7d
+ 2164 05a4 00       		.sleb128 0
+ 2165 05a5 E6000000 		.4byte	.LVL68
+ 2166 05a9 6E010000 		.4byte	.LVL77
+ 2167 05ad 0200     		.2byte	0x2
+ 2168 05af 7D       		.byte	0x7d
+ 2169 05b0 00       		.sleb128 0
+ 2170 05b1 8E010000 		.4byte	.LVL83
+ 2171 05b5 92010000 		.4byte	.LVL84
+ 2172 05b9 0300     		.2byte	0x3
+ 2173 05bb 91       		.byte	0x91
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 52
+
+
+ 2174 05bc 50       		.sleb128 -48
+ 2175 05bd 06       		.byte	0x6
+ 2176 05be 00000000 		.4byte	0
+ 2177 05c2 00000000 		.4byte	0
+ 2178              	.LLST29:
+ 2179 05c6 2A000000 		.4byte	.LVL51
+ 2180 05ca B8000000 		.4byte	.LVL59
+ 2181 05ce 0200     		.2byte	0x2
+ 2182 05d0 91       		.byte	0x91
+ 2183 05d1 44       		.sleb128 -60
+ 2184 05d2 EE000000 		.4byte	.LVL69
+ 2185 05d6 6E010000 		.4byte	.LVL77
+ 2186 05da 0200     		.2byte	0x2
+ 2187 05dc 91       		.byte	0x91
+ 2188 05dd 44       		.sleb128 -60
+ 2189 05de 8E010000 		.4byte	.LVL83
+ 2190 05e2 92010000 		.4byte	.LVL84
+ 2191 05e6 0500     		.2byte	0x5
+ 2192 05e8 91       		.byte	0x91
+ 2193 05e9 50       		.sleb128 -48
+ 2194 05ea 06       		.byte	0x6
+ 2195 05eb 23       		.byte	0x23
+ 2196 05ec 02       		.uleb128 0x2
+ 2197 05ed 00000000 		.4byte	0
+ 2198 05f1 00000000 		.4byte	0
+ 2199              	.LLST30:
+ 2200 05f5 00000000 		.4byte	.LVL89
+ 2201 05f9 0E000000 		.4byte	.LVL90
+ 2202 05fd 0100     		.2byte	0x1
+ 2203 05ff 50       		.byte	0x50
+ 2204 0600 0E000000 		.4byte	.LVL90
+ 2205 0604 1A000000 		.4byte	.LVL93
+ 2206 0608 0100     		.2byte	0x1
+ 2207 060a 54       		.byte	0x54
+ 2208 060b 1A000000 		.4byte	.LVL93
+ 2209 060f 1C000000 		.4byte	.LVL94
+ 2210 0613 0100     		.2byte	0x1
+ 2211 0615 50       		.byte	0x50
+ 2212 0616 1C000000 		.4byte	.LVL94
+ 2213 061a 34000000 		.4byte	.LFE84
+ 2214 061e 0100     		.2byte	0x1
+ 2215 0620 54       		.byte	0x54
+ 2216 0621 00000000 		.4byte	0
+ 2217 0625 00000000 		.4byte	0
+ 2218              	.LLST31:
+ 2219 0629 00000000 		.4byte	.LVL89
+ 2220 062d 10000000 		.4byte	.LVL91
+ 2221 0631 0100     		.2byte	0x1
+ 2222 0633 51       		.byte	0x51
+ 2223 0634 10000000 		.4byte	.LVL91
+ 2224 0638 17000000 		.4byte	.LVL92-1
+ 2225 063c 0100     		.2byte	0x1
+ 2226 063e 50       		.byte	0x50
+ 2227 063f 17000000 		.4byte	.LVL92-1
+ 2228 0643 1A000000 		.4byte	.LVL93
+ 2229 0647 0100     		.2byte	0x1
+ 2230 0649 55       		.byte	0x55
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 53
+
+
+ 2231 064a 1A000000 		.4byte	.LVL93
+ 2232 064e 1E000000 		.4byte	.LVL95
+ 2233 0652 0100     		.2byte	0x1
+ 2234 0654 51       		.byte	0x51
+ 2235 0655 1E000000 		.4byte	.LVL95
+ 2236 0659 34000000 		.4byte	.LFE84
+ 2237 065d 0100     		.2byte	0x1
+ 2238 065f 55       		.byte	0x55
+ 2239 0660 00000000 		.4byte	0
+ 2240 0664 00000000 		.4byte	0
+ 2241              		.section	.debug_aranges,"",%progbits
+ 2242 0000 2C000000 		.4byte	0x2c
+ 2243 0004 0200     		.2byte	0x2
+ 2244 0006 00000000 		.4byte	.Ldebug_info0
+ 2245 000a 04       		.byte	0x4
+ 2246 000b 00       		.byte	0
+ 2247 000c 0000     		.2byte	0
+ 2248 000e 0000     		.2byte	0
+ 2249 0010 00000000 		.4byte	.LFB85
+ 2250 0014 DE010000 		.4byte	.LFE85-.LFB85
+ 2251 0018 00000000 		.4byte	.LFB86
+ 2252 001c D2010000 		.4byte	.LFE86-.LFB86
+ 2253 0020 00000000 		.4byte	.LFB84
+ 2254 0024 34000000 		.4byte	.LFE84-.LFB84
+ 2255 0028 00000000 		.4byte	0
+ 2256 002c 00000000 		.4byte	0
+ 2257              		.section	.debug_ranges,"",%progbits
+ 2258              	.Ldebug_ranges0:
+ 2259 0000 00000000 		.4byte	.LFB85
+ 2260 0004 DE010000 		.4byte	.LFE85
+ 2261 0008 00000000 		.4byte	.LFB86
+ 2262 000c D2010000 		.4byte	.LFE86
+ 2263 0010 00000000 		.4byte	.LFB84
+ 2264 0014 34000000 		.4byte	.LFE84
+ 2265 0018 00000000 		.4byte	0
+ 2266 001c 00000000 		.4byte	0
+ 2267              		.section	.debug_line,"",%progbits
+ 2268              	.Ldebug_line0:
+ 2269 0000 39040000 		.section	.debug_str,"MS",%progbits,1
+ 2269      0200AF01 
+ 2269      00000201 
+ 2269      FB0E0D00 
+ 2269      01010101 
+ 2270              	.LASF41:
+ 2271 0000 5F5F636F 		.ascii	"__copy_table_t\000"
+ 2271      70795F74 
+ 2271      61626C65 
+ 2271      5F7400
+ 2272              	.LASF44:
+ 2273 000f 5F5F7A65 		.ascii	"__zero_table_t\000"
+ 2273      726F5F74 
+ 2273      61626C65 
+ 2273      5F7400
+ 2274              	.LASF2:
+ 2275 001e 5F5F7569 		.ascii	"__uint8_t\000"
+ 2275      6E74385F 
+ 2275      7400
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 54
+
+
+ 2276              	.LASF36:
+ 2277 0028 636F7356 		.ascii	"cosVal\000"
+ 2277      616C00
+ 2278              	.LASF12:
+ 2279 002f 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2279      206C6F6E 
+ 2279      6720756E 
+ 2279      7369676E 
+ 2279      65642069 
+ 2280              	.LASF43:
+ 2281 0046 5F5F636F 		.ascii	"__copy_table_end__\000"
+ 2281      70795F74 
+ 2281      61626C65 
+ 2281      5F656E64 
+ 2281      5F5F00
+ 2282              	.LASF52:
+ 2283 0059 61726D5F 		.ascii	"arm_bitreversal_q15\000"
+ 2283      62697472 
+ 2283      65766572 
+ 2283      73616C5F 
+ 2283      71313500 
+ 2284              	.LASF15:
+ 2285 006d 696E7431 		.ascii	"int16_t\000"
+ 2285      365F7400 
+ 2286              	.LASF11:
+ 2287 0075 6C6F6E67 		.ascii	"long long int\000"
+ 2287      206C6F6E 
+ 2287      6720696E 
+ 2287      7400
+ 2288              	.LASF0:
+ 2289 0083 7369676E 		.ascii	"signed char\000"
+ 2289      65642063 
+ 2289      68617200 
+ 2290              	.LASF33:
+ 2291 008f 61726D5F 		.ascii	"arm_cfft_radix2_instance_q15\000"
+ 2291      63666674 
+ 2291      5F726164 
+ 2291      6978325F 
+ 2291      696E7374 
+ 2292              	.LASF40:
+ 2293 00ac 61726D5F 		.ascii	"arm_cfft_radix2_q15\000"
+ 2293      63666674 
+ 2293      5F726164 
+ 2293      6978325F 
+ 2293      71313500 
+ 2294              	.LASF50:
+ 2295 00c0 2E5C4453 		.ascii	".\\DSP\\Source\\TransformFunctions\\arm_cfft_radix2"
+ 2295      505C536F 
+ 2295      75726365 
+ 2295      5C547261 
+ 2295      6E73666F 
+ 2296 00ef 5F713135 		.ascii	"_q15.c\000"
+ 2296      2E6300
+ 2297              	.LASF8:
+ 2298 00f6 6C6F6E67 		.ascii	"long int\000"
+ 2298      20696E74 
+ 2298      00
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 55
+
+
+ 2299              	.LASF24:
+ 2300 00ff 7131355F 		.ascii	"q15_t\000"
+ 2300      7400
+ 2301              	.LASF30:
+ 2302 0105 70426974 		.ascii	"pBitRevTable\000"
+ 2302      52657654 
+ 2302      61626C65 
+ 2302      00
+ 2303              	.LASF16:
+ 2304 0112 75696E74 		.ascii	"uint16_t\000"
+ 2304      31365F74 
+ 2304      00
+ 2305              	.LASF21:
+ 2306 011b 646F7562 		.ascii	"double\000"
+ 2306      6C6500
+ 2307              	.LASF9:
+ 2308 0122 5F5F7569 		.ascii	"__uint32_t\000"
+ 2308      6E743332 
+ 2308      5F7400
+ 2309              	.LASF3:
+ 2310 012d 5F5F696E 		.ascii	"__int16_t\000"
+ 2310      7431365F 
+ 2310      7400
+ 2311              	.LASF26:
+ 2312 0137 6666744C 		.ascii	"fftLen\000"
+ 2312      656E00
+ 2313              	.LASF37:
+ 2314 013e 73696E56 		.ascii	"sinVal\000"
+ 2314      616C00
+ 2315              	.LASF13:
+ 2316 0145 756E7369 		.ascii	"unsigned int\000"
+ 2316      676E6564 
+ 2316      20696E74 
+ 2316      00
+ 2317              	.LASF34:
+ 2318 0152 70537263 		.ascii	"pSrc\000"
+ 2318      00
+ 2319              	.LASF10:
+ 2320 0157 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2320      20756E73 
+ 2320      69676E65 
+ 2320      6420696E 
+ 2320      7400
+ 2321              	.LASF6:
+ 2322 0169 73686F72 		.ascii	"short unsigned int\000"
+ 2322      7420756E 
+ 2322      7369676E 
+ 2322      65642069 
+ 2322      6E7400
+ 2323              	.LASF32:
+ 2324 017c 62697452 		.ascii	"bitRevFactor\000"
+ 2324      65764661 
+ 2324      63746F72 
+ 2324      00
+ 2325              	.LASF19:
+ 2326 0189 73697A65 		.ascii	"sizetype\000"
+ 2326      74797065 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 56
+
+
+ 2326      00
+ 2327              	.LASF23:
+ 2328 0192 6C6F6E67 		.ascii	"long double\000"
+ 2328      20646F75 
+ 2328      626C6500 
+ 2329              	.LASF28:
+ 2330 019e 62697452 		.ascii	"bitReverseFlag\000"
+ 2330      65766572 
+ 2330      7365466C 
+ 2330      616700
+ 2331              	.LASF47:
+ 2332 01ad 64657374 		.ascii	"dest\000"
+ 2332      00
+ 2333              	.LASF22:
+ 2334 01b2 666C6F61 		.ascii	"float\000"
+ 2334      7400
+ 2335              	.LASF45:
+ 2336 01b8 5F5F7A65 		.ascii	"__zero_table_start__\000"
+ 2336      726F5F74 
+ 2336      61626C65 
+ 2336      5F737461 
+ 2336      72745F5F 
+ 2337              	.LASF17:
+ 2338 01cd 696E7433 		.ascii	"int32_t\000"
+ 2338      325F7400 
+ 2339              	.LASF1:
+ 2340 01d5 756E7369 		.ascii	"unsigned char\000"
+ 2340      676E6564 
+ 2340      20636861 
+ 2340      7200
+ 2341              	.LASF38:
+ 2342 01e3 61726D5F 		.ascii	"arm_radix2_butterfly_q15\000"
+ 2342      72616469 
+ 2342      78325F62 
+ 2342      75747465 
+ 2342      72666C79 
+ 2343              	.LASF48:
+ 2344 01fc 776C656E 		.ascii	"wlen\000"
+ 2344      00
+ 2345              	.LASF4:
+ 2346 0201 73686F72 		.ascii	"short int\000"
+ 2346      7420696E 
+ 2346      7400
+ 2347              	.LASF25:
+ 2348 020b 7133315F 		.ascii	"q31_t\000"
+ 2348      7400
+ 2349              	.LASF18:
+ 2350 0211 75696E74 		.ascii	"uint32_t\000"
+ 2350      33325F74 
+ 2350      00
+ 2351              	.LASF51:
+ 2352 021a 5C5C766D 		.ascii	"\\\\vmware-host\\Shared Folders\\Documents\\PSoC Cr"
+ 2352      77617265 
+ 2352      2D686F73 
+ 2352      745C5368 
+ 2352      61726564 
+ 2353 0248 6561746F 		.ascii	"eator\\FinalProject\\SoundDetection.cydsn\000"
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 57
+
+
+ 2353      725C4669 
+ 2353      6E616C50 
+ 2353      726F6A65 
+ 2353      63745C53 
+ 2354              	.LASF20:
+ 2355 0270 63686172 		.ascii	"char\000"
+ 2355      00
+ 2356              	.LASF42:
+ 2357 0275 5F5F636F 		.ascii	"__copy_table_start__\000"
+ 2357      70795F74 
+ 2357      61626C65 
+ 2357      5F737461 
+ 2357      72745F5F 
+ 2358              	.LASF5:
+ 2359 028a 5F5F7569 		.ascii	"__uint16_t\000"
+ 2359      6E743136 
+ 2359      5F7400
+ 2360              	.LASF7:
+ 2361 0295 5F5F696E 		.ascii	"__int32_t\000"
+ 2361      7433325F 
+ 2361      7400
+ 2362              	.LASF39:
+ 2363 029f 61726D5F 		.ascii	"arm_radix2_butterfly_inverse_q15\000"
+ 2363      72616469 
+ 2363      78325F62 
+ 2363      75747465 
+ 2363      72666C79 
+ 2364              	.LASF46:
+ 2365 02c0 5F5F7A65 		.ascii	"__zero_table_end__\000"
+ 2365      726F5F74 
+ 2365      61626C65 
+ 2365      5F656E64 
+ 2365      5F5F00
+ 2366              	.LASF29:
+ 2367 02d3 70547769 		.ascii	"pTwiddle\000"
+ 2367      64646C65 
+ 2367      00
+ 2368              	.LASF35:
+ 2369 02dc 70436F65 		.ascii	"pCoef\000"
+ 2369      6600
+ 2370              	.LASF14:
+ 2371 02e2 75696E74 		.ascii	"uint8_t\000"
+ 2371      385F7400 
+ 2372              	.LASF31:
+ 2373 02ea 74776964 		.ascii	"twidCoefModifier\000"
+ 2373      436F6566 
+ 2373      4D6F6469 
+ 2373      66696572 
+ 2373      00
+ 2374              	.LASF49:
+ 2375 02fb 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 2375      4320342E 
+ 2375      392E3320 
+ 2375      32303135 
+ 2375      30333033 
+ 2376 032e 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 2376      20726576 
+ARM GAS  C:\Users\IVYLIU~1\AppData\Local\Temp\cccUJdeT.s 			page 58
+
+
+ 2376      6973696F 
+ 2376      6E203232 
+ 2376      31323230 
+ 2377 0361 67202D73 		.ascii	"g -std=gnu99 -ffunction-sections -ffat-lto-objects\000"
+ 2377      74643D67 
+ 2377      6E753939 
+ 2377      202D6666 
+ 2377      756E6374 
+ 2378              	.LASF27:
+ 2379 0394 69666674 		.ascii	"ifftFlag\000"
+ 2379      466C6167 
+ 2379      00
+ 2380              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br
