@@ -87,6 +87,7 @@ void drawPlaySong(int song_index);
 // offset: frequency_bin - middle_c_frequencybin
 // key_num: key number of note
 // led_unms: led indexes associated with note
+// draw_offset: offset from top of screen to draw note
 //Reference: https://stackoverflow.com/questions/47880223/how-to-programmatically-map-integers-to-const-strings
 struct Notes
 {
@@ -94,49 +95,50 @@ struct Notes
     int offset;             //fft offset from midde C/C4
     int key_num;            //key number on piano, TODO: use less memory by changing from strings to key numbers
     int led_nums[2];
+    int draw_offset;
 };
 
 struct Notes notes[] = {
-    { .offset = -179,  .name = "G5", .key_num = 59, .led_nums = {99, 100}},
-    { .offset = -66,  .name = "F#5", .key_num = 58, .led_nums = {97, 98}},
-    { .offset = -60,  .name = "F5", .key_num = 57, .led_nums = {95, 96}},
-    { .offset = -54,  .name = "E5", .key_num = 56, .led_nums = {93, 94}},
-    { .offset = -49,  .name = "D#5", .key_num = 55, .led_nums = {91, 92}},
-    { .offset = -44,  .name = "D5", .key_num = 54, .led_nums = {89, 90}},
-    { .offset = -40,  .name = "C#5", .key_num = 53, .led_nums = {87, 88}},
-    { .offset = -36,  .name = "C5", .key_num = 52, .led_nums = {85, 86}},
-    { .offset = -32,  .name = "B4", .key_num = 51, .led_nums = {83, 84}},
-    { .offset = -28,  .name = "A#4", .key_num = 50, .led_nums = {82, 0}},
-    { .offset = -24,  .name = "A4", .key_num = 49, .led_nums = {80, 0}},
-    { .offset = -21,  .name = "G#4", .key_num = 48, .led_nums = {78, 0}},
-    { .offset = -18,  .name = "G4", .key_num = 47, .led_nums = {76, 77}},
-    { .offset = -15,  .name = "F#4", .key_num = 46, .led_nums = {74, 0}},
-    { .offset = -12,  .name = "F4", .key_num = 45, .led_nums = {72, 73}},
-    { .offset = -9,  .name = "E4", .key_num = 44, .led_nums = {70 ,71}},
-    { .offset = -7,  .name = "D#4", .key_num = 43, .led_nums = {68, 69}},
-    { .offset = -4,  .name = "D4", .key_num = 42, .led_nums = {66, 67}},
-    { .offset = -2,  .name = "C#4", .key_num = 41, .led_nums = {64, 65}},
-    { .offset = 0,  .name = "C4", .key_num = 40, .led_nums = {62, 63}},   // Middle C, 988 Hz
-    { .offset = 2,  .name = "B3", .key_num = 39, .led_nums = {60, 61}},
-    { .offset = 4,  .name = "A#3", .key_num = 38, .led_nums = {58, 59}},
-    { .offset = 7,  .name = "A3", .key_num = 37, .led_nums = {56, 57}},
-    { .offset = 9,  .name = "G#3", .key_num = 36, .led_nums = {55, 0}},
-    { .offset = 12,  .name = "G3", .key_num = 35, .led_nums = {53, 0}},
-    { .offset = 15,  .name = "F#3", .key_num = 34, .led_nums = {51, 0}},
-    { .offset = 18,  .name = "F3", .key_num = 33, .led_nums = {49, 50}},
-    { .offset = 21,  .name = "E3", .key_num = 32, .led_nums = {47, 48}},
-    { .offset = 24,  .name = "D#3", .key_num = 31, .led_nums = {45, 46}},
-    { .offset = 28,  .name = "D3", .key_num = 30, .led_nums = {43, 44}},
-    { .offset = 32,  .name = "C#3", .key_num = 29, .led_nums = {41, 0}},
-    { .offset = 36,  .name = "C3", .key_num = 28, .led_nums = {39, 40}},
-    { .offset = 40,  .name = "B2", .key_num = 27, .led_nums = {37, 38}},
-    { .offset = 44,  .name = "A#2", .key_num = 26, .led_nums = {35, 0}},
-    { .offset = 49,  .name = "A2", .key_num = 25, .led_nums = {33, 34}},
-    { .offset = 54,  .name = "G#2", .key_num = 24, .led_nums = {31, 32}},
-    { .offset = 60,  .name = "G2", .key_num = 23, .led_nums = {29, 30}},
-    { .offset = 66,  .name = "F#2", .key_num = 22, .led_nums = {27, 28}},
-    { .offset = -179,  .name = "F2", .key_num = 21, .led_nums = {25, 26}},
-    { .offset = -201,  .name = "E2", .key_num = 20, .led_nums = {23, 24}},
+    { .offset = -179,  .name = "G5", .key_num = 59, .led_nums = {99, 100}, .draw_offset = TOP_MARGIN - NOTE_SPACING},
+    { .offset = -66,  .name = "F#5", .key_num = 58, .led_nums = {97, 98}, .draw_offset = TOP_MARGIN},
+    { .offset = -60,  .name = "F5", .key_num = 57, .led_nums = {95, 96}, .draw_offset = TOP_MARGIN},
+    { .offset = -54,  .name = "E5", .key_num = 56, .led_nums = {93, 94}, .draw_offset = TOP_MARGIN + NOTE_SPACING},
+    { .offset = -49,  .name = "D#5", .key_num = 55, .led_nums = {91, 92}, .draw_offset = TOP_MARGIN + 2*NOTE_SPACING},
+    { .offset = -44,  .name = "D5", .key_num = 54, .led_nums = {89, 90}, .draw_offset = TOP_MARGIN + 2*NOTE_SPACING},
+    { .offset = -40,  .name = "C#5", .key_num = 53, .led_nums = {87, 88}, .draw_offset = TOP_MARGIN + 3*NOTE_SPACING},
+    { .offset = -36,  .name = "C5", .key_num = 52, .led_nums = {85, 86}, .draw_offset = TOP_MARGIN + 3*NOTE_SPACING},
+    { .offset = -32,  .name = "B4", .key_num = 51, .led_nums = {83, 84}, .draw_offset = TOP_MARGIN + 4*NOTE_SPACING},
+    { .offset = -28,  .name = "A#4", .key_num = 50, .led_nums = {82, 0}, .draw_offset = TOP_MARGIN + 5*NOTE_SPACING},
+    { .offset = -24,  .name = "A4", .key_num = 49, .led_nums = {80, 0}, .draw_offset = TOP_MARGIN + 5*NOTE_SPACING},
+    { .offset = -21,  .name = "G#4", .key_num = 48, .led_nums = {78, 0}, .draw_offset = TOP_MARGIN + 6*NOTE_SPACING},
+    { .offset = -18,  .name = "G4", .key_num = 47, .led_nums = {76, 77}, .draw_offset = TOP_MARGIN + 6*NOTE_SPACING},
+    { .offset = -15,  .name = "F#4", .key_num = 46, .led_nums = {74, 0}, .draw_offset = TOP_MARGIN + 7*NOTE_SPACING},
+    { .offset = -12,  .name = "F4", .key_num = 45, .led_nums = {72, 73}, .draw_offset = TOP_MARGIN + 7*NOTE_SPACING},
+    { .offset = -9,  .name = "E4", .key_num = 44, .led_nums = {70 ,71}, .draw_offset = TOP_MARGIN + 8*NOTE_SPACING},
+    { .offset = -7,  .name = "D#4", .key_num = 43, .led_nums = {68, 69}, .draw_offset = TOP_MARGIN + 9*NOTE_SPACING},
+    { .offset = -4,  .name = "D4", .key_num = 42, .led_nums = {66, 67}, .draw_offset = TOP_MARGIN + 9*NOTE_SPACING},
+    { .offset = -2,  .name = "C#4", .key_num = 41, .led_nums = {64, 65}, .draw_offset = TOP_MARGIN + 10*NOTE_SPACING},
+    { .offset = 0,  .name = "C4", .key_num = 40, .led_nums = {62, 63}, .draw_offset = TOP_MARGIN + 10*NOTE_SPACING},   // Middle C, 988 Hz
+    { .offset = 2,  .name = "B3", .key_num = 39, .led_nums = {60, 61}, .draw_offset = LOWER_OFFSET - NOTE_SPACING},
+    { .offset = 4,  .name = "A#3", .key_num = 38, .led_nums = {58, 59}, .draw_offset = LOWER_OFFSET},
+    { .offset = 7,  .name = "A3", .key_num = 37, .led_nums = {56, 57}, .draw_offset = LOWER_OFFSET},
+    { .offset = 9,  .name = "G#3", .key_num = 36, .led_nums = {55, 0}, .draw_offset = LOWER_OFFSET + NOTE_SPACING},
+    { .offset = 12,  .name = "G3", .key_num = 35, .led_nums = {53, 0}, .draw_offset = LOWER_OFFSET + NOTE_SPACING},
+    { .offset = 15,  .name = "F#3", .key_num = 34, .led_nums = {51, 0}, .draw_offset = LOWER_OFFSET + 2*NOTE_SPACING},
+    { .offset = 18,  .name = "F3", .key_num = 33, .led_nums = {49, 50}, .draw_offset = LOWER_OFFSET + 2*NOTE_SPACING},
+    { .offset = 21,  .name = "E3", .key_num = 32, .led_nums = {47, 48}, .draw_offset = LOWER_OFFSET + 3*NOTE_SPACING},
+    { .offset = 24,  .name = "D#3", .key_num = 31, .led_nums = {45, 46}, .draw_offset = LOWER_OFFSET + 4*NOTE_SPACING},
+    { .offset = 28,  .name = "D3", .key_num = 30, .led_nums = {43, 44}, .draw_offset = LOWER_OFFSET + 4*NOTE_SPACING},
+    { .offset = 32,  .name = "C#3", .key_num = 29, .led_nums = {41, 0}, .draw_offset = LOWER_OFFSET + 5*NOTE_SPACING},
+    { .offset = 36,  .name = "C3", .key_num = 28, .led_nums = {39, 40}, .draw_offset = LOWER_OFFSET + 5*NOTE_SPACING},
+    { .offset = 40,  .name = "B2", .key_num = 27, .led_nums = {37, 38}, .draw_offset = LOWER_OFFSET + 6*NOTE_SPACING},
+    { .offset = 44,  .name = "A#2", .key_num = 26, .led_nums = {35, 0}, .draw_offset = LOWER_OFFSET + 7*NOTE_SPACING},
+    { .offset = 49,  .name = "A2", .key_num = 25, .led_nums = {33, 34}, .draw_offset = LOWER_OFFSET + 7*NOTE_SPACING},
+    { .offset = 54,  .name = "G#2", .key_num = 24, .led_nums = {31, 32}, .draw_offset = LOWER_OFFSET + 8*NOTE_SPACING},
+    { .offset = 60,  .name = "G2", .key_num = 23, .led_nums = {29, 30}, .draw_offset = LOWER_OFFSET + 8*NOTE_SPACING},
+    { .offset = 66,  .name = "F#2", .key_num = 22, .led_nums = {27, 28}, .draw_offset = LOWER_OFFSET + 9*NOTE_SPACING},
+    { .offset = -179,  .name = "F2", .key_num = 21, .led_nums = {25, 26}, .draw_offset = LOWER_OFFSET + 9*NOTE_SPACING},
+    { .offset = -201,  .name = "E2", .key_num = 20, .led_nums = {23, 24}, .draw_offset = LOWER_OFFSET + 10*NOTE_SPACING},
     { .name = NULL }
 };
 
@@ -144,7 +146,7 @@ struct Notes notes[] = {
 // name: English name of song
 // note_seq: array of names of notes in song
 // song_length: number of note names in song
-struct Songs
+struct Song
 {
     const int song_number;
     const char *name;
@@ -172,7 +174,7 @@ const char *SONG1_SEQ[] =
     };
 
 const int SONGS_LENGTH = 2;
-struct Songs songs[] = {
+struct Song songs[] = {
     { .song_number = 0, .name = "Fur Elise", .note_seq = SONG0_SEQ, .song_length = 85},
     { .song_number = 1, .name = "Twinkle, Twinkle,\nLittle Star", .note_seq = SONG1_SEQ, .song_length = 42}
 };
@@ -187,7 +189,7 @@ int main()
     GUI_Init();                             // initilize graphics library
     NP_Start(LED_NUM, pPixelArray, 12.8);   //Start the NeoPixel component (LED_NUM pix, User array, 12.8 MHz base clock)
 
-    int state = START;
+    int state = START;  // TODO: switch back to Mode_select
 
     // Main loop, state machine
     for(;;) {
@@ -195,7 +197,7 @@ int main()
             case START: // draw start screen
                 clearLEDs();
                 drawStartScreen();
-                state = MODE_SELECT;    // TODO: switch back to Mode_select
+                state = MODE_SELECT;    
                 break;
             case MODE_SELECT: // wait for user to select mode
                 if (!SW2_Read()) {
@@ -309,7 +311,6 @@ void setNote(char* input_name, int r, int g, int b) {
         }
         ++cur_note;
     }
-
 }
 
 // Function: Given index of an LED, sets the associated LEDs to the given color
@@ -365,6 +366,8 @@ int detectNote() {
             }
         }
     }
+
+    return -1;
 }
 
 // Function: Given offset of frequency bin from middle C, determines note name
@@ -399,7 +402,7 @@ void drawPlaySong(int song_index) {
     
     int note_index = 0;
     char score_buf[3];
-    struct Songs cur_song = songs[song_index];
+    struct Song cur_song = songs[song_index];
     
     // Display first note
     drawNote(cur_song.note_seq[note_index]);
@@ -554,174 +557,26 @@ void drawNote(char* input_name){
     
     int text_x = SCREEN_WIDTH/2;
     int text_y = 240;
+
+    // Draw note based on input name
+    struct Notes *cur_note = notes;
+    while (cur_note->name) {
+        if (strcmp(cur_note->name, input_name) == 0) {
+            GUI_FillEllipse(SCREEN_WIDTH/2, cur_note->draw_offset, NOTE_WIDTH, NOTE_HEIGHT);
+            GUI_DispStringHCenterAt(input_name, text_x, text_y);
+
+            // if #, draw sharp symbol
+            if (cur_note->name[1] == '#') {
+                GUI_SetFont(&GUI_Font24B_ASCII);
+                GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, cur_note->draw_offset);
+            }
+            break;
+        }
+        ++cur_note;
+    }
     
-    if (strcmp(input_name, "G5") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN - NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("G5", text_x, text_y);
-    } else if (strcmp(input_name, "F#5") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("F#5", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, TOP_MARGIN);
-    } else if (strcmp(input_name, "F5") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("F5", text_x, text_y);
-    } else if (strcmp(input_name, "E5") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("E5", text_x, text_y);
-    } else if (strcmp(input_name, "D#5") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 2*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("D#5", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, TOP_MARGIN + 2*NOTE_SPACING);
-    } else if (strcmp(input_name, "D5") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 2*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("D5", text_x, text_y);
-    } else if (strcmp(input_name, "C#5") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 3*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("C#5", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, TOP_MARGIN + 3*NOTE_SPACING);
-    } else if (strcmp(input_name, "C5") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 3*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("C5", text_x, text_y);
-    } else if (strcmp(input_name, "B4") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 4*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("B4", text_x, text_y);
-    } else if (strcmp(input_name, "A#4") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 5*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("A#4", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, TOP_MARGIN + 5*NOTE_SPACING);
-    } else if (strcmp(input_name, "A4") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 5*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("A4", text_x, text_y);
-    } else if (strcmp(input_name, "G#4") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 6*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("G#4", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, TOP_MARGIN + 6*NOTE_SPACING);
-    } else if (strcmp(input_name, "G4") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 6*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("G4", text_x, text_y);
-    } else if (strcmp(input_name, "F#4") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 7*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("F#4", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, TOP_MARGIN + 7*NOTE_SPACING);
-    } else if (strcmp(input_name, "F4") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 7*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("F4", text_x, text_y);
-    } else if (strcmp(input_name, "E4") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 8*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("E4", text_x, text_y);
-    } else if (strcmp(input_name, "D#4") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 9*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("D#4", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, TOP_MARGIN + 9*NOTE_SPACING);
-    } else if (strcmp(input_name, "D4") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 9*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("D4", text_x, text_y);
-    } else if (strcmp(input_name, "C#4") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 10*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("C#4", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, TOP_MARGIN + 10*NOTE_SPACING);
-    } else if (strcmp(input_name, "C4") == 0) { //Middle C
-        GUI_FillEllipse(SCREEN_WIDTH/2, TOP_MARGIN + 10*NOTE_HEIGHT, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("C4", text_x, text_y);
-    } else if (strcmp(input_name, "B3") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET - NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("B3", text_x, text_y);
-    } else if (strcmp(input_name, "A#3") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("A#3", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, LOWER_OFFSET);
-    } else if (strcmp(input_name, "A3") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("A3", text_x, text_y);
-    } else if (strcmp(input_name, "G#3") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("G#3", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, LOWER_OFFSET + NOTE_SPACING);
-    } else if (strcmp(input_name, "G3") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("G3", text_x, text_y);
-    } else if (strcmp(input_name, "F#3") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 2*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("F#3", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, LOWER_OFFSET + 2*NOTE_SPACING);
-    } else if (strcmp(input_name, "F3") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 2*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("F3", text_x, text_y);
-    } else if (strcmp(input_name, "E3") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 3*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("E3", text_x, text_y);
-    } else if (strcmp(input_name, "D#3") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 4*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("D#3", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, LOWER_OFFSET + 4*NOTE_SPACING);
-    } else if (strcmp(input_name, "D3") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 4*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("D3", text_x, text_y);
-    } else if (strcmp(input_name, "C#3") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 5*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("C#3", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, LOWER_OFFSET + 5*NOTE_SPACING);
-    } else if (strcmp(input_name, "C3") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 5*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("C3", text_x, text_y);
-    } else if (strcmp(input_name, "B2") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 6*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("B2", text_x, text_y);
-    } else if (strcmp(input_name, "A#2") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 7*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("A#2", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, LOWER_OFFSET + 7*NOTE_SPACING);
-    } else if (strcmp(input_name, "A2") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 7*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("A2", text_x, text_y);
-    } else if (strcmp(input_name, "G#2") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 8*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("G#2", text_x, text_y);
-    } else if (strcmp(input_name, "G2") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 8*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("G2", text_x, text_y);
-    } else if (strcmp(input_name, "F#2") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 9*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("F#2", text_x, text_y);
-
-        GUI_SetFont(&GUI_Font24B_ASCII);
-        GUI_DispStringAt("#", SCREEN_WIDTH/2 + 2*NOTE_WIDTH, LOWER_OFFSET + 9*NOTE_SPACING);
-    } else if (strcmp(input_name, "F2") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 9*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("F2", text_x, text_y);
-    } else if (strcmp(input_name, "E2") == 0) {
-        GUI_FillEllipse(SCREEN_WIDTH/2, LOWER_OFFSET + 10*NOTE_SPACING, NOTE_WIDTH, NOTE_HEIGHT);
-        GUI_DispStringAt("E2", text_x, text_y);
-    } else {
-        GUI_DispStringAt("Invalid!", text_x, text_y);
+    if (cur_note->name == NULL) {
+        GUI_DispStringHCenterAt("Unrecognized Note", text_x, text_y);
     }
 }
 
